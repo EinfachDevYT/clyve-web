@@ -1,0 +1,16 @@
+{
+  "name": "Clyve.dev",
+  "image": "mcr.microsoft.com/devcontainers/php:1-8.3-bookworm",
+  "postCreateCommand": "bash bin/dev-setup.sh",
+  "postStartCommand": "bash bin/dev-start.sh",
+  "postAttachCommand": "cat storage/DEV-LOGIN.txt",
+  "forwardPorts": [8080, 8081],
+  "portsAttributes": {
+    "8080": { "label": "Website", "onAutoForward": "openBrowser" },
+    "8081": { "label": "Teambereich", "onAutoForward": "notify" }
+  },
+  "customizations": {
+    "codespaces": { "openFiles": ["storage/DEV-LOGIN.txt"] },
+    "vscode": { "extensions": ["bmewburn.vscode-intelephense-client"] }
+  }
+}

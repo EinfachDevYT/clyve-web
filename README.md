@@ -29,6 +29,17 @@ deploy/           nginx.conf
 
 Nur `public/` bzw. `staff/` sind vom Webserver erreichbar. Code, Konfiguration und Daten liegen darüber.
 
+## Im Browser testen (GitHub Codespaces)
+
+Auf GitHub im Repo: **Code → Codespaces → Create codespace on main**.
+Nach etwa einer Minute ist alles eingerichtet: PHP, `config/config.php`, ein Admin-Zugang und beide Server.
+Zugangsdaten und Adressen stehen in `storage/DEV-LOGIN.txt` (öffnet sich automatisch), die Ports findest du im Tab **Ports**:
+
+- 8080 – Website
+- 8081 – Teambereich
+
+Server neu starten: `bash bin/dev-start.sh`
+
 ## Einrichtung
 
 ```bash
