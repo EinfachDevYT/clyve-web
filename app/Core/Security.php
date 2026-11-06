@@ -103,8 +103,17 @@ final class Security
             return true;
         }
         // Local development only: accept the host the page is actually served from (e.g. preview proxies).
-        return config('app_env') === 'local'
-            && strcasecmp((string)parse_url($origin, PHP_URL_HOST), (string)parse_url('//' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST)) === 0;
+        if (config('app_env') !== 'local') {
+            return false;
+        }
+        $originHost = strtolower((string)parse_url($origin, PHP_URL_HOST));
+        foreach ([$_SERVER['HTTP_HOST'] ?? '', $_SERVER['HTTP_X_FORWARDED_HOST'] ?? ''] as $host) {
+            $host = trim(explode(',', (string)$host)[0]);
+            if ($host !== '' && $originHost === strtolower((string)parse_url('//' . $host, PHP_URL_HOST))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static function guardPost(): void
