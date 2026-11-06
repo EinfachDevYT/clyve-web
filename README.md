@@ -57,7 +57,7 @@ php -S 127.0.0.1:8081 -t staff bin/dev-router.php
 
 Dafür in `config.php` `app_env` auf `'local'` und die Origins auf `http://127.0.0.1:8080` bzw. `:8081` setzen.
 
-Produktiv: zwei vHosts laut `deploy/nginx.conf`, HTTPS ist Pflicht (Cookies laufen dann mit `__Host-`-Präfix).
+Produktiv auf einem Server mit Nginx: siehe **[deploy/DEPLOY.md](deploy/DEPLOY.md)**.
 `storage/` muss für den PHP-User beschreibbar sein.
 
 ## Rechnungen & Gewerbe
