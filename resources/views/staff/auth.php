@@ -12,7 +12,6 @@
   <script src="/assets/js/main.js" defer></script>
 </head>
 <body class="is-staff">
-  <canvas id="petals" aria-hidden="true"></canvas>
   <main id="app" data-swap="main">
     <?php if ($flashes): ?>
       <div class="toasts" data-toasts>
