@@ -1,0 +1,6 @@
+/config/config.php
+/storage/*
+!/storage/.gitkeep
+.DS_Store
+.idea/
+.vscode/

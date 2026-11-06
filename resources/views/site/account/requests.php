@@ -1,0 +1,27 @@
+<?php use App\Core\View; use App\Services\Notifier; ob_start() ?>
+<header class="page-head">
+  <div><p class="kicker mono">Kundenbereich</p><h1>Meine Anfragen</h1></div>
+  <a class="pill pill-sm" href="/#anfrage">Neue Anfrage</a>
+</header>
+
+<?php if (!$requests): ?>
+  <div class="panel glass"><p class="empty">Du hast noch keine Anfragen gestellt.</p></div>
+<?php else: ?>
+  <div class="table-wrap glass">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Projekt</th><th>Art</th><th>Datum</th><th>Status</th></tr></thead>
+      <tbody>
+        <?php foreach ($requests as $r): ?>
+          <tr>
+            <td data-label="ID" class="mono"><?= e($r['public_id']) ?></td>
+            <td data-label="Projekt"><?= e($r['title'] ?: '–') ?></td>
+            <td data-label="Art"><?= e(Notifier::TYPES[$r['type']] ?? $r['type']) ?></td>
+            <td data-label="Datum"><?= date_de($r['created_at']) ?></td>
+            <td data-label="Status"><?= View::badge($r['status']) ?></td>
+          </tr>
+        <?php endforeach ?>
+      </tbody>
+    </table>
+  </div>
+<?php endif ?>
+<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

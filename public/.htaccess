@@ -1,0 +1,8 @@
+Options -Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
+
+<FilesMatch "\.(sqlite|jsonl|log|sql|md|example)$">
+    Require all denied
+</FilesMatch>
