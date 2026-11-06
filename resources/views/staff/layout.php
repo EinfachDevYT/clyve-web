@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($pageTitle ? $pageTitle . ' · Team' : 'Team · Clyve.dev') ?></title>
-  <link rel="icon" href="/assets/img/blossom.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/brand/clyve-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/app.css">
   <script src="/assets/js/main.js" defer></script>
@@ -19,7 +19,7 @@
   <?php else: ?>
   <div class="staff">
     <aside class="staff-side" data-swap="nav">
-      <a class="brand" href="/"><img src="/assets/img/blossom.svg" alt="" width="24" height="24"><span>Clyve<b>.dev</b> <small class="mono">team</small></span></a>
+      <a class="brand" href="/" aria-label="Dashboard"><img src="/assets/brand/clyve-mark.svg" alt="" class="brand-mark" width="30" height="30"><img src="/assets/brand/clyve-logo.svg" alt="Clyve.dev" class="brand-logo" width="112" height="26"><small class="mono">team</small></a>
       <nav class="staff-nav">
         <a href="/"<?= View::active('/') ?>>Dashboard</a>
         <a href="/anfragen"<?= View::active('/anfragen') ?>>Anfragen</a>

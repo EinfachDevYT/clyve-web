@@ -30,8 +30,8 @@ $r = $invoice['recipient'] ?? ['name' => $invoice['customer_name'], 'company' =>
 
     <header class="head">
       <div class="brand">
-        <img src="/assets/img/blossom.svg" alt="" width="34" height="34">
-        <div><b><?= e($s['name']) ?></b><small><?= e($s['owner']) ?></small></div>
+        <img src="/assets/brand/clyve-logo-light.svg" alt="<?= e($s['name']) ?>" width="150" height="36">
+        <small><?= e($s['owner']) ?></small>
       </div>
       <div class="sender-line"><?= e($s['owner']) ?> · <?= e($s['street']) ?> · <?= e($s['zip']) ?> <?= e($s['city']) ?></div>
     </header>

@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($pageTitle) ?> · Clyve.dev</title>
-  <link rel="icon" href="/assets/img/blossom.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/brand/clyve-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/app.css">
   <script src="/assets/js/main.js" defer></script>
@@ -20,7 +20,6 @@
       </div>
     <?php endif ?>
     <?= $content ?>
-    <div class="auth-signature"><?php App\Core\View::partial('shared/signature') ?></div>
   </main>
 </body>
 </html>

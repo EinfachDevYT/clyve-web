@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#0D0B14">
   <meta name="author" content="EinfachDev · einfachdev.de">
   <link rel="author" href="/humans.txt">
-  <link rel="icon" href="/assets/img/blossom.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/brand/clyve-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/app.css">
   <script src="/assets/js/main.js" defer></script>
@@ -19,9 +19,8 @@
   <div class="progress" id="progress" aria-hidden="true"></div>
 
   <header class="nav" data-swap="nav">
-    <a class="brand" href="/">
-      <img src="/assets/img/blossom.svg" alt="" width="26" height="26">
-      <span>Clyve<b>.dev</b></span>
+    <a class="brand" href="/" aria-label="Clyve.dev Startseite">
+      <img src="/assets/brand/clyve-logo.svg" alt="Clyve.dev" class="brand-logo" width="162" height="38">
     </a>
     <nav class="nav-links" id="navLinks">
       <a href="/#leistungen">Leistungen</a>
@@ -57,7 +56,7 @@
       <path d="M0 110 C 260 60, 420 120, 620 80 S 980 40, 1200 90" />
     </svg>
     <div class="footer-inner">
-      <a class="brand" href="/"><img src="/assets/img/blossom.svg" alt="" width="22" height="22"><span>Clyve<b>.dev</b></span></a>
+      <a class="brand" href="/" aria-label="Clyve.dev"><img src="/assets/brand/clyve-logo.svg" alt="Clyve.dev" class="brand-logo brand-logo-lg" width="170" height="40"></a>
       <p class="mono muted">Danke fürs Vorbeischauen — crafted in the void</p>
       <nav class="footer-links">
         <a href="https://github.com/EinfachDevYT" target="_blank" rel="noopener">GitHub</a>
