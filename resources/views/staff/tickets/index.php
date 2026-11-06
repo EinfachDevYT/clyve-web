@@ -1,5 +1,5 @@
 <?php use App\Core\View; ?>
-<header class="page-head"><div><p class="kicker mono">Team</p><h1>Tickets</h1></div></header>
+<header class="page-head"><div><p class="kicker mono">Staff</p><h1>Tickets</h1></div></header>
 <?php View::partial('staff/_filters', ['base' => '/tickets', 'current' => $status, 'options' => ['open' => 'Offen', 'answered' => 'Beantwortet', 'closed' => 'Geschlossen']]) ?>
 
 <div class="table-wrap glass">

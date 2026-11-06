@@ -1,5 +1,5 @@
 <header class="page-head">
-  <div><p class="kicker mono">Team</p><h1>Kunden</h1></div>
+  <div><p class="kicker mono">Staff</p><h1>Kunden</h1></div>
   <form class="search" action="/kunden" method="get" role="search">
     <input type="search" name="q" value="<?= e($q) ?>" placeholder="Name, E-Mail, Discord…" aria-label="Suchen">
   </form>

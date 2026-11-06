@@ -1,5 +1,5 @@
 <?php use App\Core\View; use App\Services\Notifier; ?>
-<header class="page-head"><div><p class="kicker mono">Team</p><h1>Anfragen</h1></div></header>
+<header class="page-head"><div><p class="kicker mono">Staff</p><h1>Anfragen</h1></div></header>
 <?php View::partial('staff/_filters', ['base' => '/anfragen', 'current' => $status, 'options' => ['' => 'Alle', 'new' => 'Neu', 'contacted' => 'Kontaktiert', 'accepted' => 'Angenommen', 'declined' => 'Abgelehnt', 'done' => 'Erledigt']]) ?>
 
 <div class="table-wrap glass">

@@ -14,7 +14,7 @@ final class AuthController
         if (Auth::user()) {
             redirect('/');
         }
-        View::render('staff/login', [], 'Team-Login', 'auth');
+        View::render('staff/login', [], 'Staff-Login', 'auth');
     }
 
     public function login(): void

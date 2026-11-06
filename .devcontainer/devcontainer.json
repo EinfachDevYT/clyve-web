@@ -7,7 +7,7 @@
   "forwardPorts": [8080, 8081],
   "portsAttributes": {
     "8080": { "label": "Website", "onAutoForward": "openBrowser" },
-    "8081": { "label": "Teambereich", "onAutoForward": "notify" }
+    "8081": { "label": "Staff-Bereich", "onAutoForward": "notify" }
   },
   "customizations": {
     "codespaces": { "openFiles": ["storage/DEV-LOGIN.txt"] },

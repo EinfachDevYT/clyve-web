@@ -9,7 +9,7 @@ return [
 
     // Erlaubte Origins (Schema + Host, ohne Slash). POSTs von anderen Seiten werden abgelehnt.
     'site_origins'  => ['https://clyve.dev'],
-    'staff_origins' => ['https://team.clyve.dev'],
+    'staff_origins' => ['https://staff.clyve.dev'],
 
     // Zufälliger, langer Schlüssel:  php -r "echo bin2hex(random_bytes(32));"
     'app_secret' => 'CHANGE_ME',

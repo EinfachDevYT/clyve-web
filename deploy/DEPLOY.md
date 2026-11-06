@@ -8,7 +8,7 @@ Die vorhandene Seite in `/var/www/html` und ihre Nginx-Konfiguration werden nich
 | Bestehende Website | `/var/www/html` (bleibt unverändert) |
 | Clyve.dev Code | `/var/www/clyve-web` |
 | Hauptseite | `https://clyve.dev` → Webroot `/var/www/clyve-web/public` |
-| Teambereich | `https://team.clyve.dev` → Webroot `/var/www/clyve-web/staff` |
+| Staff-Bereich | `https://staff.clyve.dev` → Webroot `/var/www/clyve-web/staff` |
 | Daten (DB, Sessions) | `/var/www/clyve-web/storage` (nicht öffentlich) |
 
 Getestet mit Ubuntu 24.04, Nginx 1.24 und PHP 8.3 FPM. Debian 12 funktioniert genauso, dort heißt PHP `8.2` statt `8.3`.
@@ -26,13 +26,13 @@ Beim Domain-Anbieter drei Einträge auf die IP deines Servers setzen:
 |---|---|---|
 | A | `clyve.dev` (bzw. `@`) | IPv4 des Servers |
 | A | `www` | IPv4 des Servers |
-| A | `team` | IPv4 des Servers |
+| A | `staff` | IPv4 des Servers |
 
 Hat der Server IPv6, zusätzlich dieselben drei als **AAAA**-Eintrag.
 Prüfen (kann ein paar Minuten dauern):
 
 ```bash
-dig +short clyve.dev team.clyve.dev www.clyve.dev
+dig +short clyve.dev staff.clyve.dev www.clyve.dev
 ```
 
 ## 2. Pakete installieren
@@ -100,14 +100,14 @@ Mindestens diese Werte setzen:
 ```php
 'app_env'       => 'production',
 'site_origins'  => ['https://clyve.dev'],
-'staff_origins' => ['https://team.clyve.dev'],
+'staff_origins' => ['https://staff.clyve.dev'],
 'app_secret'    => '…der erzeugte Schlüssel…',
 ```
 
 Optional, aber empfohlen:
 
 - `discord_webhook`: Webhook-URL für Benachrichtigungen über neue Anfragen und Tickets
-- `staff_ip_allowlist`: z. B. `['203.0.113.10']`, dann ist der Teambereich nur von dieser IP erreichbar
+- `staff_ip_allowlist`: z. B. `['203.0.113.10']`, dann ist der Staff-Bereich nur von dieser IP erreichbar
 - `business`: Name, Anschrift, E-Mail für Impressum und Rechnungen. `registered` bleibt `false`, bis das Gewerbe angemeldet ist.
 - Läuft die Domain über **Cloudflare** (orangene Wolke): `'trusted_ip_header' => 'HTTP_CF_CONNECTING_IP'`
 
@@ -117,7 +117,7 @@ Config schützen (nur root schreibt, nur PHP liest):
 sudo chown root:www-data config/config.php && sudo chmod 640 config/config.php
 ```
 
-Ersten Admin für den Teambereich anlegen. Wichtig: als `www-data`, damit die Datenbank PHP gehört.
+Ersten Admin für den Staff-Bereich anlegen. Wichtig: als `www-data`, damit die Datenbank PHP gehört.
 
 ```bash
 sudo -u www-data php bin/create-staff.php
@@ -133,13 +133,13 @@ Die beiden Server-Blöcke kopieren. Die bestehende Konfiguration (`default` o. �
 sudo cp deploy/nginx/clyve.dev.conf /etc/nginx/sites-available/clyve.dev
 ```
 ```bash
-sudo cp deploy/nginx/team.clyve.dev.conf /etc/nginx/sites-available/team.clyve.dev
+sudo cp deploy/nginx/staff.clyve.dev.conf /etc/nginx/sites-available/staff.clyve.dev
 ```
 
 Falls dein PHP-Socket in Schritt 2 anders hieß, in beiden Dateien anpassen (Beispiel für 8.2):
 
 ```bash
-sudo sed -i 's/php8.3-fpm.sock/php8.2-fpm.sock/' /etc/nginx/sites-available/clyve.dev /etc/nginx/sites-available/team.clyve.dev
+sudo sed -i 's/php8.3-fpm.sock/php8.2-fpm.sock/' /etc/nginx/sites-available/clyve.dev /etc/nginx/sites-available/staff.clyve.dev
 ```
 
 Hat der Server **kein IPv6**, die Zeilen `listen [::]:80;` in beiden Dateien löschen.
@@ -156,7 +156,7 @@ Aktivieren, testen, neu laden:
 sudo ln -s /etc/nginx/sites-available/clyve.dev /etc/nginx/sites-enabled/
 ```
 ```bash
-sudo ln -s /etc/nginx/sites-available/team.clyve.dev /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/staff.clyve.dev /etc/nginx/sites-enabled/
 ```
 ```bash
 sudo nginx -t
@@ -174,7 +174,7 @@ Schnelltest über HTTP (noch ohne Zertifikat):
 curl -sI http://clyve.dev | head -1
 ```
 ```bash
-curl -sI http://team.clyve.dev/login | head -1
+curl -sI http://staff.clyve.dev/login | head -1
 ```
 
 Beide sollten `HTTP/1.1 200 OK` liefern. Deine bestehende Seite ist weiter unter ihrer bisherigen Adresse erreichbar.
@@ -182,7 +182,7 @@ Beide sollten `HTTP/1.1 200 OK` liefern. Deine bestehende Seite ist weiter unter
 ## 6. HTTPS mit Let's Encrypt
 
 ```bash
-sudo certbot --nginx -d clyve.dev -d www.clyve.dev -d team.clyve.dev
+sudo certbot --nginx -d clyve.dev -d www.clyve.dev -d staff.clyve.dev
 ```
 
 E-Mail angeben, Bedingungen bestätigen. Certbot trägt die Zertifikate in die beiden Clyve-Dateien ein
@@ -205,8 +205,8 @@ curl -sI https://clyve.dev | grep -iE "^HTTP|strict-transport|engineered"
 Im Browser:
 
 1. `https://clyve.dev` öffnen und unter `/registrieren` ein Test-Kundenkonto anlegen
-2. `https://team.clyve.dev` öffnen und mit dem Admin aus Schritt 4 anmelden
-3. Ein Ticket als Kunde erstellen und es im Teambereich beantworten
+2. `https://staff.clyve.dev` öffnen und mit dem Admin aus Schritt 4 anmelden
+3. Ein Ticket als Kunde erstellen und es im Staff-Bereich beantworten
 
 Diese Adressen müssen **404** liefern, sonst stimmt der Webroot nicht:
 
@@ -266,7 +266,7 @@ Die Backups sollten zusätzlich regelmäßig auf einen anderen Rechner kopiert w
 Clyve abschalten, ohne die bestehende Seite zu berühren:
 
 ```bash
-sudo rm /etc/nginx/sites-enabled/clyve.dev /etc/nginx/sites-enabled/team.clyve.dev
+sudo rm /etc/nginx/sites-enabled/clyve.dev /etc/nginx/sites-enabled/staff.clyve.dev
 ```
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
@@ -282,14 +282,14 @@ sudo nginx -t && sudo systemctl reload nginx
 | **„Service unavailable“** | `config/config.php` fehlt, ist für `www-data` nicht lesbar, oder `app_secret` ist nicht gesetzt |
 | **403 beim Login/Absenden** | `site_origins` / `staff_origins` passen nicht exakt zur Adresse im Browser (inkl. `https://`), oder HTTPS ist noch nicht eingerichtet |
 | **500 / leere Seite** | `storage/` ist nicht für `www-data` beschreibbar: Rechte aus Schritt 3 erneut setzen |
-| **Teambereich zeigt nur 404** | `staff_ip_allowlist` ist gesetzt und deine IP steht nicht drin |
+| **Staff-Bereich zeigt nur 404** | `staff_ip_allowlist` ist gesetzt und deine IP steht nicht drin |
 | **Statt Clyve erscheint die alte Seite** | DNS zeigt noch nicht auf den Server, oder die Symlinks in `sites-enabled` fehlen |
 | **Alte Seite plötzlich weg** | `sudo nginx -t` ausführen, die Meldung zeigt die fehlerhafte Datei. Notfalls Schritt „Rückgängig machen“ |
 
 Logs:
 
 ```bash
-sudo tail -f /var/log/nginx/clyve.error.log /var/log/nginx/clyve-team.error.log
+sudo tail -f /var/log/nginx/clyve.error.log /var/log/nginx/clyve-staff.error.log
 ```
 ```bash
 sudo journalctl -u php8.3-fpm -n 50

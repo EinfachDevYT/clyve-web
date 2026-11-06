@@ -13,13 +13,13 @@ url_for() {
   fi
 }
 SITE_URL=$(url_for 8080)
-TEAM_URL=$(url_for 8081)
+STAFF_URL=$(url_for 8081)
 
 if [[ ! -f config/config.php ]]; then
   SECRET=$(php -r 'echo bin2hex(random_bytes(32));')
   sed -e "s#'app_env' => 'production'#'app_env' => 'local'#" \
       -e "s#'site_origins'  => \['https://clyve.dev'\]#'site_origins'  => ['${SITE_URL}', 'http://127.0.0.1:8080']#" \
-      -e "s#'staff_origins' => \['https://team.clyve.dev'\]#'staff_origins' => ['${TEAM_URL}', 'http://127.0.0.1:8081']#" \
+      -e "s#'staff_origins' => \['https://staff.clyve.dev'\]#'staff_origins' => ['${STAFF_URL}', 'http://127.0.0.1:8081']#" \
       -e "s#'CHANGE_ME'#'${SECRET}'#" \
       config/config.example.php > config/config.php
   echo "config/config.php angelegt."
@@ -32,9 +32,9 @@ if [[ ! -f storage/DEV-LOGIN.txt ]]; then
 Clyve.dev – Testumgebung
 
 Website:      ${SITE_URL}
-Teambereich:  ${TEAM_URL}/login
+Staff-Bereich: ${STAFF_URL}/login
 
-Team-Login
+Staff-Login
   E-Mail:     admin@clyve.dev
   Passwort:   ${PASSWORD}
 
