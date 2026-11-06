@@ -40,11 +40,11 @@ php bin/create-staff.php                      # ersten Admin anlegen
 Lokal testen:
 
 ```bash
-php -S 127.0.0.1:8080 -t public public/index.php
-php -S 127.0.0.1:8081 -t staff staff/index.php
+php -S 127.0.0.1:8080 -t public bin/dev-router.php
+php -S 127.0.0.1:8081 -t staff bin/dev-router.php
 ```
 
-Dafür in `config.php` die Origins auf `http://127.0.0.1:8080` bzw. `:8081` setzen.
+Dafür in `config.php` `app_env` auf `'local'` und die Origins auf `http://127.0.0.1:8080` bzw. `:8081` setzen.
 
 Produktiv: zwei vHosts laut `deploy/nginx.conf`, HTTPS ist Pflicht (Cookies laufen dann mit `__Host-`-Präfix).
 `storage/` muss für den PHP-User beschreibbar sein.
