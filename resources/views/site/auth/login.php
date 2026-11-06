@@ -1,6 +1,6 @@
 <section class="auth">
   <div class="auth-card glass">
-    <img class="auth-mark" src="/assets/img/blossom.svg" alt="" width="44" height="44">
+    <img class="auth-mark" src="/assets/brand/clyve-mark.svg" alt="" width="64" height="64">
     <h1>Willkommen zurück</h1>
     <p class="muted">Melde dich an, um deine Projekte, Tickets und Rechnungen zu sehen.</p>
 

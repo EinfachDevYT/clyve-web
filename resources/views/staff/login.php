@@ -1,6 +1,6 @@
 <section class="auth">
   <div class="auth-card glass">
-    <img class="auth-mark" src="/assets/img/blossom.svg" alt="" width="44" height="44">
+    <img class="auth-lockup" src="/assets/brand/clyve-by-einfachdev-stacked.svg" alt="Clyve.dev – engineered by EinfachDev" width="220" height="170">
     <h1>Team-Login</h1>
     <p class="muted">Interner Bereich. Zugriffe werden protokolliert.</p>
     <form action="/login" method="post" class="stack" data-native>

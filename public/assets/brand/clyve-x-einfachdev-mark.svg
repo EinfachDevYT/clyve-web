@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250.19 100" width="250.19" height="100" role="img" aria-label="Clyve.dev × EinfachDev"><title>Clyve.dev × EinfachDev</title><defs>
+  <linearGradient id="xc" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#6D28D9"/>
+    <stop offset=".55" stop-color="#A855F7"/>
+    <stop offset="1" stop-color="#E9D5FF"/>
+  </linearGradient>
+  <linearGradient id="xp" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/>
+    <stop offset="1" stop-color="#C4B5FD"/>
+  </linearGradient>
+</defs><g transform="translate(0 0) scale(1)"><path d="M71.62 31.3A37 37 0 1 0 71.62 82.7L66.93 78.18A26.5 26.5 0 1 1 66.93 35.82Z" fill="url(#xc)"/><g transform="translate(71.27 31.56) rotate(12)"><g fill="url(#xp)"><ellipse cx="0" cy="-12.42" rx="7.29" ry="12.42" transform="rotate(0)"/><ellipse cx="0" cy="-12.42" rx="7.29" ry="12.42" transform="rotate(72)"/><ellipse cx="0" cy="-12.42" rx="7.29" ry="12.42" transform="rotate(144)"/><ellipse cx="0" cy="-12.42" rx="7.29" ry="12.42" transform="rotate(216)"/><ellipse cx="0" cy="-12.42" rx="7.29" ry="12.42" transform="rotate(288)"/></g><circle r="4.59" fill="#A855F7"/><circle r="2.16" fill="#F7F3FF"/></g><circle cx="72.06" cy="83.91" r="3" fill="#A855F7" opacity=".9"/></g><path transform="translate(112 64)" d="M19.765625 -1.38671875 23.3203125 -4.94140625 16.6796875 -11.58203125 23.3203125 -18.22265625 19.765625 -21.8359375 13.10546875 -15.17578125 6.46484375 -21.8359375 2.87109375 -18.22265625 9.51171875 -11.58203125 2.87109375 -4.94140625 6.46484375 -1.38671875 13.10546875 -8.0078125Z" fill="#8A7CA8"/><g transform="translate(202.19 52)"><ellipse cy="-22" rx="13" ry="22" transform="rotate(0)" fill="#F7F3FF"/><ellipse cy="-22" rx="13" ry="22" transform="rotate(72)" fill="#E9D5FF"/><ellipse cy="-22" rx="13" ry="22" transform="rotate(144)" fill="#F7F3FF"/><ellipse cy="-22" rx="13" ry="22" transform="rotate(216)" fill="#E9D5FF"/><ellipse cy="-22" rx="13" ry="22" transform="rotate(288)" fill="#F7F3FF"/><circle r="8" fill="#A855F7"/></g></svg>

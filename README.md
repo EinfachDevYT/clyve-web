@@ -68,3 +68,19 @@ Nach der Gewerbeanmeldung Steuernummer, Anschrift und Bankdaten in `business` ei
 - Getrennte Sessions für Hauptseite und Teambereich (Host-only-Cookies)
 - Rate-Limits für Login, Registrierung, Anfragen, Tickets (IP nur als HMAC gespeichert)
 - Teambereich optional per IP-Allowlist, Mitarbeiter nur per CLI anlegbar, Audit-Log
+
+## Logo
+
+Alle Varianten liegen als SVG in `public/assets/brand/` (jeweils mit `-light` für helle Hintergründe):
+
+| Datei | Verwendung |
+|---|---|
+| `clyve-logo.svg` | Standard-Logo (Navigation, Footer) |
+| `clyve-mark.svg` | nur das Zeichen |
+| `clyve-icon.svg` | App-Icon / Favicon |
+| `clyve-x-einfachdev.svg` | Kombi horizontal: Clyve.dev \| by EinfachDev |
+| `clyve-by-einfachdev-stacked.svg` | Kombi gestapelt |
+| `clyve-x-einfachdev-mark.svg` | Kombi-Symbol Clyve × EinfachDev |
+
+Die Schrift ist in Pfade umgewandelt (Inter Display, JetBrains Mono – beide OFL), die Logos sehen also überall gleich aus.
+Neu erzeugen: `pip install fonttools && python3 resources/brand/build.py public/assets/brand`
