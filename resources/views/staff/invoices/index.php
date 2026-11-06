@@ -1,6 +1,6 @@
 <?php use App\Core\View; ?>
 <header class="page-head">
-  <div><p class="kicker mono">Team</p><h1>Rechnungen</h1></div>
+  <div><p class="kicker mono">Staff</p><h1>Rechnungen</h1></div>
   <a class="pill pill-sm" href="/rechnungen/neu">Neue Rechnung</a>
 </header>
 

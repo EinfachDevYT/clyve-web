@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <meta name="author" content="EinfachDev · einfachdev.de">
-  <title><?= e($pageTitle ? $pageTitle . ' · Team' : 'Team · Clyve.dev') ?></title>
+  <title><?= e($pageTitle ? $pageTitle . ' · Staff' : 'Staff · Clyve.dev') ?></title>
   <link rel="icon" href="/assets/brand/clyve-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/app.css">
@@ -19,7 +19,7 @@
   <?php else: ?>
   <div class="staff">
     <aside class="staff-side" data-swap="nav">
-      <a class="brand" href="/" aria-label="Dashboard"><img src="/assets/brand/clyve-mark.svg" alt="" class="brand-mark" width="30" height="30"><img src="/assets/brand/clyve-logo.svg" alt="Clyve.dev" class="brand-logo" width="112" height="26"><small class="mono">team</small></a>
+      <a class="brand" href="/" aria-label="Dashboard"><img src="/assets/brand/clyve-mark.svg" alt="" class="brand-mark" width="30" height="30"><img src="/assets/brand/clyve-logo.svg" alt="Clyve.dev" class="brand-logo" width="112" height="26"><small class="mono">staff</small></a>
       <nav class="staff-nav">
         <a href="/"<?= View::active('/') ?>>Dashboard</a>
         <a href="/anfragen"<?= View::active('/anfragen') ?>>Anfragen</a>

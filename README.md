@@ -1,6 +1,6 @@
 # clyve-web
 
-Website und Kundenportal von **Clyve.dev** – Anfragen, Kundenbereich, Support-Tickets, Rechnungen und ein separater Teambereich.
+Website und Kundenportal von **Clyve.dev** – Anfragen, Kundenbereich, Support-Tickets, Rechnungen und ein separater Staff-Bereich.
 Pures PHP 8.2+ ohne Framework und ohne Abhängigkeiten.
 
 Design & Entwicklung: [EinfachDev](https://einfachdev.de) · Proprietär, siehe [LICENSE](LICENSE).
@@ -12,14 +12,14 @@ app/
   Core/           Router, Datenbank, Auth, Security, Views, Validierung, Rate-Limit
   Controllers/
     Site/         Hauptseite + Kundenbereich
-    Staff/        Teambereich
+    Staff/        Staff-Bereich
   Services/       Rechnungslogik, Benachrichtigungen (Discord / Mail)
   bootstrap.php   gemeinsamer Einstieg
   helpers.php
 routes/           site.php, staff.php
 resources/views/  Templates (site, staff, shared, errors)
 public/           Webroot  clyve.dev
-staff/            Webroot  team.clyve.dev   (assets -> ../public/assets)
+staff/            Webroot  staff.clyve.dev  (assets -> ../public/assets)
 config/           config.example.php -> config.php (nicht im Repo)
 database/         schema.sql
 storage/          SQLite, Sessions, Rate-Limits (nicht im Repo, nicht öffentlich)
@@ -36,7 +36,7 @@ Nach etwa einer Minute ist alles eingerichtet: PHP, `config/config.php`, ein Adm
 Zugangsdaten und Adressen stehen in `storage/DEV-LOGIN.txt` (öffnet sich automatisch), die Ports findest du im Tab **Ports**:
 
 - 8080 – Website
-- 8081 – Teambereich
+- 8081 – Staff-Bereich
 
 Server neu starten: `bash bin/dev-start.sh`
 
@@ -76,9 +76,9 @@ Nach der Gewerbeanmeldung Steuernummer, Anschrift und Bankdaten in `business` ei
 - CSRF-Token + Origin-Prüfung bei jedem POST
 - Strikte CSP ohne Inline-Skripte, HSTS, Frame-Schutz
 - Passwörter mit Argon2id, Session-Fixation-Schutz, Idle-Timeout
-- Getrennte Sessions für Hauptseite und Teambereich (Host-only-Cookies)
+- Getrennte Sessions für Hauptseite und Staff-Bereich (Host-only-Cookies)
 - Rate-Limits für Login, Registrierung, Anfragen, Tickets (IP nur als HMAC gespeichert)
-- Teambereich optional per IP-Allowlist, Mitarbeiter nur per CLI anlegbar, Audit-Log
+- Staff-Bereich optional per IP-Allowlist, Mitarbeiter nur per CLI anlegbar, Audit-Log
 
 ## Logo
 
