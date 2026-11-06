@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($pageTitle) ?> · Clyve.dev</title>
   <link rel="icon" href="/assets/img/blossom.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -19,6 +20,7 @@
       </div>
     <?php endif ?>
     <?= $content ?>
+    <div class="auth-signature"><?php App\Core\View::partial('shared/signature') ?></div>
   </main>
 </body>
 </html>

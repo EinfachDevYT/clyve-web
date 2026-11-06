@@ -3,6 +3,8 @@
 Website und Kundenportal von **Clyve.dev** – Anfragen, Kundenbereich, Support-Tickets, Rechnungen und ein separater Teambereich.
 Pures PHP 8.2+ ohne Framework und ohne Abhängigkeiten.
 
+Design & Entwicklung: [EinfachDev](https://einfachdev.de) · Proprietär, siehe [LICENSE](LICENSE).
+
 ## Struktur
 
 ```

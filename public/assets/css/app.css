@@ -227,3 +227,32 @@ code { font-family: var(--mono); font-size: .9em; background: rgba(168, 85, 247,
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(app), ::view-transition-new(app) { animation: none; }
 }
+
+/* signature */
+.footer-bar { position: relative; max-width: var(--maxw); margin: 34px auto 0; padding-top: 22px; border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; font-size: .78rem; }
+.signature { --sig: var(--lilac); position: relative; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px 7px 10px;
+  border-radius: 999px; text-decoration: none; font-size: .8rem; color: var(--muted); isolation: isolate;
+  border: 1px solid var(--line); background: rgba(13, 11, 20, .6); transition: color .3s, border-color .3s, box-shadow .3s; }
+.signature::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; z-index: -1; opacity: 0;
+  background: conic-gradient(from var(--sig-angle, 0deg), var(--violet-deep), var(--lilac-soft), var(--violet), var(--violet-deep));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  transition: opacity .3s; animation: sig-spin 3s linear infinite; }
+.signature-mark { fill: var(--lilac); transition: transform .8s cubic-bezier(.2, .8, .2, 1), filter .3s; }
+.signature-mark circle { fill: var(--violet); }
+.signature-label { font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; font-size: .68rem; }
+.signature-name { font-weight: 800; letter-spacing: .04em; color: var(--lilac-soft); }
+.signature-name b { color: var(--violet); font-weight: 800; }
+.signature:hover { color: var(--lilac); border-color: transparent; box-shadow: 0 0 22px -4px rgba(168, 85, 247, .55); }
+.signature:hover::before { opacity: 1; }
+.signature:hover .signature-mark { transform: rotate(144deg) scale(1.15); filter: drop-shadow(0 0 6px rgba(168, 85, 247, .9)); }
+.signature:focus-visible { outline: 2px solid var(--lilac); outline-offset: 3px; }
+.signature-compact { align-self: flex-start; margin: auto 8px -10px; padding: 5px 11px 5px 8px; }
+.signature-compact + .staff-me { margin-top: 0; }
+.signature-compact .signature-label { font-size: .6rem; }
+.signature-compact .signature-name { font-size: .74rem; }
+.auth-signature { display: flex; justify-content: center; padding: 0 16px 32px; margin-top: -24px; }
+@property --sig-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes sig-spin { to { --sig-angle: 360deg; } }
+@media (max-width: 980px) { .staff-side .signature-compact { display: none; } }
+@media (max-width: 560px) { .footer-bar { justify-content: center; text-align: center; } }

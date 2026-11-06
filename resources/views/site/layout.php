@@ -7,6 +7,8 @@
   <title><?= e($pageTitle ? $pageTitle . ' · Clyve.dev' : 'Clyve.dev') ?></title>
   <meta name="description" content="FiveM Scripts, Websites & Discord Bots nach Maß – sauber, performant, aus dem Saarland.">
   <meta name="theme-color" content="#0D0B14">
+  <meta name="author" content="EinfachDev · einfachdev.de">
+  <link rel="author" href="/humans.txt">
   <link rel="icon" href="/assets/img/blossom.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/app.css">
@@ -58,11 +60,15 @@
       <a class="brand" href="/"><img src="/assets/img/blossom.svg" alt="" width="22" height="22"><span>Clyve<b>.dev</b></span></a>
       <p class="mono muted">Danke fürs Vorbeischauen — crafted in the void</p>
       <nav class="footer-links">
-        <a href="https://github.com/Clyve.devYT" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/EinfachDevYT" target="_blank" rel="noopener">GitHub</a>
         <a href="https://discord.com/users/267311011520970752" target="_blank" rel="noopener">Discord</a>
         <a href="/impressum">Impressum</a>
         <a href="/datenschutz">Datenschutz</a>
       </nav>
+    </div>
+    <div class="footer-bar">
+      <span class="mono muted">© <?= date('Y') ?> Clyve.dev · Alle Rechte vorbehalten</span>
+      <?php App\Core\View::partial('shared/signature') ?>
     </div>
   </footer>
 </body>

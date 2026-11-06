@@ -5,6 +5,12 @@
   const SVGNS = 'http://www.w3.org/2000/svg';
   let cleanups = [];
 
+  console.log(
+    '%c✿ Clyve.dev%c\n\nEngineered by EinfachDev — https://einfachdev.de\nHandgeschrieben. Kein Framework. Keine Tracker.',
+    'font: 800 22px system-ui; color: #E9D5FF; text-shadow: 0 0 12px #A855F7; padding: 6px 0;',
+    'font: 500 12px ui-monospace, monospace; color: #A78BFA; line-height: 1.6;'
+  );
+
   /* ---------- falling petals ---------- */
 
   function startPetals() {
