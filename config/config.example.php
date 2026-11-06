@@ -4,6 +4,9 @@
  * config/config.php wird NICHT committet (.gitignore).
  */
 return [
+    // 'production' auf dem Server, 'local' nur zum Entwickeln.
+    'app_env' => 'production',
+
     // Erlaubte Origins (Schema + Host, ohne Slash). POSTs von anderen Seiten werden abgelehnt.
     'site_origins'  => ['https://clyve.dev'],
     'staff_origins' => ['https://team.clyve.dev'],

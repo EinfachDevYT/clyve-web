@@ -96,7 +96,15 @@ final class Security
                 $origin = $p['scheme'] . '://' . $p['host'] . (isset($p['port']) ? ':' . $p['port'] : '');
             }
         }
-        return $origin !== '' && in_array($origin, $allowed, true);
+        if ($origin === '') {
+            return false;
+        }
+        if (in_array($origin, $allowed, true)) {
+            return true;
+        }
+        // Local development only: accept the host the page is actually served from (e.g. preview proxies).
+        return config('app_env') === 'local'
+            && strcasecmp((string)parse_url($origin, PHP_URL_HOST), (string)parse_url('//' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST)) === 0;
     }
 
     public static function guardPost(): void
