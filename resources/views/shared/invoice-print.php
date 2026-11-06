@@ -14,6 +14,7 @@ $r = $invoice['recipient'] ?? ['name' => $invoice['customer_name'], 'company' =>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
+  <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($invoice['number'] ?? 'Entwurf') ?> · Rechnung</title>
   <link rel="stylesheet" href="/assets/css/invoice.css">
   <script src="/assets/js/print.js" defer></script>

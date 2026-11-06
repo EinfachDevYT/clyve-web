@@ -1,0 +1,9 @@
+/* TEAM */
+  Design & Entwicklung: EinfachDev
+  Website: https://einfachdev.de
+  GitHub: https://github.com/EinfachDevYT
+  Standort: Saarland, Deutschland
+
+/* SITE */
+  Studio: Clyve.dev
+  Stack: PHP, JavaScript, CSS — handgeschrieben, ohne Framework

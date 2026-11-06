@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($pageTitle ? $pageTitle . ' · Team' : 'Team · Clyve.dev') ?></title>
   <link rel="icon" href="/assets/img/blossom.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -26,6 +27,7 @@
         <a href="/kunden"<?= View::active('/kunden') ?>>Kunden</a>
         <a href="/rechnungen"<?= View::active('/rechnungen') ?>>Rechnungen</a>
       </nav>
+      <?php View::partial('shared/signature', ['compact' => true]) ?>
       <div class="staff-me">
         <span class="avatar"><?= e(mb_strtoupper(mb_substr($user['name'], 0, 1))) ?></span>
         <div><b><?= e($user['name']) ?></b><small><?= $user['role'] === 'admin' ? 'Admin' : 'Mitarbeiter' ?></small></div>
