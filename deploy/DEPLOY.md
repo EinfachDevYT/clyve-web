@@ -11,7 +11,13 @@ Die vorhandene Seite in `/var/www/html` und ihre Nginx-Konfiguration werden nich
 | Staff-Bereich | `https://staff.clyve.dev` → Webroot `/var/www/clyve-web/staff` |
 | Daten (DB, Sessions) | `/var/www/clyve-web/storage` (nicht öffentlich) |
 
-Getestet mit Ubuntu 24.04, Nginx 1.24 und PHP 8.3 FPM. Debian 12 funktioniert genauso, dort heißt PHP `8.2` statt `8.3`.
+Getestet mit Ubuntu 24.04, Nginx 1.24 und PHP 8.3 FPM. Andere Systeme funktionieren genauso, nur die PHP-Version im Paket- und Socket-Namen ist anders:
+
+| System | PHP-Version |
+|---|---|
+| Debian 13 (trixie) | `8.4` |
+| Ubuntu 24.04 | `8.3` |
+| Debian 12 (bookworm) | `8.2` |
 Alle Befehle als Benutzer mit `sudo`-Rechten.
 
 > Andere Domain? Ersetze in dieser Anleitung und in `deploy/nginx/*.conf` überall `clyve.dev` durch deine Domain.
@@ -40,9 +46,20 @@ dig +short clyve.dev staff.clyve.dev www.clyve.dev
 ```bash
 sudo apt update
 ```
+Mit der PHP-Version deines Systems aus der Tabelle oben, hier für Ubuntu 24.04:
+
 ```bash
 sudo apt install -y git php8.3-fpm php8.3-sqlite3 php8.3-curl php8.3-mbstring certbot python3-certbot-nginx
 ```
+
+Für Debian 13:
+
+```bash
+sudo apt install -y git php8.4-fpm php8.4-sqlite3 php8.4-curl php8.4-mbstring certbot python3-certbot-nginx
+```
+
+> Meldet `sudo` „unable to resolve host …“, fehlt der eigene Hostname in `/etc/hosts`:
+> `echo "127.0.1.1 $(hostname)" | sudo tee -a /etc/hosts`
 
 Nginx läuft bereits. PHP-Version und Socket prüfen:
 
@@ -53,7 +70,8 @@ php -v
 ls /run/php/
 ```
 
-Steht dort **nicht** `php8.3-fpm.sock` (z. B. `php8.2-fpm.sock`), merk dir den Namen. Du brauchst ihn in Schritt 5.
+Steht dort **nicht** `php8.3-fpm.sock` (z. B. `php8.4-fpm.sock`), merk dir den Namen. Du brauchst ihn in Schritt 5.
+Auch in den Befehlen weiter unten (`systemctl reload php8.3-fpm` usw.) die Version entsprechend ersetzen.
 
 ## 3. Code holen
 
@@ -136,10 +154,10 @@ sudo cp deploy/nginx/clyve.dev.conf /etc/nginx/sites-available/clyve.dev
 sudo cp deploy/nginx/staff.clyve.dev.conf /etc/nginx/sites-available/staff.clyve.dev
 ```
 
-Falls dein PHP-Socket in Schritt 2 anders hieß, in beiden Dateien anpassen (Beispiel für 8.2):
+Falls dein PHP-Socket in Schritt 2 anders hieß, in beiden Dateien anpassen (Beispiel für Debian 13 mit 8.4):
 
 ```bash
-sudo sed -i 's/php8.3-fpm.sock/php8.2-fpm.sock/' /etc/nginx/sites-available/clyve.dev /etc/nginx/sites-available/staff.clyve.dev
+sudo sed -i 's/php8.3-fpm.sock/php8.4-fpm.sock/' /etc/nginx/sites-available/clyve.dev /etc/nginx/sites-available/staff.clyve.dev
 ```
 
 Hat der Server **kein IPv6**, die Zeilen `listen [::]:80;` in beiden Dateien löschen.
