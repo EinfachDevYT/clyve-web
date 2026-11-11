@@ -22,7 +22,7 @@
 
       <p class="auth-secure">
         <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 11V8a6 6 0 0 1 12 0v3M5 11h14v10H5z"/></svg>
-        Verschlüsselte Verbindung · Kein Tracking
+        Verschlüsselte Verbindung
       </p>
     </div>
   </div>

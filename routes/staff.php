@@ -59,6 +59,13 @@ $router->post('/scripts/{id}/loeschen', [ProductController::class, 'destroy']);
 
 $router->get('/einstellungen', [SettingsController::class, 'show']);
 $router->post('/einstellungen', [SettingsController::class, 'update']);
+$router->get('/einstellungen/betreiber', [SettingsController::class, 'business']);
+$router->post('/einstellungen/betreiber', [SettingsController::class, 'updateBusiness']);
+$router->get('/einstellungen/email', [SettingsController::class, 'email']);
+$router->post('/einstellungen/email', [SettingsController::class, 'updateEmail']);
 $router->post('/einstellungen/test-mail', [SettingsController::class, 'testMail']);
+$router->get('/einstellungen/integrationen', [SettingsController::class, 'integrations']);
+$router->post('/einstellungen/integrationen', [SettingsController::class, 'updateIntegrations']);
+$router->post('/einstellungen/discord-test', [SettingsController::class, 'testDiscord']);
 
 return $router;

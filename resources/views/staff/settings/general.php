@@ -1,13 +1,10 @@
 <?php
-use App\Services\InvoiceService;
 $toggle = static function (string $key, string $label, string $hint) use ($settings): string {
     return '<label class="toggle"><input type="checkbox" name="' . e($key) . '" value="1"' . ($settings[$key] === '1' ? ' checked' : '') . '>'
         . '<span class="toggle-ui" aria-hidden="true"></span><span><b>' . e($label) . '</b><small>' . e($hint) . '</small></span></label>';
 };
 ?>
-<header class="page-head">
-  <div><p class="kicker mono">Staff</p><h1>Einstellungen</h1></div>
-</header>
+<?php App\Core\View::partial('staff/settings/_tabs', ['tabs' => $tabs, 'active' => 'allgemein']) ?>
 
 <form class="stack-lg" action="/einstellungen" method="post">
   <?= csrf_field() ?>
@@ -42,15 +39,3 @@ $toggle = static function (string $key, string $label, string $hint) use ($setti
   </div>
   <div class="row-end"><button class="pill" type="submit">Speichern</button></div>
 </form>
-
-<section class="panel glass mt">
-  <h2>System</h2>
-  <dl class="kv mt-sm">
-    <dt>Beleg-Modus</dt><dd><?= e(InvoiceService::MODES[$mode]) ?> <small class="muted">(config.php → business.mode)</small></dd>
-    <dt>E-Mail-Versand</dt><dd><?= $mailEnabled ? '<span class="badge badge-ok">eingerichtet</span>' : '<span class="badge badge-warn">aus</span> <small class="muted">(config.php → smtp)</small>' ?></dd>
-    <dt>Tebex-Sync</dt><dd><?= $tebexReady ? '<span class="badge badge-ok">eingerichtet</span>' : '<span class="badge badge-muted">aus</span> <small class="muted">(config.php → tebex)</small>' ?></dd>
-  </dl>
-  <?php if ($mailEnabled): ?>
-    <form class="mt-sm" action="/einstellungen/test-mail" method="post"><?= csrf_field() ?><button class="pill pill-sm pill-ghost" type="submit">Test-E-Mail an mich senden</button></form>
-  <?php endif ?>
-</section>

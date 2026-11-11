@@ -169,9 +169,9 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); color: var(--petal); margin: 0; line
 
 /* Form */
 .form { max-width: 820px; margin: 0 auto; padding: clamp(22px, 4vw, 40px); display: grid; gap: 20px; }
-.field { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.field { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; grid-template-columns: minmax(0, 1fr); }
 .field > span, .field legend { font-size: .9rem; font-weight: 600; color: var(--lilac-soft); padding: 0; margin-bottom: 8px; }
-.field > span { margin-bottom: 0; }
+.field > span { margin-bottom: 0; overflow-wrap: anywhere; }
 .field i, .consent i { color: var(--violet); font-style: normal; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 input[type=text], input[type=email], input[type=password], input[type=search], input[type=date], input[type=url], input[type=number], input[type=tel], select, textarea {

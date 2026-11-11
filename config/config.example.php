@@ -58,6 +58,9 @@ return [
         'zip'            => '66000',
         'city'           => 'Saarbrücken',
         'email'          => 'kontakt@clyve.dev',
+        'phone'          => '',   // optional, erscheint im Impressum
+        // Hosting-Anbieter deines Servers für die Datenschutzerklärung, z. B. 'netcup GmbH, Daimlerstraße 25, 76185 Karlsruhe'
+        'hosting'        => '',
         'tax_number'     => '',   // Steuernummer (ab Gewerbe)
         'vat_id'         => '',   // USt-IdNr. (falls vorhanden)
         'iban'           => '',

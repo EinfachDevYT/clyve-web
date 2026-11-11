@@ -6,4 +6,4 @@
 
 /* SITE */
   Studio: Clyve.dev
-  Stack: PHP, JavaScript, CSS — handgeschrieben, ohne Framework
+  Stack: PHP, JavaScript, CSS

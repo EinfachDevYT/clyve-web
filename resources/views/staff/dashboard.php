@@ -4,6 +4,10 @@
   <a class="pill pill-sm" href="/rechnungen/neu">Neue Rechnung</a>
 </header>
 
+<?php if (($user['role'] ?? '') === 'admin' && \App\Controllers\Staff\SettingsController::legalMissing()): ?>
+  <div class="notice notice-warn">Impressum und Datenschutz sind noch nicht vollständig. <a href="/einstellungen/betreiber">Jetzt Betreiberangaben ergänzen →</a></div>
+<?php endif ?>
+
 <div class="stats stats-4">
   <a class="stat glass" href="/anfragen"><b><?= $stats['requests'] ?></b><span>Neu / ungelesen</span></a>
   <a class="stat glass" href="/tickets?status=open"><b><?= $stats['tickets'] ?></b><span>Offene Tickets</span></a>

@@ -28,7 +28,108 @@ final class Settings
         'registration_open', 'tickets_enabled', 'shop_enabled',
     ];
 
+    /** Config keys the admin can override in the staff area. */
+    private const OVERRIDABLE = ['business', 'smtp', 'tebex', 'discord_webhook', 'mail_to'];
+    /** Stored encrypted, never shown again in the UI. */
+    public const SECRET_KEYS = ['smtp.password', 'discord_webhook'];
+
     private static ?array $cache = null;
+    private static ?array $overrides = null;
+    private static bool $loading = false;
+
+    public static function isOverridable(string $key): bool
+    {
+        foreach (self::OVERRIDABLE as $root) {
+            if ($key === $root || str_starts_with($key, $root . '.')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** @return array<string, mixed> e.g. ['business.name' => 'Clyve.dev', 'smtp.port' => 587] */
+    public static function overrides(): array
+    {
+        if (self::$overrides !== null) {
+            return self::$overrides;
+        }
+        if (self::$loading) {
+            return [];
+        }
+        self::$loading = true;
+        $out = [];
+        try {
+            foreach (Db::all("SELECT key, value FROM settings WHERE key LIKE 'cfg.%'") as $row) {
+                $name = substr($row['key'], 4);
+                $value = json_decode($row['value'], true);
+                if (in_array($name, self::SECRET_KEYS, true)) {
+                    $value = is_string($value) ? self::decrypt($value) : null;
+                    if ($value === null) {
+                        continue;
+                    }
+                }
+                $out[$name] = $value;
+            }
+        } catch (\Throwable $e) {
+            error_log('[settings] ' . $e->getMessage());
+            $out = [];
+        } finally {
+            self::$loading = false;
+        }
+        return self::$overrides = $out;
+    }
+
+    /** Saves overrides. null removes the override (config.php applies again). */
+    public static function setConfig(array $values): void
+    {
+        Db::transaction(static function () use ($values): void {
+            foreach ($values as $key => $value) {
+                if (!self::isOverridable($key)) {
+                    continue;
+                }
+                if ($value === null) {
+                    Db::exec('DELETE FROM settings WHERE key = ?', ['cfg.' . $key]);
+                    continue;
+                }
+                $stored = in_array($key, self::SECRET_KEYS, true) ? self::encrypt((string)$value) : $value;
+                Db::exec(
+                    "INSERT INTO settings (key, value, updated_at) VALUES (?, ?, datetime('now'))
+                     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at",
+                    ['cfg.' . $key, json_encode($stored, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)]
+                );
+            }
+        });
+        self::$overrides = null;
+    }
+
+    public static function hasSecret(string $key): bool
+    {
+        return (string)config($key, '') !== '';
+    }
+
+    private static function key(): string
+    {
+        return hash('sha256', 'clyve-settings|' . (string)config('app_secret'), true);
+    }
+
+    private static function encrypt(string $plain): string
+    {
+        $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+        return 'enc:' . base64_encode($nonce . sodium_crypto_secretbox($plain, $nonce, self::key()));
+    }
+
+    private static function decrypt(string $stored): ?string
+    {
+        if (!str_starts_with($stored, 'enc:')) {
+            return null;
+        }
+        $raw = base64_decode(substr($stored, 4), true);
+        if ($raw === false || strlen($raw) <= SODIUM_CRYPTO_SECRETBOX_NONCEBYTES) {
+            return null;
+        }
+        $plain = sodium_crypto_secretbox_open(substr($raw, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES), substr($raw, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES), self::key());
+        return $plain === false ? null : $plain;
+    }
 
     public static function all(): array
     {

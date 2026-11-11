@@ -25,7 +25,7 @@ final class RequestService
     /** Type specific questions of the request form. Values are whitelisted on the server. */
     public const DETAILS = [
         'fivem' => [
-            'framework' => ['label' => 'Framework', 'kind' => 'select', 'options' => ['ESX', 'QBCore', 'Qbox', 'ox_core', 'Standalone', 'Weiß ich nicht']],
+            'framework' => ['label' => 'Framework', 'kind' => 'select', 'options' => ['ESX', 'QBCore', 'Qbox', 'Standalone', 'Weiß ich nicht']],
             'kind'      => ['label' => 'Art', 'kind' => 'select', 'options' => ['Neues Script', 'NUI / Interface', 'MLO / Map', 'Anpassung eines bestehenden Scripts', 'Fehlerbehebung', 'Sonstiges']],
             'delivery'  => ['label' => 'Auslieferung', 'kind' => 'select', 'options' => ['Open Source', 'Escrow (Tebex)', 'Egal']],
             'extras'    => ['label' => 'Extras', 'kind' => 'multi', 'options' => ['ox_lib', 'ox_inventory', 'ox_target', 'Datenbank (oxmysql)', 'Discord-Logs', 'Konfigurierbar']],

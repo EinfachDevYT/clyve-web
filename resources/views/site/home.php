@@ -49,7 +49,7 @@
       <h3>FiveM Scripts</h3>
       <p>Performante Resources für Roleplay-Server – Jobs, NUI-Interfaces, Systeme &amp; Custom Props/Maps.</p>
       <ul class="ticks">
-        <li>ESX · QBCore · ox-Stack</li>
+        <li>ESX · QBCore · Qbox</li>
         <li>Optimiert auf 0.00 ms Idle</li>
         <li>Saubere Configs &amp; Locales</li>
       </ul>

@@ -9,7 +9,7 @@ use RuntimeException;
 /** Reads packages from the Tebex Headless API and mirrors them into the products table. */
 final class Tebex
 {
-    public const FRAMEWORKS = ['ESX', 'QBCore', 'Qbox', 'ox_core', 'Standalone'];
+    public const FRAMEWORKS = ['ESX', 'QBCore', 'Qbox', 'Standalone'];
     public const DEFAULT_IMAGE_HOSTS = ['dunb17ur4ymx4.cloudfront.net'];
 
     public static function configured(): bool

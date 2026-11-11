@@ -5,16 +5,38 @@ use App\Core\Db;
 use App\Core\Security;
 use App\Core\View;
 
+/**
+ * Reads config/config.php. Keys that can be edited in the staff area (business, e-mail, integrations)
+ * are taken from the settings table first.
+ */
 function config(string $key, mixed $default = null): mixed
 {
     $v = $GLOBALS['__config'] ?? [];
+    $found = true;
     foreach (explode('.', $key) as $k) {
         if (!is_array($v) || !array_key_exists($k, $v)) {
-            return $default;
+            $found = false;
+            $v = null;
+            break;
         }
         $v = $v[$k];
     }
-    return $v;
+
+    if (\App\Services\Settings::isOverridable($key)) {
+        $overrides = \App\Services\Settings::overrides();
+        if (array_key_exists($key, $overrides)) {
+            return $overrides[$key];
+        }
+        $prefix = $key . '.';
+        foreach ($overrides as $k => $value) {
+            if (str_starts_with($k, $prefix)) {
+                $v = is_array($v) ? $v : [];
+                $v[substr($k, strlen($prefix))] = $value;
+                $found = true;
+            }
+        }
+    }
+    return $found ? $v : $default;
 }
 
 function e(mixed $s): string
