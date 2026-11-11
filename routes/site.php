@@ -5,13 +5,19 @@ use App\Controllers\Site\AccountController;
 use App\Controllers\Site\AuthController;
 use App\Controllers\Site\HomeController;
 use App\Controllers\Site\InvoiceController;
+use App\Controllers\Site\RequestController;
+use App\Controllers\Site\ShopController;
 use App\Controllers\Site\TicketController;
 use App\Core\Router;
 
 $router = new Router();
 
 $router->get('/', [HomeController::class, 'index']);
-$router->post('/anfrage', [HomeController::class, 'submitRequest']);
+$router->post('/anfrage', [RequestController::class, 'submit']);
+$router->get('/anfrage/{token}', [RequestController::class, 'showByToken']);
+$router->post('/anfrage/{token}/antwort', [RequestController::class, 'replyByToken']);
+$router->post('/anfrage/{token}/angebot', [RequestController::class, 'offerByToken']);
+$router->get('/scripts', [ShopController::class, 'index']);
 $router->get('/impressum', [HomeController::class, 'imprint']);
 $router->get('/datenschutz', [HomeController::class, 'privacy']);
 
@@ -23,6 +29,9 @@ $router->post('/logout', [AuthController::class, 'logout']);
 
 $router->get('/konto', [AccountController::class, 'dashboard']);
 $router->get('/konto/anfragen', [AccountController::class, 'requests']);
+$router->get('/konto/anfragen/{id}', [RequestController::class, 'showForCustomer']);
+$router->post('/konto/anfragen/{id}/antwort', [RequestController::class, 'replyForCustomer']);
+$router->post('/konto/anfragen/{id}/angebot', [RequestController::class, 'offerForCustomer']);
 $router->get('/konto/profil', [AccountController::class, 'profile']);
 $router->post('/konto/profil', [AccountController::class, 'updateProfile']);
 $router->post('/konto/passwort', [AccountController::class, 'updatePassword']);

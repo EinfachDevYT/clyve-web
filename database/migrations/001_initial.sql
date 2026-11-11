@@ -1,4 +1,4 @@
--- Clyve.dev – Datenbankschema (SQLite; für MySQL siehe README)
+-- 001: Grundschema
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS customers (

@@ -1,5 +1,6 @@
 <?php
 $isDraft = $invoice['status'] === 'draft';
+$doc = \App\Services\InvoiceService::docLabel($invoice);
 $s = $invoice['sender'] ?? [
     'name' => config('business.name'), 'owner' => config('business.owner'), 'street' => config('business.street'),
     'zip' => config('business.zip'), 'city' => config('business.city'), 'email' => config('business.email'),
@@ -15,7 +16,7 @@ $r = $invoice['recipient'] ?? ['name' => $invoice['customer_name'], 'company' =>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <meta name="author" content="EinfachDev · einfachdev.de">
-  <title><?= e($invoice['number'] ?? 'Entwurf') ?> · Rechnung</title>
+  <title><?= e($invoice['number'] ?? 'Entwurf') ?> · <?= e($doc) ?></title>
   <link rel="stylesheet" href="/assets/css/invoice.css">
   <script src="/assets/js/print.js" defer></script>
 </head>
@@ -45,14 +46,14 @@ $r = $invoice['recipient'] ?? ['name' => $invoice['customer_name'], 'company' =>
         <?php if ($r['country'] && $r['country'] !== 'Deutschland'): ?><br><?= e($r['country']) ?><?php endif ?>
       </div>
       <dl class="facts">
-        <dt>Rechnungsnr.</dt><dd><?= e($invoice['number'] ?? '—') ?></dd>
-        <dt>Rechnungsdatum</dt><dd><?= date_de($invoice['issue_date']) ?></dd>
+        <dt><?= $doc === 'Quittung' ? 'Belegnr.' : 'Rechnungsnr.' ?></dt><dd><?= e($invoice['number'] ?? '—') ?></dd>
+        <dt>Datum</dt><dd><?= date_de($invoice['issue_date']) ?></dd>
         <dt>Leistungsdatum</dt><dd><?= e($invoice['service_date'] ?: '—') ?></dd>
         <dt>Kundennr.</dt><dd><?= sprintf('K-%05d', (int)$invoice['customer_id']) ?></dd>
       </dl>
     </section>
 
-    <h1>Rechnung<?= $invoice['title'] ? ' – ' . e($invoice['title']) : '' ?></h1>
+    <h1><?= e($doc) ?><?= $invoice['title'] ? ' – ' . e($invoice['title']) : '' ?></h1>
 
     <table class="items">
       <thead><tr><th>Pos.</th><th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Gesamt</th></tr></thead>
@@ -72,11 +73,13 @@ $r = $invoice['recipient'] ?? ['name' => $invoice['customer_name'], 'company' =>
           <tr><td colspan="4">Nettobetrag</td><td class="num"><?= money($invoice['net_cents']) ?></td></tr>
           <tr><td colspan="4">zzgl. <?= (int)$invoice['vat_rate'] ?> % USt.</td><td class="num"><?= money($invoice['vat_cents']) ?></td></tr>
         <?php endif ?>
-        <tr class="total"><td colspan="4">Rechnungsbetrag</td><td class="num"><?= money($invoice['gross_cents']) ?></td></tr>
+        <tr class="total"><td colspan="4"><?= $doc === 'Quittung' ? 'Betrag' : 'Rechnungsbetrag' ?></td><td class="num"><?= money($invoice['gross_cents']) ?></td></tr>
       </tfoot>
     </table>
 
-    <?php if ($invoice['small_business']): ?>
+    <?php if ($invoice['mode'] === 'hobby'): ?>
+      <p class="note">Ausgestellt von einer Privatperson, keine gewerbliche Tätigkeit. Es wird keine Umsatzsteuer ausgewiesen.</p>
+    <?php elseif ($invoice['mode'] === 'kleinunternehmer'): ?>
       <p class="note">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>
     <?php endif ?>
     <?php if ($invoice['notes']): ?><p class="note"><?= nl2p($invoice['notes']) ?></p><?php endif ?>

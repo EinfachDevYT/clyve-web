@@ -5,7 +5,7 @@
 </header>
 
 <div class="stats stats-4">
-  <a class="stat glass" href="/anfragen?status=new"><b><?= $stats['requests'] ?></b><span>Neue Anfragen</span></a>
+  <a class="stat glass" href="/anfragen"><b><?= $stats['requests'] ?></b><span>Neu / ungelesen</span></a>
   <a class="stat glass" href="/tickets?status=open"><b><?= $stats['tickets'] ?></b><span>Offene Tickets</span></a>
   <a class="stat glass" href="/kunden"><b><?= $stats['customers'] ?></b><span>Kunden</span></a>
   <a class="stat glass" href="/rechnungen?status=issued"><b><?= money($stats['unpaid']) ?></b><span>Unbezahlt</span></a>

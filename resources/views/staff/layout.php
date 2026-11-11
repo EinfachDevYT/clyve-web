@@ -26,6 +26,8 @@
         <a href="/tickets"<?= View::active('/tickets') ?>>Tickets</a>
         <a href="/kunden"<?= View::active('/kunden') ?>>Kunden</a>
         <a href="/rechnungen"<?= View::active('/rechnungen') ?>>Rechnungen</a>
+        <a href="/scripts"<?= View::active('/scripts') ?>>Scripts</a>
+        <?php if ($user['role'] === 'admin'): ?><a href="/einstellungen"<?= View::active('/einstellungen') ?>>Einstellungen</a><?php endif ?>
       </nav>
       <?php View::partial('shared/signature', ['compact' => true]) ?>
       <div class="staff-me">

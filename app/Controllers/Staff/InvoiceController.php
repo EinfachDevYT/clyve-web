@@ -124,14 +124,14 @@ final class InvoiceController
             $number = InvoiceService::issue((int)$invoice['id']);
         } catch (RuntimeException $e) {
             $messages = [
-                'No items' => 'Die Rechnung hat keine Positionen.',
+                'No items' => 'Der Beleg hat keine Positionen.',
                 'Customer address incomplete' => 'Die Anschrift des Kunden ist unvollständig.',
             ];
-            flash('error', $messages[$e->getMessage()] ?? 'Rechnung konnte nicht ausgestellt werden.');
+            flash('error', $messages[$e->getMessage()] ?? InvoiceService::docLabel() . ' konnte nicht ausgestellt werden.');
             redirect($this->url($invoice));
         }
         audit('staff:' . $staff['id'], 'invoice_issued', $number);
-        flash('success', "Rechnung {$number} ausgestellt.");
+        flash('success', InvoiceService::docLabel() . " {$number} ausgestellt.");
         redirect($this->url($invoice));
     }
 
@@ -151,7 +151,7 @@ final class InvoiceController
         $invoice = $this->find($p);
         InvoiceService::cancel((int)$invoice['id']);
         audit('staff:' . $staff['id'], 'invoice_cancelled', (string)$invoice['number']);
-        flash('info', 'Rechnung storniert.');
+        flash('info', InvoiceService::docLabel($invoice) . ' storniert.');
         redirect($this->url($invoice));
     }
 
@@ -181,7 +181,7 @@ final class InvoiceController
         Auth::require();
         $invoice = $this->find($p);
         if ($invoice['status'] !== 'draft') {
-            flash('error', 'Ausgestellte Rechnungen können nicht mehr geändert werden.');
+            flash('error', 'Ausgestellte Belege können nicht mehr geändert werden.');
             redirect($this->url($invoice));
         }
         return $invoice;

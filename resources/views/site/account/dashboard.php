@@ -4,7 +4,7 @@
     <p class="kicker mono">Kundenbereich</p>
     <h1>Hey <?= e(explode(' ', $user['name'])[0]) ?> 🌸</h1>
   </div>
-  <a class="pill pill-sm" href="/konto/tickets/neu">Neues Ticket</a>
+  <?php if (\App\Services\Settings::on('tickets_enabled')): ?><a class="pill pill-sm" href="/konto/tickets/neu">Neues Ticket</a><?php endif ?>
 </header>
 
 <div class="stats">
@@ -21,7 +21,7 @@
     <?php else: ?>
       <ul class="list">
         <?php foreach ($requests as $r): ?>
-          <li><span><b><?= e($r['title'] ?: Notifier::TYPES[$r['type']]) ?></b><small><?= date_de($r['created_at']) ?></small></span><?= View::badge($r['status']) ?></li>
+          <li><a href="/konto/anfragen/<?= (int)$r['id'] ?>"><b><?php if ($r['unread_customer']): ?><span class="unread-dot"></span><?php endif ?><?= e($r['title'] ?: Notifier::TYPES[$r['type']]) ?></b><small><?= date_de($r['updated_at'], true) ?></small></a><?= View::badge($r['status']) ?></li>
         <?php endforeach ?>
       </ul>
     <?php endif ?>

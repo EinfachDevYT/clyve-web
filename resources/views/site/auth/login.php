@@ -5,7 +5,7 @@
     <div class="cust-auth-main">
       <nav class="auth-tabs" aria-label="Kundenkonto">
         <a href="/login" aria-current="page">Anmelden</a>
-        <a href="/registrieren">Registrieren</a>
+        <?php if (\App\Services\Settings::on('registration_open')): ?><a href="/registrieren">Registrieren</a><?php endif ?>
       </nav>
 
       <h1>Willkommen zurück</h1>

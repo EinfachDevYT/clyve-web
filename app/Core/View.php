@@ -68,11 +68,16 @@ final class View
             'issued'    => ['Offen', 'warn'],
             'paid'      => ['Bezahlt', 'ok'],
             'cancelled' => ['Storniert', 'bad'],
-            'new'       => ['Neu', 'warn'],
-            'contacted' => ['Kontaktiert', 'info'],
-            'accepted'  => ['Angenommen', 'ok'],
-            'declined'  => ['Abgelehnt', 'bad'],
-            'done'      => ['Erledigt', 'muted'],
+            'new'         => ['Neu', 'warn'],
+            'in_review'   => ['In Prüfung', 'info'],
+            'offer_sent'  => ['Angebot gesendet', 'warn'],
+            'accepted'    => ['Angenommen', 'ok'],
+            'in_progress' => ['In Arbeit', 'info'],
+            'delivered'   => ['Geliefert', 'ok'],
+            'declined'    => ['Abgelehnt', 'bad'],
+            'done'        => ['Abgeschlossen', 'muted'],
+            'pending'     => ['Offen', 'warn'],
+            'withdrawn'   => ['Zurückgezogen', 'muted'],
         ];
         [$label, $tone] = $map[$status] ?? [$status, 'muted'];
         return '<span class="badge badge-' . $tone . '">' . e($label) . '</span>';

@@ -14,18 +14,16 @@ return [
     // Zufälliger, langer Schlüssel:  php -r "echo bin2hex(random_bytes(32));"
     'app_secret' => 'CHANGE_ME',
 
-    // Datenbank. Standard: SQLite-Datei außerhalb des Webroots.
-    // MySQL: 'dsn' => 'mysql:host=127.0.0.1;dbname=commissions;charset=utf8mb4', 'user' => '...', 'pass' => '...'
+    // Datenbank: SQLite-Datei außerhalb des Webroots. Wird beim ersten Aufruf angelegt und automatisch migriert.
     'db' => [
         'dsn'  => 'sqlite:' . dirname(__DIR__) . '/storage/app.sqlite',
         'user' => null,
         'pass' => null,
     ],
 
-    // Benachrichtigungen bei neuen Anfragen / Tickets
+    // Benachrichtigungen an dich bei neuen Anfragen, Antworten und Tickets
     'discord_webhook' => '',
-    'mail_to'         => '',
-    'mail_from'       => 'no-reply@clyve.dev',
+    'mail_to'         => '',   // optional zusätzlich per E-Mail (braucht SMTP unten)
 
     // Rate-Limits
     'rate_limits' => [
@@ -47,25 +45,48 @@ return [
     'session_idle' => ['site' => 7200, 'staff' => 1800],
 
     // ── Rechnungen ──────────────────────────────────────────────
+    // ── Belege & Rechnungen ─────────────────────────────────────
     'business' => [
-        // Solange false: Rechnungen können nur als ENTWURF angelegt, aber nicht ausgestellt werden.
-        // Erst nach Gewerbeanmeldung auf true setzen.
-        'registered'       => false,
-        // Kleinunternehmerregelung (§ 19 UStG): keine Umsatzsteuer ausweisen.
-        'kleinunternehmer' => true,
-        'vat_rate'         => 19,
-        'name'             => 'Clyve.dev',
-        'owner'            => 'Vorname Nachname',
-        'street'           => 'Straße 1',
-        'zip'              => '66000',
-        'city'             => 'Saarbrücken',
-        'email'            => 'kontakt@clyve.dev',
-        'tax_number'       => '',   // Steuernummer vom Finanzamt
-        'vat_id'           => '',   // USt-IdNr. (falls vorhanden)
-        'iban'             => '',
-        'bic'              => '',
-        'bank'             => '',
-        'invoice_prefix'   => 'CLY',
-        'payment_days'     => 14,
+        // hobby            = Privatperson: Angebote auch kostenlos, Belege heißen „Quittung“ (Nummern Q-2026-0001), keine USt.
+        // kleinunternehmer = nach Gewerbeanmeldung: Rechnungen mit Hinweis auf § 19 UStG
+        // regular          = Rechnungen mit Umsatzsteuer (vat_rate)
+        'mode'           => 'hobby',
+        'vat_rate'       => 19,
+        'name'           => 'Clyve.dev',
+        'owner'          => 'Vorname Nachname',
+        'street'         => 'Straße 1',
+        'zip'            => '66000',
+        'city'           => 'Saarbrücken',
+        'email'          => 'kontakt@clyve.dev',
+        'tax_number'     => '',   // Steuernummer (ab Gewerbe)
+        'vat_id'         => '',   // USt-IdNr. (falls vorhanden)
+        'iban'           => '',
+        'bic'            => '',
+        'bank'           => '',
+        'invoice_prefix' => 'CLY',
+        'payment_days'   => 14,
+    ],
+
+    // ── E-Mail (SMTP) ────────────────────────────────────────────
+    // Für Antworten an Kunden. Leer lassen = keine E-Mails, Kunden sehen alles über ihren Link/Konto.
+    // Mailcow: Postfach z. B. no-reply@clyve.dev anlegen, Host = dein Mailserver, Port 587 (STARTTLS).
+    'smtp' => [
+        'host'       => '',
+        'port'       => 587,
+        'encryption' => 'tls',   // tls = STARTTLS (587), ssl = 465
+        'username'   => '',
+        'password'   => '',
+        'from'       => 'no-reply@clyve.dev',
+        'from_name'  => 'Clyve.dev',
+    ],
+
+    // ── Tebex (Script-Shop) ──────────────────────────────────────
+    'tebex' => [
+        // Öffentlicher Webstore-Identifier aus dem Tebex-Panel (Integrations → Headless API). Leer = nur manuelle Produkte.
+        'webstore_token' => '',
+        // Adresse deines Tebex-Shops, z. B. https://clyve.tebex.io
+        'store_url'      => '',
+        // Hosts, von denen Produktbilder geladen werden dürfen
+        'image_hosts'    => ['dunb17ur4ymx4.cloudfront.net'],
     ],
 ];

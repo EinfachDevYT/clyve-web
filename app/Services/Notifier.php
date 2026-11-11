@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+/** Notifications to the owner: Discord webhook and, if configured, an e-mail to mail_to. */
 final class Notifier
 {
     public const TYPES = [
@@ -12,32 +13,32 @@ final class Notifier
         'other' => 'Sonstiges',
     ];
 
-    public static function newRequest(array $r): bool
+    public static function newRequest(array $r): void
     {
-        $sent = self::discord(
-            'Neue Anfrage: ' . ($r['title'] !== '' ? $r['title'] : self::TYPES[$r['type']]) . ' — ' . $r['name'],
-            $r['message'],
-            [
-                'Art'     => self::TYPES[$r['type']],
-                'Budget'  => $r['budget'] ?: '–',
-                'Termin'  => $r['deadline'] ?: '–',
-                'Discord' => $r['discord'] ?: '–',
-                'E-Mail'  => $r['email'] ?: '–',
-            ],
-            'Anfrage ' . $r['public_id']
-        );
-        $mailed = self::mail('Neue Anfrage: ' . self::TYPES[$r['type']], self::plain($r), $r['email'] ?: null);
-        return $sent || $mailed;
+        $fields = [
+            'Art'     => self::TYPES[$r['type']],
+            'Budget'  => $r['budget'] ?: '–',
+            'Termin'  => $r['deadline'] ?: '–',
+            'Discord' => $r['discord'] ?: '–',
+            'E-Mail'  => $r['email'] ?: '–',
+        ] + RequestService::detailLines($r);
+
+        $title = 'Neue Anfrage: ' . ($r['title'] !== '' ? $r['title'] : self::TYPES[$r['type']]) . ' — ' . $r['name'];
+        self::event($title, $r['message'], $fields, 'Anfrage ' . $r['public_id']);
+
+        $owner = (string)config('mail_to', '');
+        if ($owner !== '') {
+            $lines = [];
+            foreach ($fields as $k => $v) {
+                $lines[] = $k . ': ' . $v;
+            }
+            Mailer::send($owner, $title, implode("\n", $lines) . "\n\n" . $r['message'] . "\n\n" . RequestService::siteUrl(), $r['email'] ?: null);
+        }
     }
 
     public static function newTicket(array $ticket, array $customer, string $body): void
     {
-        self::discord(
-            'Ticket #' . $ticket['id'] . ': ' . $ticket['subject'],
-            $body,
-            ['Kunde' => $customer['name'], 'E-Mail' => $customer['email']],
-            'Support'
-        );
+        self::event('Ticket #' . $ticket['id'] . ': ' . $ticket['subject'], $body, ['Kunde' => $customer['name'], 'E-Mail' => $customer['email']], 'Support');
     }
 
     private static function escape(string $s): string
@@ -46,7 +47,7 @@ final class Notifier
         return str_replace('@', "@\u{200B}", $s);
     }
 
-    private static function discord(string $title, string $description, array $fields, string $footer): bool
+    public static function event(string $title, string $description, array $fields, string $footer): bool
     {
         $hook = (string)config('discord_webhook', '');
         if ($hook === '' || !preg_match('#^https://(?:ptb\.|canary\.)?discord(?:app)?\.com/api/webhooks/\d+/[\w-]+$#', $hook)) {
@@ -54,8 +55,8 @@ final class Notifier
         }
 
         $embedFields = [];
-        foreach ($fields as $name => $value) {
-            $embedFields[] = ['name' => $name, 'value' => mb_substr(self::escape((string)$value), 0, 1000), 'inline' => true];
+        foreach (array_slice($fields, 0, 20, true) as $name => $value) {
+            $embedFields[] = ['name' => mb_substr((string)$name, 0, 250), 'value' => mb_substr(self::escape((string)$value), 0, 1000) ?: '–', 'inline' => true];
         }
 
         $payload = json_encode([
@@ -93,27 +94,5 @@ final class Notifier
             return false;
         }
         return true;
-    }
-
-    private static function mail(string $subject, string $body, ?string $replyTo): bool
-    {
-        $to = (string)config('mail_to', '');
-        $from = (string)config('mail_from', '');
-        if (!filter_var($to, FILTER_VALIDATE_EMAIL) || !filter_var($from, FILTER_VALIDATE_EMAIL)) {
-            return false;
-        }
-        $headers = ['From: Clyve.dev <' . $from . '>', 'Content-Type: text/plain; charset=UTF-8'];
-        if ($replyTo !== null && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
-            $headers[] = 'Reply-To: ' . $replyTo;
-        }
-        return mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, implode("\r\n", $headers));
-    }
-
-    private static function plain(array $r): string
-    {
-        return "Anfrage {$r['public_id']}\n"
-            . 'Art: ' . self::TYPES[$r['type']] . "\n"
-            . "Name: {$r['name']}\nTitel: {$r['title']}\nDiscord: {$r['discord']}\nE-Mail: {$r['email']}\n"
-            . "Budget: {$r['budget']}\nTermin: {$r['deadline']}\n\n{$r['message']}\n";
     }
 }

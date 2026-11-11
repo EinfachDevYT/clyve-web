@@ -1,14 +1,14 @@
 <?php use App\Core\View; ob_start() ?>
 <header class="page-head">
   <div><p class="kicker mono">Kundenbereich</p><h1>Support</h1></div>
-  <a class="pill pill-sm" href="/konto/tickets/neu">Neues Ticket</a>
+  <?php if (\App\Services\Settings::on('tickets_enabled')): ?><a class="pill pill-sm" href="/konto/tickets/neu">Neues Ticket</a><?php endif ?>
 </header>
 
 <?php if (!$tickets): ?>
   <div class="panel glass empty-state">
     <img src="/assets/img/blossom.svg" alt="" width="48" height="48">
     <p>Alles ruhig hier. Brauchst du Hilfe?</p>
-    <a class="pill pill-sm" href="/konto/tickets/neu">Ticket erstellen</a>
+    <?php if (\App\Services\Settings::on('tickets_enabled')): ?><a class="pill pill-sm" href="/konto/tickets/neu">Ticket erstellen</a><?php endif ?>
   </div>
 <?php else: ?>
   <div class="table-wrap glass">

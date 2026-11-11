@@ -32,6 +32,8 @@
     </tfoot>
   </table>
 </div>
-<?php if ($invoice['small_business']): ?>
+<?php if ($invoice['mode'] === 'hobby'): ?>
+  <p class="muted small">Quittung einer Privatperson, keine Umsatzsteuer.</p>
+<?php elseif ($invoice['mode'] === 'kleinunternehmer'): ?>
   <p class="muted small">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>
 <?php endif ?>

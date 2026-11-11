@@ -19,7 +19,7 @@ final class AccountController
             'openTickets'  => (int)Db::value("SELECT COUNT(*) FROM tickets WHERE customer_id = ? AND status <> 'closed'", [$id]),
             'openInvoices' => (int)Db::value("SELECT COUNT(*) FROM invoices WHERE customer_id = ? AND status = 'issued'", [$id]),
             'openAmount'   => (int)Db::value("SELECT COALESCE(SUM(total_cents), 0) FROM invoices WHERE customer_id = ? AND status = 'issued'", [$id]),
-            'requests'     => Db::all('SELECT * FROM requests WHERE customer_id = ? ORDER BY id DESC LIMIT 5', [$id]),
+            'requests'     => Db::all('SELECT * FROM requests WHERE customer_id = ? ORDER BY updated_at DESC LIMIT 5', [$id]),
             'tickets'      => Db::all('SELECT * FROM tickets WHERE customer_id = ? ORDER BY updated_at DESC LIMIT 5', [$id]),
         ], 'Übersicht');
     }
@@ -28,7 +28,7 @@ final class AccountController
     {
         $user = Auth::require();
         View::render('site/account/requests', [
-            'requests' => Db::all('SELECT * FROM requests WHERE customer_id = ? ORDER BY id DESC', [$user['id']]),
+            'requests' => Db::all('SELECT * FROM requests WHERE customer_id = ? ORDER BY updated_at DESC, id DESC', [$user['id']]),
         ], 'Meine Anfragen');
     }
 

@@ -4,9 +4,7 @@
   <a class="pill pill-sm" href="/rechnungen/neu">Neue Rechnung</a>
 </header>
 
-<?php if (!$canIssue): ?>
-  <div class="notice">Kein Gewerbe hinterlegt: Rechnungen können vorbereitet, aber noch <b>nicht ausgestellt</b> werden. Nach der Gewerbeanmeldung <code>business.registered</code> in der Config auf <code>true</code> setzen.</div>
-<?php endif ?>
+<div class="notice">Modus: <b><?= e(\App\Services\InvoiceService::MODES[\App\Services\InvoiceService::mode()]) ?></b><?php if (\App\Services\InvoiceService::mode() === 'hobby'): ?> – Belege werden als <b>Quittung</b> ausgestellt (ohne USt.). Nach einer Gewerbeanmeldung <code>business.mode</code> in der Config umstellen.<?php endif ?></div>
 
 <?php View::partial('staff/_filters', ['base' => '/rechnungen', 'current' => $status, 'options' => ['' => 'Alle', 'draft' => 'Entwürfe', 'issued' => 'Offen', 'paid' => 'Bezahlt', 'cancelled' => 'Storniert']]) ?>
 

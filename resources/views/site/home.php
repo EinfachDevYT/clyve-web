@@ -1,4 +1,4 @@
-<section class="hero">
+<section id="start" class="hero" data-title="">
   <svg class="branch branch-l" viewBox="0 0 520 420" aria-hidden="true">
     <path d="M-20 30 C 120 60, 210 40, 300 120 S 420 230, 360 330" />
     <path d="M120 -10 C 140 80, 100 140, 200 190" class="thin" />
@@ -10,7 +10,7 @@
   </svg>
 
   <div class="hero-inner">
-    <p class="eyebrow mono"><span class="dot"></span> Offen für neue Aufträge</p>
+    <p class="eyebrow mono"><span class="dot<?= $openTypes ? '' : ' dot-off' ?>"></span> <?= e($settings['availability_label']) ?></p>
     <h1>
       Dein Projekt.<br />
       <span class="grad">Einfach</span> umgesetzt.
@@ -30,14 +30,14 @@
     <ul class="hero-facts mono">
       <li><b>Saarland</b><span>Standort</span></li>
       <li><b>Lua · Py · PHP · JS</b><span>Sprachen</span></li>
-      <li><b>&lt; 24h</b><span>Antwortzeit</span></li>
+      <li><b><?= e($settings['response_time']) ?></b><span>Antwortzeit</span></li>
     </ul>
   </div>
 </section>
 
 <div class="divider" aria-hidden="true"><span></span><img src="/assets/img/blossom.svg" alt="" /><span></span></div>
 
-<section id="leistungen" class="section">
+<section id="leistungen" class="section" data-title="Leistungen">
   <header class="section-head">
     <p class="kicker mono">01 — Leistungen</p>
     <h2>Was ich für dich baue</h2>
@@ -82,7 +82,7 @@
   </div>
 </section>
 
-<section id="ablauf" class="section">
+<section id="ablauf" class="section" data-title="Ablauf">
   <header class="section-head">
     <p class="kicker mono">02 — Ablauf</p>
     <h2>Von der Idee zum Release</h2>
@@ -114,78 +114,142 @@
 
 <div class="divider" aria-hidden="true"><span></span><img src="/assets/img/blossom.svg" alt="" /><span></span></div>
 
-<section id="anfrage" class="section">
+<section id="anfrage" class="section" data-title="Auftrag anfragen">
   <header class="section-head">
     <p class="kicker mono">03 — Anfrage</p>
     <h2>Erzähl mir von deinem Projekt</h2>
-    <p class="sub">Kostenlos &amp; unverbindlich. Ich antworte in der Regel innerhalb von 24 Stunden. 🌸</p>
+    <p class="sub">Kostenlos &amp; unverbindlich. Ich antworte in der Regel innerhalb von <?= e($settings['response_time']) ?>. 🌸</p>
   </header>
 
-  <form class="form glass" id="requestForm" data-json<?= $user ? ' data-logged-in="1"' : '' ?> action="/anfrage" method="post" novalidate>
+  <?php
+    $typeLabels = ['fivem' => '🚗 FiveM Script', 'web' => '🌐 Website', 'bot' => '🤖 Discord Bot', 'other' => '✨ Etwas anderes'];
+    $typeHints = [
+      'fivem' => 'Jobs, Systeme, NUI, MLOs, Anpassungen',
+      'web'   => 'Landingpages, Portale, Dashboards',
+      'bot'   => 'Tickets, Bewerbungen, Verify & mehr',
+      'other' => 'Etwas, das nicht in die Liste passt',
+    ];
+  ?>
+
+  <?php if (!$openTypes): ?>
+    <div class="closed-panel glass">
+      <img src="/assets/brand/clyve-mark.svg" alt="" width="56" height="56">
+      <h3>Gerade keine neuen Aufträge</h3>
+      <p><?= e($settings['requests_closed_message']) ?></p>
+      <a class="pill pill-ghost" href="https://discord.com/users/267311011520970752" target="_blank" rel="noopener">Auf Discord schreiben</a>
+    </div>
+  <?php else: ?>
+  <form class="form glass wizard" id="requestForm" data-json<?= $user ? ' data-logged-in="1"' : '' ?> action="/anfrage" method="post" novalidate>
     <?= csrf_field() ?>
-    <fieldset class="field">
-      <legend>Was soll entstehen? <i>*</i></legend>
-      <div class="chips" role="radiogroup">
-        <label class="chip"><input type="radio" name="type" value="fivem" required /><span>🚗 FiveM Script</span></label>
-        <label class="chip"><input type="radio" name="type" value="web" /><span>🌐 Website</span></label>
-        <label class="chip"><input type="radio" name="type" value="bot" /><span>🤖 Discord Bot</span></label>
-        <label class="chip"><input type="radio" name="type" value="other" /><span>✨ Etwas anderes</span></label>
+
+    <ol class="steps-nav" aria-hidden="true">
+      <li data-step-dot="1"><span>1</span>Kategorie</li>
+      <li data-step-dot="2"><span>2</span>Details</li>
+      <li data-step-dot="3"><span>3</span>Beschreibung</li>
+      <li data-step-dot="4"><span>4</span>Kontakt</li>
+    </ol>
+
+    <fieldset class="wizard-step" data-step="1">
+      <legend class="step-title">Was soll entstehen? <i>*</i></legend>
+      <div class="type-cards" role="radiogroup">
+        <?php foreach ($typeLabels as $key => $label): $open = in_array($key, $openTypes, true); ?>
+          <label class="type-card<?= $open ? '' : ' is-closed' ?>">
+            <input type="radio" name="type" value="<?= e($key) ?>"<?= $open ? '' : ' disabled' ?> required>
+            <span class="type-card-body">
+              <b><?= e($label) ?></b>
+              <small><?= $open ? e($typeHints[$key]) : 'Gerade geschlossen' ?></small>
+            </span>
+          </label>
+        <?php endforeach ?>
+      </div>
+      <p class="hint">Fertige Scripts findest du im <a href="/scripts">Script-Shop</a>.</p>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step="2">
+      <legend class="step-title">Ein paar Details</legend>
+      <?php foreach ($details as $type => $fields): if (!$fields) continue; ?>
+        <div class="type-details" data-for-type="<?= e($type) ?>">
+          <?php foreach ($fields as $key => $f): ?>
+            <?php if ($f['kind'] === 'multi'): ?>
+              <fieldset class="field">
+                <legend><?= e($f['label']) ?> <small class="muted">(mehrere möglich)</small></legend>
+                <div class="chips">
+                  <?php foreach ($f['options'] as $opt): ?>
+                    <label class="chip"><input type="checkbox" name="details[<?= e($key) ?>][]" value="<?= e($opt) ?>"><span><?= e($opt) ?></span></label>
+                  <?php endforeach ?>
+                </div>
+              </fieldset>
+            <?php else: ?>
+              <label class="field"><span><?= e($f['label']) ?></span>
+                <select name="details[<?= e($key) ?>]">
+                  <option value="">Bitte wählen…</option>
+                  <?php foreach ($f['options'] as $opt): ?><option><?= e($opt) ?></option><?php endforeach ?>
+                </select>
+              </label>
+            <?php endif ?>
+          <?php endforeach ?>
+        </div>
+      <?php endforeach ?>
+
+      <label class="field">
+        <span>Projekttitel</span>
+        <input type="text" name="title" maxlength="120" placeholder="z. B. Garagen-System mit NUI">
+      </label>
+      <div class="grid-2">
+        <label class="field">
+          <span>Budget</span>
+          <select name="budget">
+            <option value="">Noch unklar</option>
+            <?php foreach ($budgets as $b): ?><option><?= e($b) ?></option><?php endforeach ?>
+          </select>
+        </label>
+        <label class="field">
+          <span>Wunschtermin</span>
+          <input type="date" name="deadline">
+        </label>
       </div>
     </fieldset>
 
-    <div class="grid-2">
+    <fieldset class="wizard-step" data-step="3">
+      <legend class="step-title">Beschreib dein Projekt <i>*</i></legend>
       <label class="field">
-        <span>Name / Nickname <i>*</i></span>
-        <input type="text" name="name" maxlength="80" autocomplete="nickname" required placeholder="z. B. Max" value="<?= e($user['name'] ?? '') ?>">
+        <span class="sr-only">Beschreibung</span>
+        <textarea name="message" rows="8" maxlength="4000" required placeholder="Was soll es können? Wie soll es aussehen? Gibt es Beispiele oder Referenzen (Links)?"></textarea>
+        <small class="counter mono"><span id="msgCount">0</span> / 4000 · mindestens 20 Zeichen</small>
       </label>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step="4">
+      <legend class="step-title">Wie erreiche ich dich?</legend>
+      <div class="grid-2">
+        <label class="field">
+          <span>Name / Nickname <i>*</i></span>
+          <input type="text" name="name" maxlength="80" autocomplete="nickname" required placeholder="z. B. Max" value="<?= e($user['name'] ?? '') ?>">
+        </label>
+        <label class="field">
+          <span>Discord-Name</span>
+          <input type="text" name="discord" maxlength="32" placeholder="z. B. max.dev" value="<?= e($user['discord'] ?? '') ?>">
+        </label>
+      </div>
       <label class="field">
-        <span>Projekttitel</span>
-        <input type="text" name="title" maxlength="120" placeholder="z. B. Garagen-System mit NUI" />
+        <span>E-Mail <small class="muted">(empfohlen – dann bekommst du Antworten direkt zugeschickt)</small></span>
+        <input type="email" name="email" maxlength="160" autocomplete="email" placeholder="du@beispiel.de" value="<?= e($user['email'] ?? '') ?>">
       </label>
-    </div>
+      <p class="hint" id="contactHint">Mindestens Discord <b>oder</b> E-Mail angeben.</p>
 
-    <div class="grid-2">
-      <label class="field">
-        <span>Discord-Name</span>
-        <input type="text" name="discord" maxlength="64" placeholder="z. B. max.dev" />
+      <div class="summary" id="requestSummary" hidden></div>
+
+      <label class="hp" aria-hidden="true">Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+
+      <label class="consent">
+        <input type="checkbox" name="consent" value="1" required>
+        <span>Ich bin damit einverstanden, dass meine Angaben zur Bearbeitung der Anfrage gespeichert werden. Details in der <a href="/datenschutz">Datenschutzerklärung</a>. <i>*</i></span>
       </label>
-      <label class="field">
-        <span>E-Mail</span>
-        <input type="email" name="email" maxlength="160" autocomplete="email" placeholder="du@beispiel.de" value="<?= e($user['email'] ?? '') ?>" />
-      </label>
-    </div>
-    <p class="hint" id="contactHint">Mindestens Discord <b>oder</b> E-Mail angeben, damit ich dich erreichen kann.</p>
+    </fieldset>
 
-    <div class="grid-2">
-      <label class="field">
-        <span>Budget</span>
-        <select name="budget">
-          <option value="">Noch unklar</option>
-          <?php foreach ($budgets as $b): ?>
-          <option><?= e($b) ?></option>
-          <?php endforeach ?>
-        </select>
-      </label>
-      <label class="field">
-        <span>Wunschtermin</span>
-        <input type="date" name="deadline" />
-      </label>
-    </div>
-
-    <label class="field">
-      <span>Beschreibung <i>*</i></span>
-      <textarea name="message" rows="6" maxlength="4000" required placeholder="Was soll es können? Welches Framework / welche Features? Gibt es Beispiele oder Referenzen?"></textarea>
-      <small class="counter mono"><span id="msgCount">0</span> / 4000</small>
-    </label>
-
-    <label class="hp" aria-hidden="true">Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
-
-    <label class="consent">
-      <input type="checkbox" name="consent" value="1" required />
-      <span>Ich bin damit einverstanden, dass meine Angaben zur Bearbeitung der Anfrage gespeichert werden. Details in der <a href="/datenschutz">Datenschutzerklärung</a>. <i>*</i></span>
-    </label>
-
-    <div class="form-foot">
+    <div class="form-foot wizard-foot">
+      <button class="pill pill-ghost" type="button" data-step-prev hidden>Zurück</button>
+      <button class="pill" type="button" data-step-next hidden>Weiter</button>
       <button class="pill" type="submit" id="submitBtn">
         <span class="btn-label">Anfrage absenden</span>
         <span class="spinner" aria-hidden="true"></span>
@@ -193,9 +257,18 @@
       <p class="form-status" id="formStatus" role="status"></p>
     </div>
   </form>
+
+  <div class="form glass success-panel" id="requestSuccess" hidden>
+    <img src="/assets/brand/clyve-mark.svg" alt="" width="56" height="56">
+    <h3 id="successTitle">Danke!</h3>
+    <p id="successText"></p>
+    <a class="pill" id="successLink" href="#">Anfrage ansehen</a>
+    <p class="hint">Speichere dir den Link – darüber siehst du den Stand, kannst mir antworten und Angebote annehmen.</p>
+  </div>
+  <?php endif ?>
 </section>
 
-<section id="faq" class="section">
+<section id="faq" class="section" data-title="FAQ">
   <header class="section-head">
     <p class="kicker mono">04 — FAQ</p>
     <h2>Häufige Fragen</h2>

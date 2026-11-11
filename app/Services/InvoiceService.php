@@ -9,9 +9,33 @@ use RuntimeException;
 
 final class InvoiceService
 {
+    public const MODES = [
+        'hobby'            => 'Hobby (Privatperson, Quittungen)',
+        'kleinunternehmer' => 'Kleinunternehmer (§ 19 UStG)',
+        'regular'          => 'Regelbesteuert (mit USt.)',
+    ];
+
+    /** hobby: private person, issues receipts without VAT. kleinunternehmer: invoices per § 19 UStG. regular: invoices with VAT. */
+    public static function mode(): string
+    {
+        $mode = (string)config('business.mode', '');
+        if (isset(self::MODES[$mode])) {
+            return $mode;
+        }
+        if (!config('business.registered', false)) {
+            return 'hobby';
+        }
+        return config('business.kleinunternehmer', true) ? 'kleinunternehmer' : 'regular';
+    }
+
+    public static function docLabel(?array $invoice = null): string
+    {
+        return ($invoice['mode'] ?? self::mode()) === 'hobby' ? 'Quittung' : 'Rechnung';
+    }
+
     public static function canIssue(): bool
     {
-        return (bool)config('business.registered', false);
+        return true;
     }
 
     public static function find(int $id, ?int $customerId = null): ?array
@@ -39,10 +63,14 @@ final class InvoiceService
         foreach ($invoice['items'] as $item) {
             $net += self::lineTotal($item);
         }
-        $small = (bool)($invoice['sender']['kleinunternehmer'] ?? config('business.kleinunternehmer', true));
-        $rate = $small ? 0 : (int)($invoice['sender']['vat_rate'] ?? config('business.vat_rate', 19));
+        $sender = $invoice['sender'] ?? null;
+        $mode = $sender['mode'] ?? ($sender ? (!empty($sender['kleinunternehmer']) ? 'kleinunternehmer' : 'regular') : self::mode());
+        $rate = $mode === 'regular' ? (int)($sender['vat_rate'] ?? config('business.vat_rate', 19)) : 0;
         $vat = (int)round($net * $rate / 100);
-        return ['net_cents' => $net, 'vat_rate' => $rate, 'vat_cents' => $vat, 'gross_cents' => $net + $vat, 'small_business' => $small];
+        return [
+            'net_cents' => $net, 'vat_rate' => $rate, 'vat_cents' => $vat, 'gross_cents' => $net + $vat,
+            'small_business' => $mode !== 'regular', 'mode' => $mode,
+        ];
     }
 
     public static function lineTotal(array $item): int
@@ -50,12 +78,21 @@ final class InvoiceService
         return (int)round((float)$item['quantity'] * (int)$item['unit_price_cents']);
     }
 
-    public static function createDraft(int $customerId, string $title, int $staffId): int
+    public static function createDraft(int $customerId, string $title, int $staffId, ?int $requestId = null): int
     {
         return Db::insert(
-            'INSERT INTO invoices (customer_id, title, created_by) VALUES (?, ?, ?)',
-            [$customerId, $title, $staffId]
+            'INSERT INTO invoices (customer_id, title, created_by, request_id) VALUES (?, ?, ?, ?)',
+            [$customerId, $title, $staffId, $requestId]
         );
+    }
+
+    /** Draft with the accepted offer as single position. */
+    public static function draftFromOffer(array $request, array $offer, int $staffId): int
+    {
+        $title = $request['title'] !== '' ? $request['title'] : Notifier::TYPES[$request['type']];
+        $id = self::createDraft((int)$request['customer_id'], $title, $staffId, (int)$request['id']);
+        self::addItem($id, mb_substr($title . ' – laut Angebot', 0, 300), 1, 'Pausch.', (int)$offer['amount_cents']);
+        return $id;
     }
 
     public static function addItem(int $invoiceId, string $description, float $qty, string $unit, int $priceCents): void
@@ -92,10 +129,6 @@ final class InvoiceService
      */
     public static function issue(int $invoiceId): string
     {
-        if (!self::canIssue()) {
-            throw new RuntimeException('Business not registered');
-        }
-
         return Db::transaction(static function () use ($invoiceId): string {
             $invoice = self::find($invoiceId);
             if (!$invoice || $invoice['status'] !== 'draft') {
@@ -104,22 +137,20 @@ final class InvoiceService
             if (!$invoice['items']) {
                 throw new RuntimeException('No items');
             }
+            $mode = self::mode();
             $customer = Db::one('SELECT * FROM customers WHERE id = ?', [$invoice['customer_id']]);
-            if (!$customer || $customer['street'] === '' || $customer['zip'] === '' || $customer['city'] === '') {
+            if (!$customer || ($mode !== 'hobby' && ($customer['street'] === '' || $customer['zip'] === '' || $customer['city'] === ''))) {
                 throw new RuntimeException('Customer address incomplete');
             }
 
             $now = new DateTimeImmutable('today');
-            $year = (int)$now->format('Y');
-            $last = Db::value('SELECT last FROM invoice_counter WHERE year = ?', [$year]);
-            if ($last === false) {
-                Db::exec('INSERT INTO invoice_counter (year, last) VALUES (?, 1)', [$year]);
-                $next = 1;
-            } else {
-                $next = (int)$last + 1;
-                Db::exec('UPDATE invoice_counter SET last = ? WHERE year = ?', [$next, $year]);
-            }
-            $number = sprintf('%s-%d-%04d', config('business.invoice_prefix', 'RE'), $year, $next);
+            $prefix = $mode === 'hobby' ? 'Q' : (string)config('business.invoice_prefix', 'RE');
+            $series = $prefix . '-' . $now->format('Y');
+            do {
+                $next = (int)Db::value('SELECT last FROM invoice_series WHERE series = ?', [$series]) + 1;
+                Db::exec('INSERT INTO invoice_series (series, last) VALUES (?, ?) ON CONFLICT(series) DO UPDATE SET last = excluded.last', [$series, $next]);
+                $number = sprintf('%s-%04d', $series, $next);
+            } while (Db::value('SELECT 1 FROM invoices WHERE number = ?', [$number]));
 
             $b = (array)config('business');
             $sender = [
@@ -127,7 +158,7 @@ final class InvoiceService
                 'zip' => $b['zip'] ?? '', 'city' => $b['city'] ?? '', 'email' => $b['email'] ?? '',
                 'tax_number' => $b['tax_number'] ?? '', 'vat_id' => $b['vat_id'] ?? '',
                 'iban' => $b['iban'] ?? '', 'bic' => $b['bic'] ?? '', 'bank' => $b['bank'] ?? '',
-                'kleinunternehmer' => (bool)($b['kleinunternehmer'] ?? true), 'vat_rate' => (int)($b['vat_rate'] ?? 19),
+                'mode' => $mode, 'kleinunternehmer' => $mode === 'kleinunternehmer', 'vat_rate' => (int)($b['vat_rate'] ?? 19),
             ];
             $recipient = [
                 'name' => $customer['name'], 'company' => $customer['company'], 'street' => $customer['street'],

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= e($pageTitle ? $pageTitle . ' · Clyve.dev' : 'Clyve.dev') ?></title>
+  <title><?= e($pageTitle ? $pageTitle . ' · Clyve.dev' : 'Clyve.dev – FiveM Scripts, Websites & Discord Bots') ?></title>
   <meta name="description" content="FiveM Scripts, Websites & Discord Bots nach Maß – sauber, performant, aus dem Saarland.">
   <meta name="theme-color" content="#0D0B14">
   <meta name="author" content="EinfachDev · einfachdev.de">
@@ -26,6 +26,7 @@
       <a href="/#leistungen">Leistungen</a>
       <a href="/#ablauf">Ablauf</a>
       <a href="/#faq">FAQ</a>
+      <?php if (\App\Services\Settings::on('shop_enabled')): ?><a href="/scripts"<?= View::active('/scripts') ?>>Scripts</a><?php endif ?>
       <?php if ($user): ?>
         <a href="/konto"<?= View::active('/konto') ?>>Mein Konto</a>
         <form action="/logout" method="post" class="inline-form">
@@ -41,6 +42,9 @@
   </header>
 
   <main id="app" data-swap="main">
+    <?php if (($announcement = \App\Services\Settings::get('announcement')) !== ''): ?>
+      <div class="announcement" role="note"><?= e($announcement) ?></div>
+    <?php endif ?>
     <?php if ($flashes): ?>
       <div class="toasts" data-toasts>
         <?php foreach ($flashes as $f): ?>

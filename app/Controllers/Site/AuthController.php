@@ -36,12 +36,14 @@ final class AuthController
     public function showRegister(): void
     {
         $this->guestOnly();
+        $this->registrationOpen();
         View::render('site/auth/register', [], 'Konto erstellen');
     }
 
     public function register(): void
     {
         $this->guestOnly();
+        $this->registrationOpen();
         if (!RateLimiter::ip('register')) {
             fail_back([], '/registrieren', 'Zu viele Registrierungen. Bitte versuch es später erneut.');
         }
@@ -76,6 +78,14 @@ final class AuthController
         Auth::logout();
         flash('info', 'Du wurdest abgemeldet.');
         redirect('/');
+    }
+
+    private function registrationOpen(): void
+    {
+        if (!\App\Services\Settings::on('registration_open')) {
+            flash('info', 'Neue Konten können gerade nicht erstellt werden.');
+            redirect('/login');
+        }
     }
 
     private function guestOnly(): void

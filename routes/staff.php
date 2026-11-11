@@ -4,8 +4,10 @@ declare(strict_types=1);
 use App\Controllers\Staff\AuthController;
 use App\Controllers\Staff\CustomerController;
 use App\Controllers\Staff\DashboardController;
+use App\Controllers\Staff\ProductController;
 use App\Controllers\Staff\InvoiceController;
 use App\Controllers\Staff\RequestController;
+use App\Controllers\Staff\SettingsController;
 use App\Controllers\Staff\TicketController;
 use App\Core\Router;
 
@@ -20,6 +22,10 @@ $router->get('/', [DashboardController::class, 'index']);
 $router->get('/anfragen', [RequestController::class, 'index']);
 $router->get('/anfragen/{id}', [RequestController::class, 'show']);
 $router->post('/anfragen/{id}/status', [RequestController::class, 'updateStatus']);
+$router->post('/anfragen/{id}/antwort', [RequestController::class, 'reply']);
+$router->post('/anfragen/{id}/angebot', [RequestController::class, 'offer']);
+$router->post('/anfragen/{id}/link', [RequestController::class, 'rotateLink']);
+$router->post('/anfragen/{id}/rechnung', [RequestController::class, 'createInvoice']);
 
 $router->get('/tickets', [TicketController::class, 'index']);
 $router->get('/tickets/{id}', [TicketController::class, 'show']);
@@ -41,5 +47,18 @@ $router->post('/rechnungen/{id}/bezahlt', [InvoiceController::class, 'markPaid']
 $router->post('/rechnungen/{id}/stornieren', [InvoiceController::class, 'cancel']);
 $router->post('/rechnungen/{id}/loeschen', [InvoiceController::class, 'destroy']);
 $router->get('/rechnungen/{id}/druck', [InvoiceController::class, 'print']);
+
+$router->get('/scripts', [ProductController::class, 'index']);
+$router->get('/scripts/neu', [ProductController::class, 'create']);
+$router->post('/scripts', [ProductController::class, 'store']);
+$router->post('/scripts/sync', [ProductController::class, 'sync']);
+$router->get('/scripts/{id}', [ProductController::class, 'edit']);
+$router->post('/scripts/{id}', [ProductController::class, 'update']);
+$router->post('/scripts/{id}/toggle', [ProductController::class, 'toggle']);
+$router->post('/scripts/{id}/loeschen', [ProductController::class, 'destroy']);
+
+$router->get('/einstellungen', [SettingsController::class, 'show']);
+$router->post('/einstellungen', [SettingsController::class, 'update']);
+$router->post('/einstellungen/test-mail', [SettingsController::class, 'testMail']);
 
 return $router;

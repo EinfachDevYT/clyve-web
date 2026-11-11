@@ -254,8 +254,51 @@ cd /var/www/clyve-web && sudo git pull --ff-only
 sudo systemctl reload php8.3-fpm
 ```
 
+Die Datenbank wird beim nächsten Seitenaufruf **automatisch migriert** (`database/migrations/`), bestehende Daten bleiben erhalten.
+Vorher ein Backup zu machen schadet trotzdem nie (siehe unten).
+
+Neue Einstellungen in `config/config.example.php` sind optional – fehlen sie in deiner `config.php`, gelten sichere Standardwerte.
+
 Haben sich die Dateien in `deploy/nginx/` geändert, die Änderungen in `/etc/nginx/sites-available/` übernehmen
 (dabei die von Certbot ergänzten SSL-Zeilen behalten), dann `sudo nginx -t` und `sudo systemctl reload nginx`.
+
+## E-Mail an Kunden (Mailcow / SMTP)
+
+Damit Kunden bei Antworten, Angeboten und Statuswechseln eine E-Mail bekommen:
+
+1. In Mailcow ein Postfach anlegen, z. B. `no-reply@clyve.dev`.
+2. In `config/config.php` ergänzen bzw. anpassen:
+
+```php
+'smtp' => [
+    'host'       => 'mail.clyve.dev',
+    'port'       => 587,
+    'encryption' => 'tls',
+    'username'   => 'no-reply@clyve.dev',
+    'password'   => '…',
+    'from'       => 'no-reply@clyve.dev',
+    'from_name'  => 'Clyve.dev',
+],
+```
+
+3. Im Staff-Bereich unter **Einstellungen → Test-E-Mail an mich senden** prüfen.
+
+Ohne SMTP funktioniert alles weiter – Kunden sehen Antworten dann nur über ihren Link bzw. ihr Konto.
+
+## Tebex (Script-Shop)
+
+1. Im Tebex-Panel unter **Integrations → Headless API** den öffentlichen Webstore-Identifier kopieren.
+2. In `config/config.php`:
+
+```php
+'tebex' => [
+    'webstore_token' => '…',
+    'store_url'      => 'https://deinshop.tebex.io',
+    'image_hosts'    => ['dunb17ur4ymx4.cloudfront.net'],
+],
+```
+
+3. Staff → **Scripts → Von Tebex synchronisieren**. Sichtbarkeit, Reihenfolge und Frameworks stellst du danach pro Script ein.
 
 ## Backup
 

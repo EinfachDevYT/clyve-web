@@ -33,7 +33,11 @@ final class Router
 
         $allowed = [];
         foreach ($this->routes as [$verb, $pattern, [$class, $action]]) {
-            $regex = '#^' . preg_replace('#\{(\w+)\}#', '(?P<$1>\d+)', $pattern) . '$#';
+            $regex = '#^' . preg_replace_callback(
+                '#\{([a-z]+)\}#',
+                static fn(array $m) => $m[1] === 'token' ? '(?P<token>[a-f0-9]{40})' : '(?P<' . $m[1] . '>\d+)',
+                $pattern
+            ) . '$#';
             if (!preg_match($regex, $path, $m)) {
                 continue;
             }

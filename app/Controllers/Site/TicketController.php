@@ -30,12 +30,14 @@ final class TicketController
     public function create(): void
     {
         Auth::require();
+        $this->enabled('/konto/tickets');
         View::render('site/tickets/create', ['categories' => self::CATEGORIES], 'Neues Ticket');
     }
 
     public function store(): void
     {
         $user = Auth::require();
+        $this->enabled('/konto/tickets');
         if (!RateLimiter::hit('ticket', 'c' . $user['id'])) {
             fail_back([], '/konto/tickets/neu', 'Bitte warte kurz, bevor du weitere Tickets erstellst.');
         }
@@ -81,6 +83,7 @@ final class TicketController
     public function reply(array $p): void
     {
         $user = Auth::require();
+        $this->enabled('/konto/tickets/' . id_param($p));
         $ticket = $this->owned(id_param($p), (int)$user['id']);
         $back = '/konto/tickets/' . $ticket['id'];
 
@@ -108,6 +111,14 @@ final class TicketController
         Db::exec("UPDATE tickets SET status = 'closed', updated_at = datetime('now') WHERE id = ?", [$ticket['id']]);
         flash('info', 'Ticket geschlossen.');
         redirect('/konto/tickets/' . $ticket['id']);
+    }
+
+    private function enabled(string $back): void
+    {
+        if (!\App\Services\Settings::on('tickets_enabled')) {
+            flash('info', 'Support-Tickets sind gerade deaktiviert. Schreib mir bitte auf Discord.');
+            redirect($back);
+        }
     }
 
     private function owned(int $id, int $customerId): array

@@ -5,18 +5,18 @@
 </header>
 
 <?php if (!$requests): ?>
-  <div class="panel glass"><p class="empty">Du hast noch keine Anfragen gestellt.</p></div>
+  <div class="panel glass"><p class="empty">Du hast noch keine Anfragen gestellt. <a href="/#anfrage">Jetzt anfragen →</a></p></div>
 <?php else: ?>
   <div class="table-wrap glass">
     <table class="table">
-      <thead><tr><th>ID</th><th>Projekt</th><th>Art</th><th>Datum</th><th>Status</th></tr></thead>
+      <thead><tr><th>ID</th><th>Projekt</th><th>Art</th><th>Aktualisiert</th><th>Status</th></tr></thead>
       <tbody>
         <?php foreach ($requests as $r): ?>
           <tr>
-            <td data-label="ID" class="mono"><?= e($r['public_id']) ?></td>
-            <td data-label="Projekt"><?= e($r['title'] ?: '–') ?></td>
+            <td data-label="ID" class="mono"><a href="/konto/anfragen/<?= (int)$r['id'] ?>"><?php if ($r['unread_customer']): ?><span class="unread-dot" title="Neue Nachricht"></span><?php endif ?><?= e($r['public_id']) ?></a></td>
+            <td data-label="Projekt"><a href="/konto/anfragen/<?= (int)$r['id'] ?>"><?= e($r['title'] ?: '–') ?></a></td>
             <td data-label="Art"><?= e(Notifier::TYPES[$r['type']] ?? $r['type']) ?></td>
-            <td data-label="Datum"><?= date_de($r['created_at']) ?></td>
+            <td data-label="Aktualisiert"><?= date_de($r['updated_at'], true) ?></td>
             <td data-label="Status"><?= View::badge($r['status']) ?></td>
           </tr>
         <?php endforeach ?>

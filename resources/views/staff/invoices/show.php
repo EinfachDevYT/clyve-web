@@ -9,8 +9,8 @@
   <div class="actions">
     <a class="pill pill-ghost pill-sm" href="/rechnungen/<?= $id ?>/druck" target="_blank" rel="noopener" data-native><?= $draft ? 'Vorschau' : 'PDF / Drucken' ?></a>
     <?php if ($draft && $admin): ?>
-      <form action="/rechnungen/<?= $id ?>/ausstellen" method="post" data-confirm="Rechnung jetzt verbindlich ausstellen? Danach ist sie nicht mehr änderbar.">
-        <?= csrf_field() ?><button class="pill pill-sm" type="submit"<?= $canIssue ? '' : ' disabled title="Erst nach Gewerbeanmeldung möglich"' ?>>Ausstellen</button>
+      <form action="/rechnungen/<?= $id ?>/ausstellen" method="post" data-confirm="<?= e(\App\Services\InvoiceService::docLabel()) ?> jetzt verbindlich ausstellen? Danach ist sie nicht mehr änderbar.">
+        <?= csrf_field() ?><button class="pill pill-sm" type="submit">Ausstellen</button>
       </form>
     <?php endif ?>
     <?php if ($invoice['status'] === 'issued' && $admin): ?>
@@ -22,10 +22,10 @@
   </div>
 </header>
 
-<?php if ($draft && !$canIssue): ?>
-  <div class="notice">Entwurfsmodus: Ohne Gewerbeanmeldung kann diese Rechnung nur vorbereitet werden. Die Vorschau ist mit „ENTWURF" gekennzeichnet und keine gültige Rechnung.</div>
+<?php if ($draft): ?>
+  <div class="notice">Wird ausgestellt als <b><?= e(\App\Services\InvoiceService::docLabel()) ?></b> (<?= e(\App\Services\InvoiceService::MODES[\App\Services\InvoiceService::mode()]) ?>).</div>
 <?php endif ?>
-<?php if ($draft && $customer && ($customer['street'] === '' || $customer['city'] === '')): ?>
+<?php if ($draft && $customer && \App\Services\InvoiceService::mode() !== 'hobby' && ($customer['street'] === '' || $customer['city'] === '')): ?>
   <div class="notice notice-warn">Beim Kunden fehlt die Anschrift – sie ist zum Ausstellen erforderlich.</div>
 <?php endif ?>
 
@@ -52,7 +52,7 @@
       <h2>Details</h2>
       <label class="field"><span>Titel</span><input type="text" name="title" value="<?= e(old('title', $invoice['title'])) ?>" maxlength="120"></label>
       <label class="field"><span>Leistungsdatum / -zeitraum</span><input type="text" name="service_date" value="<?= e(old('service_date', $invoice['service_date'])) ?>" maxlength="60" placeholder="z. B. 01.–14.11.2026"></label>
-      <label class="field"><span>Hinweis auf der Rechnung</span><textarea name="notes" rows="3" maxlength="1000"><?= e(old('notes', $invoice['notes'])) ?></textarea></label>
+      <label class="field"><span>Hinweis auf dem Beleg</span><textarea name="notes" rows="3" maxlength="1000"><?= e(old('notes', $invoice['notes'])) ?></textarea></label>
       <div class="row-between">
         <button class="pill pill-sm" type="submit">Speichern</button>
       </div>

@@ -164,6 +164,43 @@
     cleanups.push(() => io.disconnect());
   }
 
+  /* Sections with data-title drive the tab title, the active nav link and the #hash while scrolling. */
+  function sectionTitles(root) {
+    const sections = [...root.querySelectorAll('section[id][data-title]')];
+    if (!sections.length || !('IntersectionObserver' in window)) return;
+
+    const brand = 'Clyve.dev';
+    const baseTitle = document.title;
+    const path = location.pathname;
+    let current = null;
+
+    const activate = (section) => {
+      if (section === current) return;
+      current = section;
+      const label = section.dataset.title;
+      document.title = label ? `${label} · ${brand}` : baseTitle;
+      document.querySelectorAll('.nav-links a[href^="/#"]').forEach((a) => {
+        if (a.getAttribute('href') === `/#${section.id}`) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+      if (location.pathname === path) {
+        const hash = label ? `#${section.id}` : '';
+        if (location.hash !== hash) history.replaceState(history.state, '', path + location.search + hash);
+      }
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      const hit = entries.filter((en) => en.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (hit) activate(hit.target);
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: [0, 0.01] });
+
+    sections.forEach((s) => io.observe(s));
+    cleanups.push(() => {
+      io.disconnect();
+      document.querySelectorAll('.nav-links a[aria-current="location"]').forEach((a) => a.removeAttribute('aria-current'));
+    });
+  }
+
   function toasts(root) {
     root.querySelectorAll('[data-toasts] .toast').forEach((t, i) => {
       const id = setTimeout(() => {
@@ -178,20 +215,36 @@
     const form = root.querySelector('#requestForm');
     if (!form) return;
 
-    const date = form.querySelector('[name="deadline"]');
-    if (date) date.min = new Date().toISOString().slice(0, 10);
-
+    const steps = [...form.querySelectorAll('[data-step]')];
+    const dots = [...form.querySelectorAll('[data-step-dot]')];
+    const prevBtn = form.querySelector('[data-step-prev]');
+    const nextBtn = form.querySelector('[data-step-next]');
+    const submitBtn = form.querySelector('#submitBtn');
+    const status = form.querySelector('#formStatus');
+    const hint = form.querySelector('#contactHint');
     const msg = form.querySelector('[name="message"]');
     const count = form.querySelector('#msgCount');
+    const summary = form.querySelector('#requestSummary');
+    let current = 1;
+
+    const date = form.querySelector('[name="deadline"]');
+    if (date) date.min = new Date().toISOString().slice(0, 10);
     msg.addEventListener('input', () => { count.textContent = msg.value.length; });
 
-    const status = form.querySelector('#formStatus');
-    const btn = form.querySelector('#submitBtn');
-    const hint = form.querySelector('#contactHint');
-
-    const fieldOf = (name) => form.querySelector(`[name="${name}"]`)?.closest('.field, .consent');
+    const fieldOf = (name) => {
+      const el = name.startsWith('details_')
+        ? form.querySelector(`[name^="details[${name.slice(8)}]"]`)
+        : form.querySelector(`[name="${name}"]`);
+      return el?.closest('.field, .consent, .type-cards') || null;
+    };
+    const stepOfError = (key) => {
+      if (key === 'type') return 1;
+      if (key.startsWith('details_') || ['title', 'budget', 'deadline'].includes(key)) return 2;
+      if (key === 'message') return 3;
+      return 4;
+    };
     const setStatus = (text, ok) => { status.textContent = text; status.className = 'form-status ' + (ok ? 'ok' : 'err'); };
-    const clear = () => { form.querySelectorAll('.invalid').forEach((f) => f.classList.remove('invalid')); hint.classList.remove('error'); };
+    const clear = () => { form.querySelectorAll('.invalid').forEach((f) => f.classList.remove('invalid')); hint.classList.remove('error'); setStatus('', true); };
     const mark = (errors) => {
       Object.keys(errors).forEach((k) => {
         if (k === 'contact') {
@@ -200,56 +253,145 @@
           fieldOf('email')?.classList.add('invalid');
         } else fieldOf(k)?.classList.add('invalid');
       });
-      form.querySelector('.invalid input, .invalid textarea, .invalid select')?.focus();
     };
-    const validate = () => {
+
+    const selectedType = () => form.querySelector('[name="type"]:checked')?.value || '';
+    const syncType = () => {
+      const type = selectedType();
+      form.querySelectorAll('[data-for-type]').forEach((box) => {
+        const on = box.dataset.forType === type;
+        box.hidden = !on;
+        box.querySelectorAll('input, select').forEach((el) => { el.disabled = !on; });
+      });
+    };
+
+    const validate = (step) => {
       const d = new FormData(form), e = {};
-      if (!d.get('type')) e.type = 1;
-      if (String(d.get('name') || '').trim().length < 2) e.name = 1;
-      const mail = String(d.get('email') || '').trim(), dc = String(d.get('discord') || '').trim();
-      if (mail && !form.email.checkValidity()) e.email = 1;
-      if (!mail && !dc && !form.dataset.loggedIn) e.contact = 1;
-      if (String(d.get('message') || '').trim().length < 20) e.message = 1;
-      if (!d.get('consent')) e.consent = 1;
+      if (step === 1 && !d.get('type')) e.type = 'Bitte wähle eine Kategorie.';
+      if (step === 3 && String(d.get('message') || '').trim().length < 20) e.message = 'Bitte beschreibe dein Projekt etwas genauer (mind. 20 Zeichen).';
+      if (step === 4) {
+        if (String(d.get('name') || '').trim().length < 2) e.name = 'Bitte gib deinen Namen an.';
+        const mail = String(d.get('email') || '').trim(), dc = String(d.get('discord') || '').trim();
+        if (mail && !form.email.checkValidity()) e.email = 'Die E-Mail-Adresse sieht nicht richtig aus.';
+        if (!mail && !dc && !form.dataset.loggedIn) e.contact = 'Bitte gib Discord oder E-Mail an.';
+        if (!d.get('consent')) e.consent = 'Bitte stimme der Datenverarbeitung zu.';
+      }
       return e;
     };
 
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const renderSummary = () => {
+      const d = new FormData(form);
+      const rows = [];
+      const typeCard = form.querySelector('[name="type"]:checked')?.closest('.type-card')?.querySelector('b');
+      if (typeCard) rows.push(['Kategorie', typeCard.textContent]);
+      form.querySelectorAll(`[data-for-type="${selectedType()}"] .field`).forEach((f) => {
+        const label = f.querySelector('span, legend')?.childNodes[0]?.textContent.trim();
+        const values = [...f.querySelectorAll('select, input:checked')].map((el) => el.value).filter(Boolean);
+        if (label && values.length) rows.push([label, values.join(', ')]);
+      });
+      ['title:Titel', 'budget:Budget', 'deadline:Termin'].forEach((pair) => {
+        const [k, l] = pair.split(':');
+        const v = String(d.get(k) || '').trim();
+        if (v) rows.push([l, k === 'deadline' ? new Date(v).toLocaleDateString('de-DE') : v]);
+      });
+      const text = String(d.get('message') || '').trim();
+      summary.innerHTML = '<b>Zusammenfassung</b><dl>' + rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('') + '</dl>'
+        + (text ? `<p>${esc(text.length > 220 ? text.slice(0, 220) + '…' : text)}</p>` : '');
+      summary.hidden = false;
+    };
+
+    const show = (step, focus = true) => {
+      current = step;
+      steps.forEach((s) => { s.hidden = Number(s.dataset.step) !== step; });
+      dots.forEach((dot) => {
+        const n = Number(dot.dataset.stepDot);
+        dot.classList.toggle('is-active', n === step);
+        dot.classList.toggle('is-done', n < step);
+      });
+      prevBtn.hidden = step === 1;
+      nextBtn.hidden = step === steps.length;
+      submitBtn.hidden = step !== steps.length;
+      if (step === steps.length) renderSummary();
+      if (focus) {
+        form.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        steps[step - 1].querySelector('input:not([type=hidden]):not([disabled]), select, textarea')?.focus({ preventScroll: true });
+      }
+    };
+
+    const next = () => {
+      clear();
+      const errs = validate(current);
+      if (Object.keys(errs).length) {
+        mark(errs);
+        setStatus(Object.values(errs)[0], false);
+        return;
+      }
+      show(Math.min(current + 1, steps.length));
+    };
+
+    form.classList.add('is-wizard');
+    const preset = form.querySelector(`[name="type"][value="${new URLSearchParams(location.search).get('typ')}"]:not(:disabled)`);
+    if (preset) preset.checked = true;
+    syncType();
+    show(preset ? 2 : 1, false);
+
+    form.addEventListener('change', (e) => {
+      if (e.target.name === 'type') { syncType(); clear(); setTimeout(next, 180); }
+    });
+    nextBtn.addEventListener('click', next);
+    prevBtn.addEventListener('click', () => { clear(); show(Math.max(1, current - 1)); });
+    dots.forEach((dot) => dot.addEventListener('click', () => {
+      const n = Number(dot.dataset.stepDot);
+      if (n < current) { clear(); show(n); }
+    }));
+    form.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName === 'INPUT' && current < steps.length) { e.preventDefault(); next(); }
+    });
+
     root.querySelectorAll('[data-pick]').forEach((a) => a.addEventListener('click', () => {
-      const r = form.querySelector(`[name="type"][value="${a.dataset.pick}"]`);
-      if (r) r.checked = true;
+      const r = form.querySelector(`[name="type"][value="${a.dataset.pick}"]:not(:disabled)`);
+      if (r) { r.checked = true; syncType(); show(2, false); }
     }));
 
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       clear();
-      const errs = validate();
-      if (Object.keys(errs).length) {
-        mark(errs);
-        setStatus(errs.message ? 'Bitte beschreibe dein Projekt etwas genauer (mind. 20 Zeichen).' : 'Bitte fülle die markierten Felder aus.', false);
-        return;
+      for (let s = 1; s <= steps.length; s++) {
+        const errs = validate(s);
+        if (Object.keys(errs).length) { show(s); mark(errs); setStatus(Object.values(errs)[0], false); return; }
       }
-      btn.classList.add('loading');
-      setStatus('', true);
+      submitBtn.classList.add('loading');
       try {
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          credentials: 'same-origin',
-          headers: { Accept: 'application/json' },
-        });
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { Accept: 'application/json' } });
         const data = await res.json().catch(() => ({}));
         if (res.ok && data.ok) {
-          form.reset();
-          count.textContent = '0';
-          setStatus(data.message, true);
+          const panel = root.querySelector('#requestSuccess');
+          if (panel && data.url) {
+            panel.querySelector('#successTitle').textContent = data.message || 'Danke!';
+            panel.querySelector('#successText').textContent = data.mailed
+              ? 'Ich habe dir eine Bestätigung mit deinem persönlichen Link per E-Mail geschickt.'
+              : 'Über deinen persönlichen Link siehst du jederzeit den Stand deiner Anfrage.';
+            panel.querySelector('#successLink').href = data.url;
+            form.hidden = true;
+            panel.hidden = false;
+            panel.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+          } else {
+            form.reset();
+            setStatus(data.message, true);
+          }
         } else {
-          if (data.errors) mark(data.errors);
+          if (data.errors) {
+            const first = Math.min(...Object.keys(data.errors).map(stepOfError));
+            show(first);
+            mark(data.errors);
+          }
           setStatus(data.message || 'Etwas ist schiefgelaufen.', false);
         }
       } catch {
         setStatus('Keine Verbindung zum Server.', false);
       } finally {
-        btn.classList.remove('loading');
+        submitBtn.classList.remove('loading');
       }
     });
   }
@@ -260,6 +402,8 @@
     growBranches(root);
     typer(root);
     reveal(root);
+    sectionTitles(root);
+    root.querySelectorAll('[data-progress]').forEach((el) => { el.style.width = `${Math.max(0, Math.min(100, Number(el.dataset.progress) || 0))}%`; });
     toasts(root);
     requestForm(root);
   }
@@ -434,6 +578,34 @@
     if (!sameOrigin(action)) return;
     e.preventDefault();
     submit(form, e.submitter);
+  });
+
+  document.addEventListener('click', (e) => {
+    const ins = e.target.closest?.('[data-insert]');
+    if (ins) {
+      const ta = document.querySelector(ins.dataset.target);
+      if (ta) {
+        ta.value = ta.value.trim() ? ta.value.replace(/\s*$/, '\n\n') + ins.dataset.insert : ins.dataset.insert;
+        ta.focus();
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+      }
+      return;
+    }
+    const copy = e.target.closest?.('[data-copy]');
+    if (copy && navigator.clipboard) {
+      navigator.clipboard.writeText(copy.dataset.copy).then(() => {
+        const old = copy.textContent;
+        copy.textContent = 'Kopiert ✓';
+        setTimeout(() => { copy.textContent = old; }, 1400);
+      });
+    }
+  });
+
+  document.addEventListener('input', (e) => {
+    if (e.target.matches?.('[data-range]')) {
+      const out = e.target.closest('form')?.querySelector('[data-range-out]');
+      if (out) out.textContent = e.target.value;
+    }
   });
 
   addEventListener('popstate', () => navigate(location.href, { push: false, scroll: false }));

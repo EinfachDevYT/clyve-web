@@ -13,7 +13,13 @@ final class Security
 
     public static function sendHeaders(): void
     {
-        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
+        $imgHosts = '';
+        foreach (\App\Services\Tebex::imageHosts() as $host) {
+            if (is_string($host) && preg_match('/^[a-z0-9.-]+\.[a-z]{2,}$/i', $host)) {
+                $imgHosts .= ' https://' . $host;
+            }
+        }
+        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:{$imgHosts}; "
             . "font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'");
         header('X-Content-Type-Options: nosniff');
         header('X-Engineered-By: EinfachDev <https://einfachdev.de>');
