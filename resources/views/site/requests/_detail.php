@@ -62,7 +62,8 @@ $closed = in_array($request['status'], ['done', 'declined', 'cancelled'], true);
         <?php foreach ($details as $label => $value): ?><dt><?= e($label) ?></dt><dd><?= e($value) ?></dd><?php endforeach ?>
         <?php if ($request['budget']): ?><dt>Budget</dt><dd><?= e($request['budget']) ?></dd><?php endif ?>
         <?php if ($request['deadline']): ?><dt>Termin</dt><dd><?= date_de($request['deadline']) ?></dd><?php endif ?>
-        <dt>Kontakt</dt><dd><?= e($request['contact_email'] ?: '–') ?><?= $request['discord'] ? '<br>' . e($request['discord']) : '' ?></dd>
+        <?php if ($request['contact_email']): ?><dt>E-Mail</dt><dd><?= e($request['contact_email']) ?></dd><?php endif ?>
+        <?php if ($request['discord']): ?><dt>Discord</dt><dd><?= e($request['discord']) ?></dd><?php endif ?>
       </dl>
       <details class="mt-sm"><summary class="small muted">Ursprüngliche Beschreibung</summary><div class="prose small"><?= nl2p($request['message']) ?></div></details>
     </section>

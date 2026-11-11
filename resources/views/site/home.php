@@ -139,7 +139,7 @@
       <a class="pill pill-ghost" href="https://discord.com/users/267311011520970752" target="_blank" rel="noopener">Auf Discord schreiben</a>
     </div>
   <?php else: ?>
-  <form class="form glass wizard" id="requestForm" data-json<?= $user ? ' data-logged-in="1"' : '' ?> action="/anfrage" method="post" novalidate>
+  <form class="form glass wizard" id="requestForm" data-json<?= $user ? ' data-logged-in="1"' : '' ?> action="/anfrage" method="post">
     <?= csrf_field() ?>
 
     <ol class="steps-nav" aria-hidden="true">

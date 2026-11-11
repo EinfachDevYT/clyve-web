@@ -158,3 +158,15 @@ function nl2p(string $text): string
 {
     return nl2br(e($text), false);
 }
+
+/** Asset URL with a content fingerprint, so browsers fetch new CSS/JS right after an update. */
+function asset(string $path): string
+{
+    static $cache = [];
+    if (!isset($cache[$path])) {
+        $file = BASE_PATH . '/public' . $path;
+        $hash = is_file($file) ? substr(hash_file('sha256', $file), 0, 10) : '0';
+        $cache[$path] = $path . '?v=' . $hash;
+    }
+    return $cache[$path];
+}

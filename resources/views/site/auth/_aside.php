@@ -11,7 +11,7 @@
     <ul class="auth-points">
       <li><span>01</span>Status deiner Anfragen live verfolgen</li>
       <li><span>02</span>Support-Tickets direkt ans Team</li>
-      <li><span>03</span>Rechnungen jederzeit als PDF</li>
+      <li><span>03</span>Belege jederzeit als PDF</li>
     </ul>
   </div>
 </aside>

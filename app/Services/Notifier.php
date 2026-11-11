@@ -87,7 +87,6 @@ final class Notifier
         ]);
         curl_exec($ch);
         $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         if ($code < 200 || $code >= 300) {
             error_log('[notifier] discord webhook failed: HTTP ' . $code);

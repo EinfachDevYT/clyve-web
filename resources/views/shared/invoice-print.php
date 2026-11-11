@@ -17,8 +17,8 @@ $r = $invoice['recipient'] ?? ['name' => $invoice['customer_name'], 'company' =>
   <meta name="robots" content="noindex">
   <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($invoice['number'] ?? 'Entwurf') ?> · <?= e($doc) ?></title>
-  <link rel="stylesheet" href="/assets/css/invoice.css">
-  <script src="/assets/js/print.js" defer></script>
+  <link rel="stylesheet" href="<?= e(asset('/assets/css/invoice.css')) ?>">
+  <script src="<?= e(asset('/assets/js/print.js')) ?>" defer></script>
 </head>
 <body>
   <div class="toolbar">

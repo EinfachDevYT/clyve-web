@@ -330,6 +330,7 @@
       show(Math.min(current + 1, steps.length));
     };
 
+    form.noValidate = true;
     form.classList.add('is-wizard');
     const preset = form.querySelector(`[name="type"][value="${new URLSearchParams(location.search).get('typ')}"]:not(:disabled)`);
     if (preset) preset.checked = true;
@@ -453,7 +454,9 @@
     const current = [...document.querySelectorAll('[data-swap]')];
     const keys = (list) => list.map((el) => el.dataset.swap).sort().join(',');
 
-    if (!incoming.length || keys(incoming) !== keys(current) || doc.body.className !== document.body.className) {
+    const assets = (d) => [...d.querySelectorAll('link[rel="stylesheet"], script[src]')].map((el) => el.getAttribute('href') || el.getAttribute('src')).join('|');
+
+    if (!incoming.length || keys(incoming) !== keys(current) || doc.body.className !== document.body.className || assets(doc) !== assets(document)) {
       location.href = url;
       return;
     }

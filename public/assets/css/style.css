@@ -96,7 +96,7 @@ main, .nav, .footer, .staff { position: relative; z-index: 1; }
 
 /* HERO */
 .hero { position: relative; min-height: calc(100vh - 70px); display: grid; place-items: center; padding: 60px 20px 80px; overflow: hidden; }
-.hero-inner { position: relative; max-width: 760px; text-align: center; }
+.hero-inner { position: relative; z-index: 1; max-width: 760px; text-align: center; }
 .eyebrow { display: inline-flex; align-items: center; gap: .6em; padding: .45em 1em; border: 1px solid var(--line); border-radius: 999px; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--lilac); background: var(--glass); }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; box-shadow: 0 0 10px #4ADE80; animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: .4; } }
@@ -174,7 +174,7 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); color: var(--petal); margin: 0; line
 .field > span { margin-bottom: 0; }
 .field i, .consent i { color: var(--violet); font-style: normal; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-input[type=text], input[type=email], input[type=password], input[type=search], input[type=date], select, textarea {
+input[type=text], input[type=email], input[type=password], input[type=search], input[type=date], input[type=url], input[type=number], input[type=tel], select, textarea {
   width: 100%; padding: .85em 1em; border-radius: 12px;
   background: rgba(6, 5, 16, .7); border: 1px solid var(--line);
   color: var(--petal); font: inherit; font-size: .97rem;
@@ -249,7 +249,11 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--v
   .nav-links.open { opacity: 1; transform: none; pointer-events: auto; }
   .grid-2 { grid-template-columns: minmax(0, 1fr); }
   .section { padding: 72px 16px; }
-  .branch-l, .branch-r { width: 80vw; opacity: .7; }
+  .branch-l { width: 78vw; opacity: .55; }
+  .branch-r { width: 62vw; opacity: .3; bottom: -70px; }
+  .hero-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .hero-facts b { font-size: .85rem; line-height: 1.35; text-align: center; }
+  .hero-facts span { font-size: .62rem; letter-spacing: .1em; margin-top: 4px; }
 }
 @media (max-width: 480px) {
   .steps { grid-template-columns: 1fr; }
@@ -260,3 +264,4 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--v
   .reveal { opacity: 1; transform: none; }
   html { scroll-behavior: auto; }
 }
+@media (scripting: none) { .reveal { opacity: 1; transform: none; } }

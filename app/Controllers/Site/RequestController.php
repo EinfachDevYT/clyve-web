@@ -20,15 +20,19 @@ final class RequestController
     public function submit(): void
     {
         $startedAt = (int)($_SESSION['_form_at'] ?? 0);
-        if (!empty($_POST['website']) || $startedAt === 0 || time() - $startedAt < (int)config('min_fill_seconds', 4)) {
-            json_out(200, ['ok' => true, 'message' => 'Danke! Deine Anfrage ist angekommen.']);
+        if (!empty($_POST['website'])) {
+            $this->answer(200, ['ok' => true, 'message' => 'Danke! Deine Anfrage ist angekommen.']);
+        }
+        if ($startedAt === 0 || time() - $startedAt < (int)config('min_fill_seconds', 4)) {
+            $_SESSION['_form_at'] = $startedAt ?: time();
+            $this->answer(429, ['ok' => false, 'message' => 'Das ging sehr schnell – bitte prüfe deine Angaben kurz und sende dann erneut.']);
         }
         if (!Settings::openTypes()) {
-            json_out(403, ['ok' => false, 'message' => Settings::get('requests_closed_message')]);
+            $this->answer(403, ['ok' => false, 'message' => Settings::get('requests_closed_message')]);
         }
         if (!RateLimiter::ip('request')) {
             header('Retry-After: 600');
-            json_out(429, ['ok' => false, 'message' => 'Zu viele Anfragen. Versuch es später erneut oder schreib mir auf Discord.']);
+            $this->answer(429, ['ok' => false, 'message' => 'Zu viele Anfragen. Versuch es später erneut oder schreib mir auf Discord.']);
         }
 
         $customer = Auth::user();
@@ -52,14 +56,14 @@ final class RequestController
             $v->addError('contact', 'Bitte gib Discord oder E-Mail an.');
         }
         if ($v->fails()) {
-            json_out(422, ['ok' => false, 'message' => 'Bitte überprüfe deine Eingaben.', 'errors' => $v->errors()]);
+            $this->answer(422, ['ok' => false, 'message' => 'Bitte überprüfe deine Eingaben: ' . implode(' ', array_values($v->errors())), 'errors' => $v->errors()]);
         }
 
         [$request, $token] = RequestService::create(compact('type', 'name', 'title', 'discord', 'email', 'budget', 'deadline', 'message', 'details'), $customer);
         $_SESSION['_form_at'] = time();
 
         $url = $customer ? '/konto/anfragen/' . $request['id'] : '/anfrage/' . $token;
-        json_out(200, [
+        $this->answer(200, [
             'ok'      => true,
             'message' => 'Danke! Deine Anfrage ' . $request['public_id'] . ' ist angekommen.',
             'url'     => $url,
@@ -67,7 +71,17 @@ final class RequestController
         ]);
     }
 
-    /** Validates the type specific answers against the whitelist in RequestService::DETAILS. */
+    /** JSON for the form script, redirect with a message for plain form posts (JavaScript disabled). */
+    private function answer(int $status, array $data): never
+    {
+        if (wants_json()) {
+            json_out($status, $data);
+        }
+        flash($data['ok'] ? 'success' : 'error', (string)$data['message']);
+        redirect($data['ok'] && !empty($data['url']) ? $data['url'] : '/#anfrage');
+    }
+
+        /** Validates the type specific answers against the whitelist in RequestService::DETAILS. */
     private function details(string $type, Validator $v): array
     {
         $out = [];

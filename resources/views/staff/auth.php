@@ -7,9 +7,9 @@
   <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($pageTitle) ?> · Clyve.dev</title>
   <link rel="icon" href="/assets/brand/clyve-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/css/style.css">
-  <link rel="stylesheet" href="/assets/css/app.css">
-  <script src="/assets/js/main.js" defer></script>
+  <link rel="stylesheet" href="<?= e(asset('/assets/css/style.css')) ?>">
+  <link rel="stylesheet" href="<?= e(asset('/assets/css/app.css')) ?>">
+  <script src="<?= e(asset('/assets/js/main.js')) ?>" defer></script>
 </head>
 <body class="is-staff">
   <main id="app" data-swap="main">

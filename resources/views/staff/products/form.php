@@ -25,7 +25,7 @@
       <?php endforeach ?>
     </div>
   </fieldset>
-  <div class="grid-3">
+  <div class="grid-3 align-end">
     <label class="consent"><input type="checkbox" name="active" value="1"<?= ($pr['active'] ?? 1) ? ' checked' : '' ?>><span>Sichtbar</span></label>
     <label class="consent"><input type="checkbox" name="featured" value="1"<?= ($pr['featured'] ?? 0) ? ' checked' : '' ?>><span>Hervorheben</span></label>
     <label class="field"><span>Reihenfolge</span><input type="text" inputmode="numeric" name="sort" value="<?= (int)($pr['sort'] ?? 0) ?>"></label>
