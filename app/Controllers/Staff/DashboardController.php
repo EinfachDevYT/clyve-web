@@ -12,7 +12,12 @@ final class DashboardController
     public function index(): void
     {
         Auth::require();
+        \App\Services\Hosting::tick();
         View::render('staff/dashboard', [
+            'expiring' => Db::all(
+                "SELECT s.*, c.name AS customer_name FROM services s JOIN customers c ON c.id = s.customer_id
+                 WHERE s.status = 'active' AND s.expires_on IS NOT NULL AND s.expires_on <= date('now', 'localtime', '+14 days') ORDER BY s.expires_on LIMIT 6"
+            ),
             'stats' => [
                 'requests'  => (int)Db::value("SELECT COUNT(*) FROM requests WHERE unread_staff = 1 OR status = 'new'"),
                 'tickets'   => (int)Db::value("SELECT COUNT(*) FROM tickets WHERE status = 'open'"),

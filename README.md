@@ -88,6 +88,14 @@ Keine Rechts- oder Steuerberatung: Wer regelmäßig bezahlte Aufträge annimmt, 
 Anfragen an/aus (mit eigener Meldung), einzelne Kategorien, Registrierung, Support-Tickets, Script-Shop,
 Verfügbarkeitstext, Antwortzeit und ein Ankündigungsbanner. Die Schalter werden serverseitig durchgesetzt.
 
+## Bot-Hosting & Lizenzen
+
+Staff → Hosting: Dienste pro Kunde mit Tarif, Laufzeit, Verlängerung (optional direkt mit Beleg-Entwurf),
+manueller Sperre mit Grund, Kündigung und Verlauf. Nach Ablauf + Kulanzzeit wird automatisch gesperrt,
+vorher gehen Erinnerungsmails raus (Tage einstellbar). Jeder Dienst hat einen Lizenzschlüssel (`CLY-…`, nur als Hash gespeichert),
+den der Bot über `GET /api/v1/license` mit `Authorization: Bearer …` prüft. Kunden sehen ihre Dienste unter Konto → Dienste.
+Cronjob: `bin/cron.php` alle 5 Minuten (siehe `deploy/DEPLOY.md`).
+
 ## Script-Shop (Tebex)
 
 Seite `/scripts` mit Framework-Filter und „Auf Tebex kaufen“. Produkte pflegst du unter Staff → Scripts,

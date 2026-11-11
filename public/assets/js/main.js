@@ -474,8 +474,11 @@
       initPage(document.getElementById('app') || document);
     };
 
-    if (document.startViewTransition && !reduced) document.startViewTransition(apply);
-    else apply();
+    if (document.startViewTransition && !reduced) {
+      const t = document.startViewTransition(apply);
+      t.ready.catch(() => {});
+      t.finished.catch(() => {});
+    } else apply();
   }
 
   async function navigate(href, opts = { push: true }) {

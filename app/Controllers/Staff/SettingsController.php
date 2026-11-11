@@ -18,6 +18,7 @@ final class SettingsController
         'betreiber'     => ['/einstellungen/betreiber', 'Betreiber & Rechtliches'],
         'email'         => ['/einstellungen/email', 'E-Mail'],
         'integrationen' => ['/einstellungen/integrationen', 'Integrationen'],
+        'hosting'       => ['/einstellungen/hosting', 'Hosting & Lizenzen'],
     ];
 
     /** Fields that must be filled before Impressum and Datenschutz are complete. */
@@ -235,6 +236,59 @@ final class SettingsController
         flash($ok ? 'success' : 'error', $ok
             ? 'Test-E-Mail an ' . $staff['email'] . ' gesendet. Schau auch im Spam-Ordner nach.'
             : 'Versand fehlgeschlagen. Prüfe Server, Port, Verschlüsselung und Zugangsdaten (Details im PHP-Fehlerlog).');
+        redirect($back);
+    }
+
+    /* ---------- Hosting & Lizenzen ---------- */
+
+    public function hosting(): void
+    {
+        Auth::requireAdmin();
+        $this->render('hosting', ['settings' => Settings::all()], 'Hosting & Lizenzen');
+    }
+
+    public function updateHosting(): void
+    {
+        $staff = Auth::requireAdmin();
+        $back = '/einstellungen/hosting';
+        $v = new Validator($_POST);
+        $grace = (string)($_POST['hosting_grace_days'] ?? '');
+        if (!ctype_digit($grace) || (int)$grace > 60) {
+            $v->addError('hosting_grace_days', 'Bitte 0 bis 60 Tage.');
+        }
+        $interval = (string)($_POST['hosting_check_interval'] ?? '');
+        if (!ctype_digit($interval) || (int)$interval < 60 || (int)$interval > 86400) {
+            $v->addError('hosting_check_interval', 'Bitte 60 bis 86400 Sekunden.');
+        }
+        $reminders = trim((string)($_POST['hosting_reminder_days'] ?? ''));
+        $days = $reminders === '' ? [] : array_map('trim', explode(',', $reminders));
+        foreach ($days as $d) {
+            if (!ctype_digit($d) || (int)$d < 1 || (int)$d > 60) {
+                $v->addError('hosting_reminder_days', 'Tage durch Komma getrennt, jeweils 1 bis 60 (z. B. 14,3).');
+                break;
+            }
+        }
+        if (count($days) > 5) {
+            $v->addError('hosting_reminder_days', 'Maximal 5 Erinnerungen.');
+        }
+        $message = $v->text('hosting_suspend_message', 5, 200, 'Sperrhinweis');
+        if ($v->fails()) {
+            fail_back($v->errors(), $back);
+        }
+        $days = array_unique(array_map('intval', $days));
+        rsort($days);
+        $values = [
+            'hosting_grace_days'      => (string)(int)$grace,
+            'hosting_check_interval'  => (string)(int)$interval,
+            'hosting_reminder_days'   => implode(',', $days),
+            'hosting_suspend_message' => $message,
+        ];
+        foreach (Settings::HOSTING_TOGGLES as $key) {
+            $values[$key] = ($_POST[$key] ?? '') === '1' ? '1' : '0';
+        }
+        Settings::set($values);
+        audit('staff:' . $staff['id'], 'settings_hosting');
+        flash('success', 'Hosting-Einstellungen gespeichert.');
         redirect($back);
     }
 

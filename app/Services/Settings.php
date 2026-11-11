@@ -21,12 +21,22 @@ final class Settings
         'availability_label'      => 'Offen für neue Aufträge',
         'response_time'           => '< 24h',
         'announcement'            => '',
+        'hosting_auto_suspend'    => '1',
+        'hosting_grace_days'      => '3',
+        'hosting_reminder_days'   => '14,3',
+        'hosting_api_enabled'     => '1',
+        'hosting_check_interval'  => '300',
+        'hosting_notify_discord'  => '1',
+        'hosting_suspend_message' => 'Dieser Bot ist gerade pausiert. Bitte wende dich an den Support.',
+        'hosting_customer_view'   => '1',
     ];
 
     public const TOGGLES = [
         'requests_open', 'type_fivem', 'type_web', 'type_bot', 'type_other',
         'registration_open', 'tickets_enabled', 'shop_enabled',
     ];
+
+    public const HOSTING_TOGGLES = ['hosting_auto_suspend', 'hosting_api_enabled', 'hosting_notify_discord', 'hosting_customer_view'];
 
     /** Config keys the admin can override in the staff area. */
     private const OVERRIDABLE = ['business', 'smtp', 'tebex', 'discord_webhook', 'mail_to'];

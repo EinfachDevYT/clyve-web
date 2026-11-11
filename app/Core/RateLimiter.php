@@ -5,9 +5,9 @@ namespace App\Core;
 
 final class RateLimiter
 {
-    public static function hit(string $bucket, string $identity): bool
+    public static function hit(string $bucket, string $identity, array $default = [['window' => 600, 'max' => 5]]): bool
     {
-        $limits = (array)config('rate_limits.' . $bucket, [['window' => 600, 'max' => 5]]);
+        $limits = (array)config('rate_limits.' . $bucket, $default);
         $dir = STORAGE_PATH . '/ratelimit';
         if (!is_dir($dir)) {
             mkdir($dir, 0700, true);
@@ -46,9 +46,9 @@ final class RateLimiter
         }
     }
 
-    public static function ip(string $bucket): bool
+    public static function ip(string $bucket, array $default = [['window' => 600, 'max' => 5]]): bool
     {
-        return self::hit($bucket, Security::clientIp());
+        return self::hit($bucket, Security::clientIp(), $default);
     }
 
     private static function gc(string $dir): void

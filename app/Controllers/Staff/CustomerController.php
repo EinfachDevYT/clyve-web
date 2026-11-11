@@ -36,6 +36,7 @@ final class CustomerController
             'requests' => Db::all('SELECT * FROM requests WHERE customer_id = ? ORDER BY id DESC', [$id]),
             'tickets'  => Db::all('SELECT * FROM tickets WHERE customer_id = ? ORDER BY updated_at DESC', [$id]),
             'invoices' => Db::all('SELECT * FROM invoices WHERE customer_id = ? ORDER BY id DESC', [$id]),
+            'services' => Db::all("SELECT * FROM services WHERE customer_id = ? ORDER BY status = 'cancelled', id DESC", [$id]),
         ], $customer['name']);
     }
 }

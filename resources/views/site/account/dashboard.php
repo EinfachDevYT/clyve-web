@@ -7,6 +7,11 @@
   <?php if (\App\Services\Settings::on('tickets_enabled')): ?><a class="pill pill-sm" href="/konto/tickets/neu">Neues Ticket</a><?php endif ?>
 </header>
 
+<?php foreach ($attention as $sv): $left = \App\Services\Hosting::daysLeft($sv); ?>
+  <div class="notice notice-warn"><a href="/konto/dienste/<?= (int)$sv['id'] ?>"><b><?= e($sv['name']) ?></b></a>
+    <?= $sv['status'] === 'suspended' ? 'ist pausiert.' : ($left >= 0 ? 'läuft am ' . date_de($sv['expires_on']) . ' ab.' : 'ist seit ' . date_de($sv['expires_on']) . ' abgelaufen – bitte verlängern.') ?></div>
+<?php endforeach ?>
+
 <div class="stats">
   <a class="stat glass" href="/konto/tickets"><b><?= $openTickets ?></b><span>Offene Tickets</span></a>
   <a class="stat glass" href="/konto/rechnungen"><b><?= $openInvoices ?></b><span>Offene Rechnungen</span></a>

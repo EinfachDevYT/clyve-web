@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Controllers\Staff\AuthController;
 use App\Controllers\Staff\CustomerController;
 use App\Controllers\Staff\DashboardController;
+use App\Controllers\Staff\HostingController;
 use App\Controllers\Staff\ProductController;
 use App\Controllers\Staff\InvoiceController;
 use App\Controllers\Staff\RequestController;
@@ -57,6 +58,20 @@ $router->post('/scripts/{id}', [ProductController::class, 'update']);
 $router->post('/scripts/{id}/toggle', [ProductController::class, 'toggle']);
 $router->post('/scripts/{id}/loeschen', [ProductController::class, 'destroy']);
 
+$router->get('/hosting', [HostingController::class, 'index']);
+$router->get('/hosting/neu', [HostingController::class, 'create']);
+$router->post('/hosting', [HostingController::class, 'store']);
+$router->get('/hosting/tarife', [HostingController::class, 'plans']);
+$router->post('/hosting/tarife', [HostingController::class, 'storePlan']);
+$router->post('/hosting/tarife/{id}/toggle', [HostingController::class, 'togglePlan']);
+$router->get('/hosting/{id}', [HostingController::class, 'show']);
+$router->post('/hosting/{id}', [HostingController::class, 'update']);
+$router->post('/hosting/{id}/verlaengern', [HostingController::class, 'renew']);
+$router->post('/hosting/{id}/sperren', [HostingController::class, 'suspend']);
+$router->post('/hosting/{id}/entsperren', [HostingController::class, 'unsuspend']);
+$router->post('/hosting/{id}/schluessel', [HostingController::class, 'rotateKey']);
+$router->post('/hosting/{id}/kuendigen', [HostingController::class, 'cancel']);
+
 $router->get('/einstellungen', [SettingsController::class, 'show']);
 $router->post('/einstellungen', [SettingsController::class, 'update']);
 $router->get('/einstellungen/betreiber', [SettingsController::class, 'business']);
@@ -67,5 +82,7 @@ $router->post('/einstellungen/test-mail', [SettingsController::class, 'testMail'
 $router->get('/einstellungen/integrationen', [SettingsController::class, 'integrations']);
 $router->post('/einstellungen/integrationen', [SettingsController::class, 'updateIntegrations']);
 $router->post('/einstellungen/discord-test', [SettingsController::class, 'testDiscord']);
+$router->get('/einstellungen/hosting', [SettingsController::class, 'hosting']);
+$router->post('/einstellungen/hosting', [SettingsController::class, 'updateHosting']);
 
 return $router;

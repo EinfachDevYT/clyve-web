@@ -8,12 +8,14 @@ $v = static fn(string $k) => trim((string)($b[$k] ?? ''));
 $discord = Settings::hasSecret('discord_webhook');
 $mail = Mailer::enabled();
 $shop = Settings::on('shop_enabled') || Tebex::configured();
+$licenses = (bool)\App\Core\Db::value('SELECT 1 FROM services LIMIT 1');
 $hosting = $v('hosting');
 
 $sections = ['verantwortlicher' => 'Verantwortlicher', 'grundsaetze' => 'Allgemeines', 'hosting' => 'Hosting und Server-Logfiles', 'cookies' => 'Cookies',
     'anfragen' => 'Anfragen und Auftragsabwicklung', 'konto' => 'Kundenkonto', 'tickets' => 'Support-Tickets', 'belege' => 'Belege'];
 if ($mail) { $sections['email'] = 'E-Mail-Benachrichtigungen'; }
 if ($discord) { $sections['discord'] = 'Interne Benachrichtigung über Discord'; }
+if ($licenses) { $sections['lizenzen'] = 'Gehostete Dienste und Lizenzprüfung'; }
 $sections['schutz'] = 'Schutz vor Missbrauch';
 if ($shop) { $sections['tebex'] = 'Script-Shop und Tebex'; }
 $sections += ['links' => 'Externe Links', 'rechte' => 'Deine Rechte', 'stand' => 'Stand'];
@@ -76,6 +78,12 @@ $h = static function (string $id) use ($sections, &$n): string { $n++; return '<
     <?= $h('discord') ?>
     <p>Um zeitnah auf Anfragen reagieren zu können, sende ich mir neue Anfragen, Nachrichten und Tickets als interne Benachrichtigung in einen privaten Discord-Kanal. Dabei werden die Inhalte der Anfrage bzw. Nachricht sowie dein Name und deine Kontaktangaben an die Discord Inc., 444 De Haro Street, Suite 200, San Francisco, CA 94107, USA übermittelt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (effiziente Bearbeitung von Anfragen).</p>
     <p>Die USA gelten als Drittland. Die Übermittlung erfolgt auf Grundlage der von Discord bereitgestellten Garantien (EU-Standardvertragsklauseln bzw. EU-US Data Privacy Framework). Weitere Informationen: <a href="https://discord.com/privacy" target="_blank" rel="noopener">Datenschutzerklärung von Discord</a>.</p>
+  <?php endif ?>
+
+  <?php if ($licenses): ?>
+    <?= $h('lizenzen') ?>
+    <p>Für gehostete Dienste (z. B. Discord-Bots) speichere ich Bezeichnung, Laufzeit, Preis, Status und einen Verlauf der Änderungen (Verlängerung, Sperre, Kündigung) in deinem Kundenkonto. Der Lizenzschlüssel wird nur als nicht umkehrbarer Hashwert gespeichert.</p>
+    <p>Der Bot fragt in regelmäßigen Abständen bei dieser Website ab, ob er laufen darf. Dabei werden der Lizenzschlüssel und optional die Versionsnummer des Bots übermittelt; gespeichert werden der Zeitpunkt der letzten Abfrage und die Versionsnummer. Die IP-Adresse des Servers, auf dem der Bot läuft, wird nur wie unter „Schutz vor Missbrauch“ beschrieben verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Vor Ablauf der Laufzeit erhältst du eine Erinnerung per E-Mail. Die Daten werden gelöscht, wenn sie für die Vertragsabwicklung nicht mehr benötigt werden, spätestens zusammen mit deinem Kundenkonto, soweit keine Aufbewahrungspflichten bestehen.</p>
   <?php endif ?>
 
   <?= $h('schutz') ?>

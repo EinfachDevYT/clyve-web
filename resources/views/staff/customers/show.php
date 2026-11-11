@@ -4,11 +4,22 @@
     <p class="kicker mono"><a href="/kunden">Kunden</a> / <?= sprintf('K-%05d', (int)$customer['id']) ?></p>
     <h1><?= e($customer['name']) ?></h1>
   </div>
-  <a class="pill pill-sm" href="/rechnungen/neu?customer=<?= (int)$customer['id'] ?>">Rechnung erstellen</a>
+  <div class="actions">
+    <a class="pill pill-sm pill-ghost" href="/hosting/neu?kunde=<?= (int)$customer['id'] ?>">Dienst anlegen</a>
+    <a class="pill pill-sm" href="/rechnungen/neu?customer=<?= (int)$customer['id'] ?>">Rechnung erstellen</a>
+  </div>
 </header>
 
 <div class="grid-side">
   <div class="stack-lg">
+    <?php if ($services): ?>
+    <section class="panel glass">
+      <header class="panel-head"><h2>Dienste</h2></header>
+      <ul class="list"><?php foreach ($services as $sv): ?>
+        <li><a href="/hosting/<?= (int)$sv['id'] ?>"><b><?= e($sv['name']) ?></b><small><?= $sv['expires_on'] ? 'bis ' . date_de($sv['expires_on']) : 'unbefristet' ?></small></a><?= \App\Services\Hosting::badge($sv) ?></li>
+      <?php endforeach ?></ul>
+    </section>
+    <?php endif ?>
     <section class="panel glass">
       <header class="panel-head"><h2>Tickets</h2></header>
       <?php if (!$tickets): ?><p class="empty">Keine Tickets.</p><?php else: ?>

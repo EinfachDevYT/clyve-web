@@ -8,6 +8,17 @@
   <div class="notice notice-warn">Impressum und Datenschutz sind noch nicht vollständig. <a href="/einstellungen/betreiber">Jetzt Betreiberangaben ergänzen →</a></div>
 <?php endif ?>
 
+<?php if ($expiring): ?>
+  <section class="panel glass mb">
+    <header class="panel-head"><h2>Dienste laufen bald ab</h2><a href="/hosting?status=bald">Alle</a></header>
+    <ul class="list">
+      <?php foreach ($expiring as $sv): $left = \App\Services\Hosting::daysLeft($sv); ?>
+        <li><a href="/hosting/<?= (int)$sv['id'] ?>"><b><?= e($sv['name']) ?></b><small><?= e($sv['customer_name']) ?> · <?= $left >= 0 ? 'noch ' . $left . ' ' . ($left === 1 ? 'Tag' : 'Tage') : 'seit ' . date_de($sv['expires_on']) . ' abgelaufen' ?></small></a><?= \App\Services\Hosting::badge($sv) ?></li>
+      <?php endforeach ?>
+    </ul>
+  </section>
+<?php endif ?>
+
 <div class="stats stats-4">
   <a class="stat glass" href="/anfragen"><b><?= $stats['requests'] ?></b><span>Neu / ungelesen</span></a>
   <a class="stat glass" href="/tickets?status=open"><b><?= $stats['tickets'] ?></b><span>Offene Tickets</span></a>

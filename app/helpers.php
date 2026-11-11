@@ -170,6 +170,9 @@ function audit(string $actor, string $action, string $subject = ''): void
 
 function abort(int $code): never
 {
+    if (APP_CONTEXT === 'api') {
+        json_out($code, ['ok' => false, 'message' => $code === 404 ? 'Not found' : 'Error']);
+    }
     http_response_code($code);
     $titles = [403 => 'Kein Zugriff', 404 => 'Nicht gefunden'];
     View::render('errors/' . ($code === 403 ? '403' : '404'), [], $titles[$code] ?? 'Fehler');

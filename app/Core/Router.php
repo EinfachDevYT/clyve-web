@@ -23,7 +23,7 @@ final class Router
         $method = $method === 'HEAD' ? 'GET' : $method;
         $path = rtrim((string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH), '/') ?: '/';
 
-        if ($method === 'POST') {
+        if ($method === 'POST' && APP_CONTEXT !== 'api') {
             if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 65536) {
                 http_response_code(413);
                 exit;

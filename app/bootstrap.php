@@ -51,14 +51,17 @@ if (!is_dir(STORAGE_PATH)) {
 
 if (PHP_SAPI !== 'cli') {
     Security::sendHeaders();
-    Security::startSession(APP_CONTEXT);
+    if (APP_CONTEXT !== 'api') {
+        Security::startSession(APP_CONTEXT);
+    }
 
     set_exception_handler(static function (Throwable $e): void {
         error_log('[app] ' . $e::class . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
         if (!headers_sent()) {
             http_response_code(500);
         }
-        if (wants_json()) {
+        if (APP_CONTEXT === 'api' || wants_json()) {
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode(['ok' => false, 'message' => 'Serverfehler.']);
             return;
         }

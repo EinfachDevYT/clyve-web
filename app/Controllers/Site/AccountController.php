@@ -21,6 +21,10 @@ final class AccountController
             'openAmount'   => (int)Db::value("SELECT COALESCE(SUM(total_cents), 0) FROM invoices WHERE customer_id = ? AND status = 'issued'", [$id]),
             'requests'     => Db::all('SELECT * FROM requests WHERE customer_id = ? ORDER BY updated_at DESC LIMIT 5', [$id]),
             'tickets'      => Db::all('SELECT * FROM tickets WHERE customer_id = ? ORDER BY updated_at DESC LIMIT 5', [$id]),
+            'attention'    => \App\Services\Settings::on('hosting_customer_view') ? Db::all(
+                "SELECT * FROM services WHERE customer_id = ? AND (status = 'suspended' OR (status = 'active' AND expires_on IS NOT NULL AND expires_on <= date('now', 'localtime', '+14 days'))) ORDER BY expires_on",
+                [$id]
+            ) : [],
         ], 'Übersicht');
     }
 

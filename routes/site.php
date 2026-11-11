@@ -6,6 +6,7 @@ use App\Controllers\Site\AuthController;
 use App\Controllers\Site\HomeController;
 use App\Controllers\Site\InvoiceController;
 use App\Controllers\Site\RequestController;
+use App\Controllers\Site\ServiceController;
 use App\Controllers\Site\ShopController;
 use App\Controllers\Site\TicketController;
 use App\Core\Router;
@@ -42,6 +43,9 @@ $router->post('/konto/tickets', [TicketController::class, 'store']);
 $router->get('/konto/tickets/{id}', [TicketController::class, 'show']);
 $router->post('/konto/tickets/{id}/antwort', [TicketController::class, 'reply']);
 $router->post('/konto/tickets/{id}/schliessen', [TicketController::class, 'close']);
+
+$router->get('/konto/dienste', [ServiceController::class, 'index']);
+$router->get('/konto/dienste/{id}', [ServiceController::class, 'show']);
 
 $router->get('/konto/rechnungen', [InvoiceController::class, 'index']);
 $router->get('/konto/rechnungen/{id}', [InvoiceController::class, 'show']);

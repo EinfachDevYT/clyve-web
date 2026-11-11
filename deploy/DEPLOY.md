@@ -264,41 +264,37 @@ Haben sich die Dateien in `deploy/nginx/` geändert, die Änderungen in `/etc/ng
 
 ## E-Mail an Kunden (Mailcow / SMTP)
 
-Damit Kunden bei Antworten, Angeboten und Statuswechseln eine E-Mail bekommen:
-
 1. In Mailcow ein Postfach anlegen, z. B. `no-reply@clyve.dev`.
-2. In `config/config.php` ergänzen bzw. anpassen:
+2. Staff → **Einstellungen → E-Mail**: Server `mail.clyve.dev`, Port `587`, STARTTLS, Benutzer, Passwort und Absender eintragen.
+3. **Test-E-Mail senden** klicken.
 
-```php
-'smtp' => [
-    'host'       => 'mail.clyve.dev',
-    'port'       => 587,
-    'encryption' => 'tls',
-    'username'   => 'no-reply@clyve.dev',
-    'password'   => '…',
-    'from'       => 'no-reply@clyve.dev',
-    'from_name'  => 'Clyve.dev',
-],
-```
-
-3. Im Staff-Bereich unter **Einstellungen → Test-E-Mail an mich senden** prüfen.
+Das Passwort wird verschlüsselt in der Datenbank gespeichert (Schlüssel aus `app_secret`) und nie wieder angezeigt.
+Alternativ kannst du den `smtp`-Block weiter in `config/config.php` pflegen; Werte aus dem Staff-Bereich haben Vorrang.
 
 Ohne SMTP funktioniert alles weiter – Kunden sehen Antworten dann nur über ihren Link bzw. ihr Konto.
 
 ## Tebex (Script-Shop)
 
 1. Im Tebex-Panel unter **Integrations → Headless API** den öffentlichen Webstore-Identifier kopieren.
-2. In `config/config.php`:
+2. Staff → **Einstellungen → Integrationen**: Identifier und Shop-Adresse eintragen.
+3. Staff → **Scripts → Von Tebex synchronisieren**. Sichtbarkeit, Reihenfolge und Frameworks stellst du danach pro Script ein.
 
-```php
-'tebex' => [
-    'webstore_token' => '…',
-    'store_url'      => 'https://deinshop.tebex.io',
-    'image_hosts'    => ['dunb17ur4ymx4.cloudfront.net'],
-],
+## Bot-Hosting & Lizenzen
+
+Gehostete Discord-Bots legst du unter Staff → **Hosting** an (Tarife unter **Hosting → Tarife**,
+Regeln unter **Einstellungen → Hosting & Lizenzen**). Jeder Dienst bekommt einen Lizenzschlüssel; der Bot fragt
+`https://clyve.dev/api/v1/license` ab und beendet sich, wenn der Dienst gesperrt, gekündigt oder abgelaufen ist.
+Fertigen Code für discord.py und discord.js findest du auf der Seite jedes Dienstes.
+
+Erinnerungsmails und die automatische Sperre nach Ablauf erledigt ein Cronjob (als `www-data`, damit die
+Datenbankdateien ihm und PHP-FPM gehören):
+
+```bash
+echo '*/5 * * * * www-data php /var/www/clyve-web/bin/cron.php' | sudo tee /etc/cron.d/clyve-web
 ```
 
-3. Staff → **Scripts → Von Tebex synchronisieren**. Sichtbarkeit, Reihenfolge und Frameworks stellst du danach pro Script ein.
+Ohne Cronjob läuft die Prüfung beim Öffnen des Staff-Bereichs und nach Lizenzabfragen mit, Erinnerungen kommen dann aber unregelmäßig.
+Wichtig: den Cronjob **nicht** als `root` laufen lassen.
 
 ## Backup
 

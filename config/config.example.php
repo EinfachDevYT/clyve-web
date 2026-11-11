@@ -31,6 +31,8 @@ return [
         'login'   => [['window' => 900, 'max' => 8]],
         'register'=> [['window' => 3600, 'max' => 3]],
         'ticket'  => [['window' => 600, 'max' => 6]],
+        'license'      => [['window' => 60, 'max' => 240]],
+        'license_fail' => [['window' => 600, 'max' => 30]],
     ],
     'min_fill_seconds' => 4,
 
