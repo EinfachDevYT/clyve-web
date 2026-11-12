@@ -1,16 +1,11 @@
-<?php use App\Core\View; ob_start() ?>
-<header class="page-head">
-  <div><p class="kicker mono">Kundenbereich</p><h1>Profil</h1></div>
-</header>
-
-<div class="grid-2 gap-lg align-start">
-  <form class="panel glass stack" action="/konto/profil" method="post">
+<?php ob_start() ?>
+  <form class="panel glass stack narrow" action="/konto/einstellungen" method="post">
     <?= csrf_field() ?>
     <h2>Kontaktdaten &amp; Anschrift</h2>
     <p class="muted small">Die Anschrift wird für Rechnungen benötigt.</p>
     <label class="field<?= invalid('name') ?>"><span>Name</span>
       <input type="text" name="name" value="<?= e(old('name', $user['name'])) ?>" maxlength="80" required><?= error_for('name') ?></label>
-    <label class="field"><span>E-Mail</span>
+    <label class="field"><span>E-Mail <small class="muted">(ändern unter <a href="/konto/einstellungen/sicherheit">Anmeldung &amp; Sicherheit</a>)</small></span>
       <input type="email" value="<?= e($user['email']) ?>" disabled></label>
     <label class="field<?= invalid('discord') ?>"><span>Discord</span>
       <input type="text" name="discord" value="<?= e(old('discord', $user['discord'])) ?>" maxlength="32"><?= error_for('discord') ?></label>
@@ -28,17 +23,4 @@
       <input type="text" name="country" value="<?= e(old('country', $user['country'])) ?>" maxlength="60"></label>
     <button class="pill" type="submit">Speichern</button>
   </form>
-
-  <form class="panel glass stack" action="/konto/passwort" method="post">
-    <?= csrf_field() ?>
-    <h2>Passwort ändern</h2>
-    <label class="field<?= invalid('password_current') ?>"><span>Aktuelles Passwort</span>
-      <input type="password" name="password_current" autocomplete="current-password" required><?= error_for('password_current') ?></label>
-    <label class="field<?= invalid('password') ?>"><span>Neues Passwort</span>
-      <input type="password" name="password" minlength="10" autocomplete="new-password" required><?= error_for('password') ?></label>
-    <label class="field<?= invalid('password_confirm') ?>"><span>Wiederholen</span>
-      <input type="password" name="password_confirm" autocomplete="new-password" required><?= error_for('password_confirm') ?></label>
-    <button class="pill pill-ghost" type="submit">Passwort ändern</button>
-  </form>
-</div>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>
+<?php App\Core\View::partial('shared/security/_page', ['user' => $user, 'active' => 'profil', 'inner' => ob_get_clean()]) ?>

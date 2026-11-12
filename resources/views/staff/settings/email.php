@@ -8,7 +8,7 @@
 </div>
 
 <div class="grid-side">
-  <form class="panel glass stack" action="/einstellungen/email" method="post">
+  <form class="panel glass stack" action="/verwaltung/email" method="post">
     <?= csrf_field() ?>
     <div><h2>Mailserver (SMTP)</h2><p class="muted small">Für Mailcow: ein Postfach wie <span class="mono">no-reply@clyve.dev</span> anlegen und hier eintragen. Server leer lassen = Versand aus.</p></div>
     <div class="grid-smtp">
@@ -40,7 +40,7 @@
     <section class="panel glass stack">
       <h2>Testen</h2>
       <p class="muted small">Schickt eine Test-E-Mail an deine Staff-Adresse (<?= e($user['email']) ?>).</p>
-      <form action="/einstellungen/test-mail" method="post"><?= csrf_field() ?><button class="pill pill-sm pill-ghost" type="submit"<?= $enabled ? '' : ' disabled' ?>>Test-E-Mail senden</button></form>
+      <form action="/verwaltung/test-mail" method="post"><?= csrf_field() ?><button class="pill pill-sm pill-ghost" type="submit"<?= $enabled ? '' : ' disabled' ?>>Test-E-Mail senden</button></form>
     </section>
     <section class="panel glass">
       <h2>Wann wird gemailt?</h2>

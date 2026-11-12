@@ -102,8 +102,7 @@ function invalid(string $key): string
 
 function fail_back(array $errors, string $fallback, ?string $message = null): never
 {
-    $input = $_POST;
-    unset($input['csrf'], $input['password'], $input['password_confirm'], $input['password_current']);
+    $input = array_filter($_POST, static fn($k) => !preg_match('/^(csrf|password|code)/', (string)$k), ARRAY_FILTER_USE_KEY);
     $_SESSION['_old'] = $input;
     $_SESSION['_errors'] = $errors;
     flash('error', $message ?? 'Bitte überprüfe deine Eingaben.');

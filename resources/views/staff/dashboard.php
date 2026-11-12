@@ -5,7 +5,7 @@
 </header>
 
 <?php if (($user['role'] ?? '') === 'admin' && \App\Controllers\Staff\SettingsController::legalMissing()): ?>
-  <div class="notice notice-warn">Impressum und Datenschutz sind noch nicht vollständig. <a href="/einstellungen/betreiber">Jetzt Betreiberangaben ergänzen →</a></div>
+  <div class="notice notice-warn">Impressum und Datenschutz sind noch nicht vollständig. <a href="/verwaltung/betreiber">Jetzt Betreiberangaben ergänzen →</a></div>
 <?php endif ?>
 
 <?php if ($expiring): ?>

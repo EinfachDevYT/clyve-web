@@ -1,6 +1,6 @@
 <?php App\Core\View::partial('staff/settings/_tabs', ['tabs' => $tabs, 'active' => 'integrationen']) ?>
 
-<form class="stack-lg" action="/einstellungen/integrationen" method="post">
+<form class="stack-lg" action="/verwaltung/integrationen" method="post">
   <?= csrf_field() ?>
   <div class="grid-2 gap-lg align-start">
     <section class="panel glass stack">
@@ -29,5 +29,5 @@
 </form>
 
 <?php if ($hasWebhook): ?>
-  <form class="mt" action="/einstellungen/discord-test" method="post"><?= csrf_field() ?><button class="pill pill-sm pill-ghost" type="submit">Test-Nachricht an Discord senden</button></form>
+  <form class="mt" action="/verwaltung/discord-test" method="post"><?= csrf_field() ?><button class="pill pill-sm pill-ghost" type="submit">Test-Nachricht an Discord senden</button></form>
 <?php endif ?>

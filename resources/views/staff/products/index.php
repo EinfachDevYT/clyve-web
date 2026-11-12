@@ -9,10 +9,10 @@
 </header>
 
 <?php if (!$configured): ?>
-  <div class="notice">Tebex-Sync ist nicht eingerichtet. Trag in <code>config.php</code> unter <code>tebex</code> deinen Webstore-Identifier und die Shop-Adresse ein – oder pflege die Scripts hier von Hand.</div>
+  <div class="notice">Tebex-Sync ist nicht eingerichtet. Trag unter <a href="/verwaltung/integrationen">Verwaltung → Integrationen</a> deinen Webstore-Identifier und die Shop-Adresse ein – oder pflege die Scripts hier von Hand.</div>
 <?php endif ?>
 <?php if (!\App\Services\Settings::on('shop_enabled')): ?>
-  <div class="notice notice-warn">Der Script-Shop ist in den Einstellungen ausgeschaltet – die Seite /scripts ist gerade nicht erreichbar.</div>
+  <div class="notice notice-warn">Der Script-Shop ist unter Verwaltung → Allgemein ausgeschaltet – die Seite /scripts ist gerade nicht erreichbar.</div>
 <?php endif ?>
 
 <div class="table-wrap glass">

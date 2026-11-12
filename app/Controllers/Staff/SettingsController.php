@@ -14,11 +14,12 @@ use App\Services\Tebex;
 final class SettingsController
 {
     public const TABS = [
-        'allgemein'     => ['/einstellungen', 'Allgemein'],
-        'betreiber'     => ['/einstellungen/betreiber', 'Betreiber & Rechtliches'],
-        'email'         => ['/einstellungen/email', 'E-Mail'],
-        'integrationen' => ['/einstellungen/integrationen', 'Integrationen'],
-        'hosting'       => ['/einstellungen/hosting', 'Hosting & Lizenzen'],
+        'allgemein'     => ['/verwaltung', 'Allgemein'],
+        'betreiber'     => ['/verwaltung/betreiber', 'Betreiber & Rechtliches'],
+        'email'         => ['/verwaltung/email', 'E-Mail'],
+        'integrationen' => ['/verwaltung/integrationen', 'Integrationen'],
+        'hosting'       => ['/verwaltung/hosting', 'Hosting & Lizenzen'],
+        'sicherheit'    => ['/verwaltung/sicherheit', 'Sicherheit'],
     ];
 
     /** Fields that must be filled before Impressum and Datenschutz are complete. */
@@ -47,7 +48,7 @@ final class SettingsController
     public function show(): void
     {
         Auth::requireAdmin();
-        $this->render('general', ['settings' => Settings::all()], 'Einstellungen');
+        $this->render('general', ['settings' => Settings::all()], 'Verwaltung');
     }
 
     public function update(): void
@@ -61,15 +62,15 @@ final class SettingsController
             'announcement'            => $v->text('announcement', 0, 200, 'Ankündigung'),
         ];
         if ($v->fails()) {
-            fail_back($v->errors(), '/einstellungen');
+            fail_back($v->errors(), '/verwaltung');
         }
         foreach (Settings::TOGGLES as $key) {
             $values[$key] = ($_POST[$key] ?? '') === '1' ? '1' : '0';
         }
         Settings::set($values);
         audit('staff:' . $staff['id'], 'settings_general');
-        flash('success', 'Einstellungen gespeichert.');
-        redirect('/einstellungen');
+        flash('success', 'Gespeichert.');
+        redirect('/verwaltung');
     }
 
     /* ---------- Betreiber & Rechtliches ---------- */
@@ -83,7 +84,7 @@ final class SettingsController
     public function updateBusiness(): void
     {
         $staff = Auth::requireAdmin();
-        $back = '/einstellungen/betreiber';
+        $back = '/verwaltung/betreiber';
         $v = new Validator($_POST);
         $d = [
             'name'           => $v->text('name', 2, 80, 'Name der Website / Marke'),
@@ -179,7 +180,7 @@ final class SettingsController
     public function updateEmail(): void
     {
         $staff = Auth::requireAdmin();
-        $back = '/einstellungen/email';
+        $back = '/verwaltung/email';
         $v = new Validator($_POST);
         $host = strtolower($v->text('host', 0, 120, 'Server'));
         $port = (int)($_POST['port'] ?? 587);
@@ -224,7 +225,7 @@ final class SettingsController
     public function testMail(): void
     {
         $staff = Auth::requireAdmin();
-        $back = '/einstellungen/email';
+        $back = '/verwaltung/email';
         if (!Mailer::enabled()) {
             fail_back([], $back, 'Bitte zuerst Server und Absenderadresse speichern.');
         }
@@ -250,7 +251,7 @@ final class SettingsController
     public function updateHosting(): void
     {
         $staff = Auth::requireAdmin();
-        $back = '/einstellungen/hosting';
+        $back = '/verwaltung/hosting';
         $v = new Validator($_POST);
         $grace = (string)($_POST['hosting_grace_days'] ?? '');
         if (!ctype_digit($grace) || (int)$grace > 60) {
@@ -292,6 +293,33 @@ final class SettingsController
         redirect($back);
     }
 
+    /* ---------- Sicherheit ---------- */
+
+    public function securityPolicy(): void
+    {
+        Auth::requireAdmin();
+        $this->render('security', [
+            'settings' => Settings::all(),
+            'staff'    => \App\Core\Db::all('SELECT id, name, totp_enabled_at FROM staff WHERE active = 1 ORDER BY name'),
+        ], 'Sicherheit');
+    }
+
+    public function updateSecurityPolicy(): void
+    {
+        $staff = Auth::requireAdmin();
+        $require = ($_POST['staff_require_2fa'] ?? '') === '1';
+        if ($require && !$staff['has_2fa']) {
+            fail_back([], '/verwaltung/sicherheit', 'Richte zuerst für dein eigenes Konto die Zwei-Faktor-Anmeldung ein, sonst sperrst du dich aus.');
+        }
+        Settings::set([
+            'staff_require_2fa' => $require ? '1' : '0',
+            'security_mails'    => ($_POST['security_mails'] ?? '') === '1' ? '1' : '0',
+        ]);
+        audit('staff:' . $staff['id'], 'settings_security');
+        flash('success', 'Sicherheitsrichtlinien gespeichert.');
+        redirect('/verwaltung/sicherheit');
+    }
+
     /* ---------- Integrationen ---------- */
 
     public function integrations(): void
@@ -307,7 +335,7 @@ final class SettingsController
     public function updateIntegrations(): void
     {
         $staff = Auth::requireAdmin();
-        $back = '/einstellungen/integrationen';
+        $back = '/verwaltung/integrationen';
         $v = new Validator($_POST);
         $values = [];
 
@@ -357,6 +385,6 @@ final class SettingsController
         $staff = Auth::requireAdmin();
         $ok = \App\Services\Notifier::event('Test-Nachricht', 'Wenn du das liest, kommen Benachrichtigungen von ' . config('business.name', 'Clyve.dev') . ' an.', ['Von' => (string)$staff['name']], 'Test');
         flash($ok ? 'success' : 'error', $ok ? 'Test-Nachricht an Discord gesendet.' : 'Discord hat die Nachricht nicht angenommen. Ist der Webhook richtig?');
-        redirect('/einstellungen/integrationen');
+        redirect('/verwaltung/integrationen');
     }
 }

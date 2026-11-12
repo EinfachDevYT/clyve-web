@@ -62,6 +62,8 @@ $h = static function (string $id) use ($sections, &$n): string { $n++; return '<
 
   <?= $h('konto') ?>
   <p>Für ein Kundenkonto speichere ich Name, E-Mail-Adresse und ein mit einem sicheren Verfahren (Argon2id) gehashtes Passwort, optional Discord-Name, Firma und Anschrift. Die Anschrift wird nur für Belege verwendet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Das Konto bleibt bestehen, bis du dessen Löschung verlangst; Daten, die gesetzlichen Aufbewahrungspflichten unterliegen, werden bis zum Ablauf dieser Fristen gesperrt aufbewahrt.</p>
+  <p>Zum Schutz deines Kontos protokolliere ich sicherheitsrelevante Ereignisse (z. B. Anmeldungen, fehlgeschlagene Anmeldeversuche, Passwort- oder E-Mail-Änderungen) mit Zeitpunkt, Browser und Betriebssystem sowie einer gekürzten IP-Adresse (bei IPv4 ohne das letzte Segment). Du siehst diese Einträge selbst unter Einstellungen → Anmeldung &amp; Sicherheit. Sie werden nach 180 Tagen gelöscht. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (Schutz vor unbefugtem Zugriff).</p>
+  <p>Aktivierst du die Zwei-Faktor-Anmeldung, wird der dafür nötige geheime Schlüssel verschlüsselt gespeichert; Wiederherstellungscodes werden nur als Hashwert gespeichert. Für das Zurücksetzen des Passworts und das Ändern der E-Mail-Adresse erzeuge ich zeitlich begrenzte Einmal-Links, die ebenfalls nur als Hashwert gespeichert werden.</p>
 
   <?= $h('tickets') ?>
   <p>Wenn du ein Support-Ticket erstellst, speichere ich Betreff, Kategorie und alle Nachrichten des Verlaufs, um dein Anliegen zu bearbeiten (Art. 6 Abs. 1 lit. b DSGVO). Tickets werden gelöscht, wenn sie für die Betreuung nicht mehr benötigt werden, spätestens zusammen mit deinem Kundenkonto.</p>

@@ -257,6 +257,9 @@ sudo systemctl reload php8.3-fpm
 Die Datenbank wird beim nächsten Seitenaufruf **automatisch migriert** (`database/migrations/`), bestehende Daten bleiben erhalten.
 Vorher ein Backup zu machen schadet trotzdem nie (siehe unten).
 
+Nach dem Update auf die Version mit Zwei-Faktor-Anmeldung werden alle einmal abgemeldet (neue Sitzungsprüfung) – einfach neu anmelden.
+Weitere Mitarbeiter lädst du danach bequem im Staff-Bereich unter **Mitarbeiter** ein, `bin/create-staff.php` brauchst du nur für den ersten Admin.
+
 Neue Einstellungen in `config/config.example.php` sind optional – fehlen sie in deiner `config.php`, gelten sichere Standardwerte.
 
 Haben sich die Dateien in `deploy/nginx/` geändert, die Änderungen in `/etc/nginx/sites-available/` übernehmen
@@ -265,7 +268,7 @@ Haben sich die Dateien in `deploy/nginx/` geändert, die Änderungen in `/etc/ng
 ## E-Mail an Kunden (Mailcow / SMTP)
 
 1. In Mailcow ein Postfach anlegen, z. B. `no-reply@clyve.dev`.
-2. Staff → **Einstellungen → E-Mail**: Server `mail.clyve.dev`, Port `587`, STARTTLS, Benutzer, Passwort und Absender eintragen.
+2. Staff → **Verwaltung → E-Mail**: Server `mail.clyve.dev`, Port `587`, STARTTLS, Benutzer, Passwort und Absender eintragen.
 3. **Test-E-Mail senden** klicken.
 
 Das Passwort wird verschlüsselt in der Datenbank gespeichert (Schlüssel aus `app_secret`) und nie wieder angezeigt.
@@ -276,13 +279,13 @@ Ohne SMTP funktioniert alles weiter – Kunden sehen Antworten dann nur über ih
 ## Tebex (Script-Shop)
 
 1. Im Tebex-Panel unter **Integrations → Headless API** den öffentlichen Webstore-Identifier kopieren.
-2. Staff → **Einstellungen → Integrationen**: Identifier und Shop-Adresse eintragen.
+2. Staff → **Verwaltung → Integrationen**: Identifier und Shop-Adresse eintragen.
 3. Staff → **Scripts → Von Tebex synchronisieren**. Sichtbarkeit, Reihenfolge und Frameworks stellst du danach pro Script ein.
 
 ## Bot-Hosting & Lizenzen
 
 Gehostete Discord-Bots legst du unter Staff → **Hosting** an (Tarife unter **Hosting → Tarife**,
-Regeln unter **Einstellungen → Hosting & Lizenzen**). Jeder Dienst bekommt einen Lizenzschlüssel; der Bot fragt
+Regeln unter **Verwaltung → Hosting & Lizenzen**). Jeder Dienst bekommt einen Lizenzschlüssel; der Bot fragt
 `https://clyve.dev/api/v1/license` ab und beendet sich, wenn der Dienst gesperrt, gekündigt oder abgelaufen ist.
 Fertigen Code für discord.py und discord.js findest du auf der Seite jedes Dienstes.
 

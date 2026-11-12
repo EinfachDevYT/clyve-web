@@ -8,9 +8,22 @@ use App\Core\Db;
 use App\Core\RateLimiter;
 use App\Core\Validator;
 use App\Core\View;
+use App\Controllers\Concerns\AuthFlow;
 
 final class AuthController
 {
+    use AuthFlow;
+
+    protected function home(): string
+    {
+        return '/konto';
+    }
+
+    protected function settingsUrl(): string
+    {
+        return '/konto/einstellungen/sicherheit';
+    }
+
     public function showLogin(): void
     {
         $this->guestOnly();
@@ -26,11 +39,11 @@ final class AuthController
         if (!RateLimiter::ip('login') || !RateLimiter::hit('login', 'mail:' . $email)) {
             fail_back([], '/login', 'Zu viele Versuche. Bitte warte ein paar Minuten.');
         }
-        if (strlen($password) > 200 || !Auth::attempt($email, $password)) {
+        $user = strlen($password) <= 200 ? Auth::verify($email, $password) : null;
+        if (!$user) {
             fail_back(['email' => ' '], '/login', 'E-Mail oder Passwort ist falsch.');
         }
-        flash('success', 'Willkommen zurück!');
-        redirect(Auth::intended('/konto'));
+        $this->completeLogin($user);
     }
 
     public function showRegister(): void
@@ -69,6 +82,7 @@ final class AuthController
         $id = Db::insert('INSERT INTO customers (email, name, password_hash) VALUES (?, ?, ?)', [$email, $name, Auth::hash($password)]);
         Db::exec('UPDATE requests SET customer_id = ? WHERE customer_id IS NULL AND email = ?', [$id, $email]);
         Auth::login($id);
+        \App\Services\Account::log('customer', $id, 'login');
         flash('success', 'Dein Konto ist bereit. 🌸');
         redirect('/konto');
     }

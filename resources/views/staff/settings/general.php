@@ -6,7 +6,7 @@ $toggle = static function (string $key, string $label, string $hint) use ($setti
 ?>
 <?php App\Core\View::partial('staff/settings/_tabs', ['tabs' => $tabs, 'active' => 'allgemein']) ?>
 
-<form class="stack-lg" action="/einstellungen" method="post">
+<form class="stack-lg" action="/verwaltung" method="post">
   <?= csrf_field() ?>
   <div class="grid-2 gap-lg align-start">
     <section class="panel glass stack">

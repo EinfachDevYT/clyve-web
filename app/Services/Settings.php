@@ -29,6 +29,8 @@ final class Settings
         'hosting_notify_discord'  => '1',
         'hosting_suspend_message' => 'Dieser Bot ist gerade pausiert. Bitte wende dich an den Support.',
         'hosting_customer_view'   => '1',
+        'staff_require_2fa'       => '0',
+        'security_mails'          => '1',
     ];
 
     public const TOGGLES = [
@@ -117,28 +119,14 @@ final class Settings
         return (string)config($key, '') !== '';
     }
 
-    private static function key(): string
-    {
-        return hash('sha256', 'clyve-settings|' . (string)config('app_secret'), true);
-    }
-
     private static function encrypt(string $plain): string
     {
-        $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
-        return 'enc:' . base64_encode($nonce . sodium_crypto_secretbox($plain, $nonce, self::key()));
+        return \App\Core\Crypto::encrypt($plain, 'settings');
     }
 
     private static function decrypt(string $stored): ?string
     {
-        if (!str_starts_with($stored, 'enc:')) {
-            return null;
-        }
-        $raw = base64_decode(substr($stored, 4), true);
-        if ($raw === false || strlen($raw) <= SODIUM_CRYPTO_SECRETBOX_NONCEBYTES) {
-            return null;
-        }
-        $plain = sodium_crypto_secretbox_open(substr($raw, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES), substr($raw, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES), self::key());
-        return $plain === false ? null : $plain;
+        return \App\Core\Crypto::decrypt($stored, 'settings');
     }
 
     public static function all(): array

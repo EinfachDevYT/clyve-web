@@ -15,7 +15,7 @@ $hasServices = \App\Services\Settings::on('hosting_customer_view') && Db::value(
       <a href="/konto/tickets"<?= View::active('/konto/tickets') ?>>Support</a>
       <?php if ($hasServices): ?><a href="/konto/dienste"<?= View::active('/konto/dienste') ?>>Dienste</a><?php endif ?>
       <a href="/konto/rechnungen"<?= View::active('/konto/rechnungen') ?>>Rechnungen</a>
-      <a href="/konto/profil"<?= View::active('/konto/profil') ?>>Profil</a>
+      <a href="/konto/einstellungen"<?= View::active('/konto/einstellungen') ?>>Einstellungen</a>
     </nav>
   </aside>
   <section class="shell-main">

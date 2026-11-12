@@ -28,12 +28,18 @@
         <a href="/rechnungen"<?= View::active('/rechnungen') ?>>Rechnungen</a>
         <a href="/hosting"<?= View::active('/hosting') ?>>Hosting</a>
         <a href="/scripts"<?= View::active('/scripts') ?>>Scripts</a>
-        <?php if ($user['role'] === 'admin'): ?><a href="/einstellungen"<?= View::active('/einstellungen') ?>>Einstellungen</a><?php endif ?>
+        <?php if ($user['role'] === 'admin'): ?>
+          <span class="nav-label mono">Verwaltung</span>
+          <a href="/verwaltung"<?= View::active('/verwaltung') ?>>Website &amp; System</a>
+          <a href="/mitarbeiter"<?= View::active('/mitarbeiter') ?>>Mitarbeiter</a>
+        <?php endif ?>
+        <span class="nav-label mono">Persönlich</span>
+        <a href="/einstellungen"<?= View::active('/einstellungen') ?>>Einstellungen</a>
       </nav>
       <?php View::partial('shared/signature', ['compact' => true]) ?>
       <div class="staff-me">
         <span class="avatar"><?= e(mb_strtoupper(mb_substr($user['name'], 0, 1))) ?></span>
-        <div><b><?= e($user['name']) ?></b><small><?= $user['role'] === 'admin' ? 'Admin' : 'Mitarbeiter' ?></small></div>
+        <a class="staff-me-link" href="/einstellungen" title="Einstellungen"><b><?= e($user['name']) ?></b><small><?= $user['role'] === 'admin' ? 'Admin' : 'Mitarbeiter' ?></small></a>
         <form action="/logout" method="post"><?= csrf_field() ?><button class="icon-btn" type="submit" aria-label="Abmelden" title="Abmelden">⏻</button></form>
       </div>
     </aside>

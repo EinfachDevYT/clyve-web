@@ -8,7 +8,7 @@ $val = static fn(string $k) => e(old($k, $settings[$k]));
 ?>
 <?php App\Core\View::partial('staff/settings/_tabs', ['tabs' => $tabs, 'active' => 'hosting']) ?>
 
-<form class="stack-lg" action="/einstellungen/hosting" method="post">
+<form class="stack-lg" action="/verwaltung/hosting" method="post">
   <?= csrf_field() ?>
   <div class="grid-2 gap-lg align-start">
     <section class="panel glass stack">

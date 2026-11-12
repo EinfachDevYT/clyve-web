@@ -83,10 +83,21 @@ Benachrichtigungen: Kunde per E-Mail (SMTP, optional), du per Discord-Webhook.
 Ausgestellte Belege behalten ihren Modus und sind unveränderlich (Korrektur per Storno). PDF über die Druckansicht.
 Keine Rechts- oder Steuerberatung: Wer regelmäßig bezahlte Aufträge annimmt, braucht in der Regel eine Gewerbeanmeldung.
 
-## Schalter (Staff → Einstellungen, nur Admin)
+## Verwaltung (Staff → Verwaltung, nur Admin)
 
 Anfragen an/aus (mit eigener Meldung), einzelne Kategorien, Registrierung, Support-Tickets, Script-Shop,
 Verfügbarkeitstext, Antwortzeit und ein Ankündigungsbanner. Die Schalter werden serverseitig durchgesetzt.
+
+## Konten & Sicherheit
+
+Kunden (Konto → Einstellungen) und Staff (Einstellungen) haben einen persönlichen Bereich mit Profil sowie
+„Anmeldung & Sicherheit“: Passwort ändern, E-Mail-Adresse ändern (mit Bestätigungslink an die neue Adresse),
+Zwei-Faktor-Anmeldung per Authenticator-App (TOTP, QR-Code, 10 Wiederherstellungscodes), „auf allen anderen Geräten abmelden“
+und ein Verlauf der letzten Anmeldungen. „Passwort vergessen“ schickt einen Einmal-Link (60 Minuten gültig).
+
+Admins verwalten unter **Mitarbeiter** das Team: einladen (Link per E-Mail oder zum Weitergeben), Rolle ändern,
+Zugang sperren, 2FA zurücksetzen. Unter **Verwaltung → Sicherheit** lässt sich 2FA für Staff verpflichtend machen.
+Sicherheitsrelevante Änderungen lösen eine Hinweis-E-Mail aus. 2FA-Schlüssel sind verschlüsselt, Codes und Links nur gehasht gespeichert.
 
 ## Bot-Hosting & Lizenzen
 

@@ -11,7 +11,7 @@ $labels = ['name' => 'Name der Website', 'owner' => 'Vor- und Nachname', 'street
   <div class="notice">Diese Angaben erscheinen im <a href="<?= e(rtrim((string)(config('site_origins')[0] ?? ''), '/')) ?>/impressum" target="_blank" rel="noopener">Impressum</a>, in der <a href="<?= e(rtrim((string)(config('site_origins')[0] ?? ''), '/')) ?>/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a> und auf neuen Belegen.</div>
 <?php endif ?>
 
-<form class="stack-lg" action="/einstellungen/betreiber" method="post">
+<form class="stack-lg" action="/verwaltung/betreiber" method="post">
   <?= csrf_field() ?>
   <div class="grid-2 gap-lg align-start">
     <section class="panel glass stack">

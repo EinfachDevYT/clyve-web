@@ -6,6 +6,8 @@ use App\Controllers\Staff\CustomerController;
 use App\Controllers\Staff\DashboardController;
 use App\Controllers\Staff\HostingController;
 use App\Controllers\Staff\ProductController;
+use App\Controllers\Staff\ProfileController;
+use App\Controllers\Staff\StaffController;
 use App\Controllers\Staff\InvoiceController;
 use App\Controllers\Staff\RequestController;
 use App\Controllers\Staff\SettingsController;
@@ -17,6 +19,13 @@ $router = new Router();
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout']);
+$router->get('/login/2fa', [AuthController::class, 'showTwoFactor']);
+$router->post('/login/2fa', [AuthController::class, 'verifyTwoFactor']);
+$router->get('/passwort-vergessen', [AuthController::class, 'showForgot']);
+$router->post('/passwort-vergessen', [AuthController::class, 'sendForgot']);
+$router->get('/passwort-zuruecksetzen/{token}', [AuthController::class, 'showReset']);
+$router->post('/passwort-zuruecksetzen/{token}', [AuthController::class, 'reset']);
+$router->get('/email-bestaetigen/{token}', [AuthController::class, 'confirmEmail']);
 
 $router->get('/', [DashboardController::class, 'index']);
 
@@ -72,17 +81,42 @@ $router->post('/hosting/{id}/entsperren', [HostingController::class, 'unsuspend'
 $router->post('/hosting/{id}/schluessel', [HostingController::class, 'rotateKey']);
 $router->post('/hosting/{id}/kuendigen', [HostingController::class, 'cancel']);
 
-$router->get('/einstellungen', [SettingsController::class, 'show']);
-$router->post('/einstellungen', [SettingsController::class, 'update']);
-$router->get('/einstellungen/betreiber', [SettingsController::class, 'business']);
-$router->post('/einstellungen/betreiber', [SettingsController::class, 'updateBusiness']);
-$router->get('/einstellungen/email', [SettingsController::class, 'email']);
-$router->post('/einstellungen/email', [SettingsController::class, 'updateEmail']);
-$router->post('/einstellungen/test-mail', [SettingsController::class, 'testMail']);
-$router->get('/einstellungen/integrationen', [SettingsController::class, 'integrations']);
-$router->post('/einstellungen/integrationen', [SettingsController::class, 'updateIntegrations']);
-$router->post('/einstellungen/discord-test', [SettingsController::class, 'testDiscord']);
-$router->get('/einstellungen/hosting', [SettingsController::class, 'hosting']);
-$router->post('/einstellungen/hosting', [SettingsController::class, 'updateHosting']);
+$router->get('/verwaltung', [SettingsController::class, 'show']);
+$router->post('/verwaltung', [SettingsController::class, 'update']);
+$router->get('/verwaltung/betreiber', [SettingsController::class, 'business']);
+$router->post('/verwaltung/betreiber', [SettingsController::class, 'updateBusiness']);
+$router->get('/verwaltung/email', [SettingsController::class, 'email']);
+$router->post('/verwaltung/email', [SettingsController::class, 'updateEmail']);
+$router->post('/verwaltung/test-mail', [SettingsController::class, 'testMail']);
+$router->get('/verwaltung/integrationen', [SettingsController::class, 'integrations']);
+$router->post('/verwaltung/integrationen', [SettingsController::class, 'updateIntegrations']);
+$router->post('/verwaltung/discord-test', [SettingsController::class, 'testDiscord']);
+$router->get('/verwaltung/hosting', [SettingsController::class, 'hosting']);
+$router->post('/verwaltung/hosting', [SettingsController::class, 'updateHosting']);
+$router->get('/verwaltung/sicherheit', [SettingsController::class, 'securityPolicy']);
+$router->post('/verwaltung/sicherheit', [SettingsController::class, 'updateSecurityPolicy']);
+
+$router->get('/mitarbeiter', [StaffController::class, 'index']);
+$router->get('/mitarbeiter/neu', [StaffController::class, 'create']);
+$router->post('/mitarbeiter', [StaffController::class, 'store']);
+$router->get('/mitarbeiter/{id}', [StaffController::class, 'show']);
+$router->post('/mitarbeiter/{id}', [StaffController::class, 'update']);
+$router->post('/mitarbeiter/{id}/status', [StaffController::class, 'toggleActive']);
+$router->post('/mitarbeiter/{id}/2fa-reset', [StaffController::class, 'resetTwoFactor']);
+$router->post('/mitarbeiter/{id}/link', [StaffController::class, 'sendLink']);
+$router->post('/kunden/{id}/2fa-reset', [CustomerController::class, 'resetTwoFactor']);
+$router->post('/kunden/{id}/passwort-link', [CustomerController::class, 'sendResetLink']);
+
+$router->get('/einstellungen', [ProfileController::class, 'profile']);
+$router->post('/einstellungen', [ProfileController::class, 'updateProfile']);
+$router->get('/einstellungen/sicherheit', [ProfileController::class, 'security']);
+$router->post('/einstellungen/sicherheit/passwort', [ProfileController::class, 'updatePassword']);
+$router->post('/einstellungen/sicherheit/email', [ProfileController::class, 'updateEmail']);
+$router->post('/einstellungen/sicherheit/email/abbrechen', [ProfileController::class, 'cancelEmail']);
+$router->get('/einstellungen/sicherheit/2fa', [ProfileController::class, 'setupTwoFactor']);
+$router->post('/einstellungen/sicherheit/2fa', [ProfileController::class, 'enableTwoFactor']);
+$router->post('/einstellungen/sicherheit/2fa/deaktivieren', [ProfileController::class, 'disableTwoFactor']);
+$router->post('/einstellungen/sicherheit/2fa/codes', [ProfileController::class, 'renewCodes']);
+$router->post('/einstellungen/sicherheit/abmelden', [ProfileController::class, 'revokeSessions']);
 
 return $router;
