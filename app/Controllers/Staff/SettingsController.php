@@ -96,6 +96,8 @@ final class SettingsController
             'email'          => $v->email('email'),
             'phone'          => $v->text('phone', 0, 30, 'Telefon'),
             'hosting'        => $v->text('hosting', 0, 200, 'Hosting-Anbieter'),
+            'dsa_email'      => $v->email('dsa_email', false),
+            'dsa_languages'  => $v->text('dsa_languages', 0, 80, 'Sprachen'),
             'mode'           => $v->oneOf('mode', array_keys(InvoiceService::MODES), 'Bitte einen Modus wählen.'),
             'tax_number'     => $v->text('tax_number', 0, 30, 'Steuernummer'),
             'vat_id'         => strtoupper(str_replace(' ', '', $v->text('vat_id', 0, 20, 'USt-IdNr.'))),
@@ -111,6 +113,9 @@ final class SettingsController
         }
         if ($d['phone'] !== '' && !preg_match('/^\+?[0-9 ()\/\-]{6,30}$/', $d['phone'])) {
             $v->addError('phone', 'Ungültige Telefonnummer.');
+        }
+        if ($d['dsa_email'] !== '' && $d['dsa_languages'] === '') {
+            $d['dsa_languages'] = 'Deutsch, Englisch';
         }
         if ($d['vat_id'] !== '' && !preg_match('/^[A-Z]{2}[A-Z0-9]{8,12}$/', $d['vat_id'])) {
             $v->addError('vat_id', 'Ungültige USt-IdNr. (z. B. DE123456789).');

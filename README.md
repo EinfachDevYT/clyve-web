@@ -97,6 +97,9 @@ Not legal or tax advice: if you take paid jobs regularly, you usually need to re
 Requests on/off (with a custom message), single categories, registration, e-mail verification, support tickets,
 script shop, availability text, response time and an announcement banner. Switches are enforced server-side.
 Business details, SMTP and integrations (Discord, Tebex) are edited here too; imprint and privacy policy are generated from them.
+Optionally add a DSA contact point (Verwaltung → Betreiber → „Kontaktstelle nach DSA“): an e-mail address for authorities,
+users and reports of illegal content (Art. 11, 12, 16 Regulation (EU) 2022/2065). Once set, the imprint gets a matching
+section and the privacy policy explains how reports are processed.
 
 ## Devlog
 

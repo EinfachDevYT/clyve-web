@@ -574,3 +574,5 @@ pre.code code { background: none; border: 0; padding: 0; color: inherit; font-si
 .danger-zone > summary { cursor: pointer; color: #F9A8D4; font-weight: 600; font-size: .92rem; }
 .danger-zone[open] > summary { margin-bottom: 12px; }
 .danger-zone ul { margin: 0; padding-left: 1.2em; color: var(--lilac); }
+.form-sub { margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--line); }
+.form-sub h3 { margin: 0 0 4px; font-size: 1rem; text-shadow: none; }

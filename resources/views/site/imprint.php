@@ -28,6 +28,14 @@ $v = static fn(string $k) => trim((string)($b[$k] ?? ''));
     <p>Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: <?= e($v('vat_id')) ?></p>
   <?php endif ?>
 
+  <?php if ($v('dsa_email') !== ''): ?>
+    <h2>Kontaktstelle nach dem Digital Services Act</h2>
+    <p>Zentrale Kontaktstelle für Behörden der Mitgliedstaaten, die Europäische Kommission und das Europäische Gremium für digitale Dienste (Art. 11 Verordnung (EU) 2022/2065) sowie für Nutzer (Art. 12):<br>
+      E-Mail: <a href="mailto:<?= e($v('dsa_email')) ?>"><?= e($v('dsa_email')) ?></a><br>
+      Kontaktaufnahme möglich auf: <?= e($v('dsa_languages') ?: 'Deutsch, Englisch') ?></p>
+    <p>An diese Adresse kannst du auch rechtswidrige Inhalte oder Missbrauch melden, z. B. durch einen bei mir gehosteten Bot (Art. 16 DSA). Bitte nenne dabei, wo sich der Inhalt befindet, warum er rechtswidrig ist, sowie deinen Namen und deine E-Mail-Adresse. Du erhältst eine Eingangsbestätigung und eine Mitteilung über meine Entscheidung.</p>
+  <?php endif ?>
+
   <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
   <p><?= e($v('owner')) ?><br><?= e($v('street')) ?><br><?= e($v('zip')) ?> <?= e($v('city')) ?></p>
 

@@ -16,6 +16,7 @@ $sections = ['verantwortlicher' => 'Verantwortlicher', 'grundsaetze' => 'Allgeme
 if ($mail) { $sections['email'] = 'E-Mail-Benachrichtigungen'; }
 if ($discord) { $sections['discord'] = 'Interne Benachrichtigung über Discord'; }
 if ($licenses) { $sections['lizenzen'] = 'Gehostete Dienste und Lizenzprüfung'; }
+if ($v('dsa_email') !== '') { $sections['meldungen'] = 'Meldungen nach dem Digital Services Act'; }
 $sections['schutz'] = 'Schutz vor Missbrauch';
 if ($shop) { $sections['tebex'] = 'Script-Shop und Tebex'; }
 $sections += ['links' => 'Externe Links', 'rechte' => 'Deine Rechte', 'stand' => 'Stand'];
@@ -86,6 +87,11 @@ $h = static function (string $id) use ($sections, &$n): string { $n++; return '<
     <?= $h('lizenzen') ?>
     <p>Für gehostete Dienste (z. B. Discord-Bots) speichere ich Bezeichnung, Laufzeit, Preis, Status und einen Verlauf der Änderungen (Verlängerung, Sperre, Kündigung) in deinem Kundenkonto. Der Lizenzschlüssel wird nur als nicht umkehrbarer Hashwert gespeichert.</p>
     <p>Der Bot fragt in regelmäßigen Abständen bei dieser Website ab, ob er laufen darf. Dabei werden der Lizenzschlüssel und optional die Versionsnummer des Bots übermittelt; gespeichert werden der Zeitpunkt der letzten Abfrage und die Versionsnummer. Die IP-Adresse des Servers, auf dem der Bot läuft, wird nur wie unter „Schutz vor Missbrauch“ beschrieben verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Vor Ablauf der Laufzeit erhältst du eine Erinnerung per E-Mail. Die Daten werden gelöscht, wenn sie für die Vertragsabwicklung nicht mehr benötigt werden, spätestens zusammen mit deinem Kundenkonto, soweit keine Aufbewahrungspflichten bestehen.</p>
+  <?php endif ?>
+
+  <?php if ($v('dsa_email') !== ''): ?>
+    <?= $h('meldungen') ?>
+    <p>Wenn du mir über <?= e($v('dsa_email')) ?> rechtswidrige Inhalte oder Missbrauch meldest, verarbeite ich die Angaben deiner Meldung, deinen Namen und deine E-Mail-Adresse, um die Meldung zu prüfen, dir den Eingang zu bestätigen und dich über meine Entscheidung zu informieren. Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO in Verbindung mit Art. 16 der Verordnung (EU) 2022/2065 (Digital Services Act). Der betroffene Kunde erfährt deinen Namen und deine E-Mail-Adresse nur, wenn das zur Prüfung erforderlich ist. Die Daten werden gelöscht, sobald die Meldung abschließend bearbeitet ist und keine Aufbewahrungs- oder Nachweispflichten mehr bestehen.</p>
   <?php endif ?>
 
   <?= $h('schutz') ?>

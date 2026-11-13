@@ -63,6 +63,8 @@ return [
         'phone'          => '',   // optional, erscheint im Impressum
         // Hosting-Anbieter deines Servers für die Datenschutzerklärung, z. B. 'netcup GmbH, Daimlerstraße 25, 76185 Karlsruhe'
         'hosting'        => '',
+        'dsa_email'      => '',   // optional: Kontaktstelle nach DSA (Art. 11/12/16), erscheint im Impressum
+        'dsa_languages'  => 'Deutsch, Englisch',
         'tax_number'     => '',   // Steuernummer (ab Gewerbe)
         'vat_id'         => '',   // USt-IdNr. (falls vorhanden)
         'iban'           => '',

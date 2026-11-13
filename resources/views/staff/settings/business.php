@@ -30,6 +30,14 @@ $labels = ['name' => 'Name der Website', 'owner' => 'Vor- und Nachname', 'street
       </div>
       <label class="field<?= invalid('hosting') ?>"><span>Hosting-Anbieter <small class="muted">(für die Datenschutzerklärung)</small></span>
         <input type="text" name="hosting" maxlength="200" value="<?= $f('hosting') ?>" placeholder="z. B. netcup GmbH, Daimlerstraße 25, 76185 Karlsruhe"><?= error_for('hosting') ?></label>
+      <div class="stack form-sub">
+        <div><h3>Kontaktstelle nach DSA <small class="muted">(optional)</small></h3>
+          <p class="muted small">Für Hosting-Dienste nach dem Digital Services Act: zentrale Kontaktstelle für Behörden (Art. 11) und Nutzer (Art. 12) sowie Meldungen rechtswidriger Inhalte (Art. 16). Erscheint im Impressum, sobald eine Adresse eingetragen ist.</p></div>
+        <div class="grid-2">
+          <label class="field<?= invalid('dsa_email') ?>"><span>E-Mail für Meldungen</span><input type="email" name="dsa_email" maxlength="160" value="<?= $f('dsa_email') ?>" placeholder="z. B. abuse@clyve.dev"><?= error_for('dsa_email') ?></label>
+          <label class="field<?= invalid('dsa_languages') ?>"><span>Sprachen</span><input type="text" name="dsa_languages" maxlength="80" value="<?= $f('dsa_languages', 'Deutsch, Englisch') ?>"><?= error_for('dsa_languages') ?></label>
+        </div>
+      </div>
     </section>
 
     <div class="stack-lg">
