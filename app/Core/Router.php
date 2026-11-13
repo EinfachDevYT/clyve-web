@@ -35,7 +35,7 @@ final class Router
         foreach ($this->routes as [$verb, $pattern, [$class, $action]]) {
             $regex = '#^' . preg_replace_callback(
                 '#\{([a-z]+)\}#',
-                static fn(array $m) => $m[1] === 'token' ? '(?P<token>[a-f0-9]{40})' : '(?P<' . $m[1] . '>\d+)',
+                static fn(array $m) => match ($m[1]) { 'token' => '(?P<token>[a-f0-9]{40})', 'slug' => '(?P<slug>[a-z0-9-]{1,70})', default => '(?P<' . $m[1] . '>\d+)' },
                 $pattern
             ) . '$#';
             if (!preg_match($regex, $path, $m)) {

@@ -327,6 +327,7 @@ final class SettingsController
         Auth::requireAdmin();
         $this->render('integrations', [
             'hasWebhook' => Settings::hasSecret('discord_webhook'),
+            'hasDevlogHook' => Settings::hasSecret('devlog_webhook'),
             'tebex'      => (array)config('tebex', []),
             'imageHosts' => Tebex::imageHosts(),
         ], 'Integrationen');
@@ -343,11 +344,26 @@ final class SettingsController
         if (($_POST['discord_webhook_clear'] ?? '') === '1') {
             $values['discord_webhook'] = '';
         } elseif ($webhook !== '') {
-            if (!preg_match('#^https://(?:ptb\.|canary\.)?discord(?:app)?\.com/api/webhooks/\d+/[\w-]+$#', $webhook)) {
+            if (!\App\Services\Notifier::validWebhook($webhook)) {
                 $v->addError('discord_webhook', 'Das ist keine gültige Discord-Webhook-URL.');
             }
             $values['discord_webhook'] = $webhook;
         }
+
+        $devlogHook = trim((string)($_POST['devlog_webhook'] ?? ''));
+        if (($_POST['devlog_webhook_clear'] ?? '') === '1') {
+            $values['devlog_webhook'] = '';
+        } elseif ($devlogHook !== '') {
+            if (!\App\Services\Notifier::validWebhook($devlogHook)) {
+                $v->addError('devlog_webhook', 'Das ist keine gültige Discord-Webhook-URL.');
+            }
+            $values['devlog_webhook'] = $devlogHook;
+        }
+        $role = $v->text('devlog_role', 0, 22, 'Rollen-ID');
+        if ($role !== '' && !preg_match('/^\d{15,22}$/', $role)) {
+            $v->addError('devlog_role', 'Die Rollen-ID besteht nur aus Ziffern (Rechtsklick auf die Rolle → ID kopieren).');
+        }
+        $values['devlog_role'] = $role;
 
         $token = $v->text('webstore_token', 0, 80, 'Webstore-Identifier');
         if ($token !== '' && !preg_match('/^[a-z0-9-]{4,80}$/i', $token)) {

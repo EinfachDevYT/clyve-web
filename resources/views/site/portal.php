@@ -1,6 +1,7 @@
 <?php
 use App\Core\Db;
 use App\Core\View;
+$devlogNew = $user && Db::value("SELECT 1 FROM devlog_posts WHERE status = 'published' LIMIT 1") ? \App\Services\Devlog::unseen($user) : null;
 $hasServices = $user && \App\Services\Settings::on('hosting_customer_view') && Db::value('SELECT 1 FROM services WHERE customer_id = ? LIMIT 1', [$user['id']]);
 ?>
 <!doctype html>
@@ -11,6 +12,13 @@ $hasServices = $user && \App\Services\Settings::on('hosting_customer_view') && D
   <meta name="robots" content="noindex, nofollow">
   <meta name="author" content="EinfachDev · einfachdev.de">
   <title><?= e($pageTitle ? $pageTitle . ' · Kundenbereich' : 'Kundenbereich · Clyve.dev') ?></title>
+  <?php if (!empty($meta['url'])): ?>
+  <meta property="og:site_name" content="Clyve.dev">
+  <meta property="og:title" content="<?= e($pageTitle) ?>">
+  <meta property="og:description" content="<?= e($meta['description']) ?>">
+  <meta property="og:url" content="<?= e($meta['url']) ?>">
+  <?php endif ?>
+  <meta name="theme-color" content="#A855F7">
   <link rel="icon" href="/assets/brand/clyve-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="<?= e(asset('/assets/css/style.css')) ?>">
   <link rel="stylesheet" href="<?= e(asset('/assets/css/app.css')) ?>">
@@ -27,6 +35,7 @@ $hasServices = $user && \App\Services\Settings::on('hosting_customer_view') && D
         <a href="/konto/tickets"<?= View::active('/konto/tickets') ?>>Support</a>
         <?php if ($hasServices): ?><a href="/konto/dienste"<?= View::active('/konto/dienste') ?>>Dienste</a><?php endif ?>
         <a href="/konto/rechnungen"<?= View::active('/konto/rechnungen') ?>>Rechnungen</a>
+        <?php if ($devlogNew !== null): ?><a href="/konto/devlog"<?= View::active('/konto/devlog') ?: View::active('/devlog') ?>>Devlog<?php if ($devlogNew): ?> <span class="nav-count"><?= $devlogNew ?></span><?php endif ?></a><?php endif ?>
         <span class="nav-label mono">Persönlich</span>
         <a href="/konto/einstellungen"<?= View::active('/konto/einstellungen') ?>>Einstellungen</a>
         <span class="nav-label mono">Clyve.dev</span>

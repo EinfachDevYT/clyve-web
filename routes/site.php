@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Controllers\Site\AccountController;
 use App\Controllers\Site\AuthController;
+use App\Controllers\Site\DevlogController;
 use App\Controllers\Site\HomeController;
 use App\Controllers\Site\InvoiceController;
 use App\Controllers\Site\RequestController;
@@ -66,6 +67,10 @@ $router->post('/konto/tickets/{id}/schliessen', [TicketController::class, 'close
 
 $router->get('/konto/dienste', [ServiceController::class, 'index']);
 $router->get('/konto/dienste/{id}', [ServiceController::class, 'show']);
+
+$router->get('/konto/devlog', [DevlogController::class, 'index']);
+$router->get('/devlog', [DevlogController::class, 'legacy']);
+$router->get('/devlog/{slug}', [DevlogController::class, 'show']);
 
 $router->get('/konto/rechnungen', [InvoiceController::class, 'index']);
 $router->get('/konto/rechnungen/{id}', [InvoiceController::class, 'show']);

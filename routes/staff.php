@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Controllers\Staff\AuthController;
 use App\Controllers\Staff\CustomerController;
 use App\Controllers\Staff\DashboardController;
+use App\Controllers\Staff\DevlogController;
 use App\Controllers\Staff\HostingController;
 use App\Controllers\Staff\ProductController;
 use App\Controllers\Staff\ProfileController;
@@ -66,6 +67,15 @@ $router->get('/scripts/{id}', [ProductController::class, 'edit']);
 $router->post('/scripts/{id}', [ProductController::class, 'update']);
 $router->post('/scripts/{id}/toggle', [ProductController::class, 'toggle']);
 $router->post('/scripts/{id}/loeschen', [ProductController::class, 'destroy']);
+
+$router->get('/devlog', [DevlogController::class, 'index']);
+$router->get('/devlog/neu', [DevlogController::class, 'create']);
+$router->post('/devlog', [DevlogController::class, 'store']);
+$router->get('/devlog/{id}', [DevlogController::class, 'edit']);
+$router->post('/devlog/{id}', [DevlogController::class, 'update']);
+$router->post('/devlog/{id}/zurueckziehen', [DevlogController::class, 'unpublish']);
+$router->post('/devlog/{id}/discord', [DevlogController::class, 'discord']);
+$router->post('/devlog/{id}/loeschen', [DevlogController::class, 'destroy']);
 
 $router->get('/hosting', [HostingController::class, 'index']);
 $router->get('/hosting/neu', [HostingController::class, 'create']);

@@ -28,6 +28,7 @@
         <a href="/rechnungen"<?= View::active('/rechnungen') ?>>Rechnungen</a>
         <a href="/hosting"<?= View::active('/hosting') ?>>Hosting</a>
         <a href="/scripts"<?= View::active('/scripts') ?>>Scripts</a>
+        <a href="/devlog"<?= View::active('/devlog') ?>>Devlog</a>
         <?php if ($user['role'] === 'admin'): ?>
           <span class="nav-label mono">Verwaltung</span>
           <a href="/verwaltung"<?= View::active('/verwaltung') ?>>Website &amp; System</a>

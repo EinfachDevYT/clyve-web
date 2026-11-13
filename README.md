@@ -88,6 +88,31 @@ Keine Rechts- oder Steuerberatung: Wer regelmäßig bezahlte Aufträge annimmt, 
 Anfragen an/aus (mit eigener Meldung), einzelne Kategorien, Registrierung, Support-Tickets, Script-Shop,
 Verfügbarkeitstext, Antwortzeit und ein Ankündigungsbanner. Die Schalter werden serverseitig durchgesetzt.
 
+## Devlog
+
+Im Staff-Bereich unter **Devlog** schreibst du Beiträge über Updates. Im Inhalt wird jede Zeile mit einem Zeichen am
+Anfang ein Changelog-Eintrag wie bei GitHub:
+
+```
+Ein paar einleitende Sätze …
+
+## Kundenbereich
++ Neu hinzugefügt
+- Entfernt
+~ Verbessert
+! Behoben
+```
+
+`## ` startet einen Abschnitt, `**fett**` und `` `code` `` funktionieren im Text. Beiträge sind erst Entwürfe und werden
+mit „Veröffentlichen“ sichtbar. Eingeloggte Kunden sehen sie unter **Devlog** im Kundenbereich (mit Zähler für neue
+Beiträge). Jeder veröffentlichte Beitrag hat einen eigenen Link (`/devlog/<titel>`), der auch ohne Login lesbar ist,
+damit Discord eine Vorschau anzeigt – die Übersicht aller Beiträge bleibt im Kundenbereich.
+
+Zum Teilen zeigt die Beitragsseite eine fertige Discord-Nachricht mit ```` ```diff ````-Block (grün/rot wie bei GitHub)
+und Link zum Kopieren. Mit einem Devlog-Webhook unter Verwaltung → Integrationen postest du sie direkt per Klick in
+deinen Ankündigungs-Kanal, optional mit Erwähnung einer Rolle. Die ersten Beiträge zu den bisherigen Updates liegen
+als Entwürfe bereit.
+
 ## Konten & Sicherheit
 
 Der Kundenbereich (`/konto`) ist wie der Staff-Bereich eine eigene App mit Seitenleiste – getrennt von Startseite,

@@ -5,8 +5,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($pageTitle ? $pageTitle . ' · Clyve.dev' : 'Clyve.dev – FiveM Scripts, Websites & Discord Bots') ?></title>
-  <meta name="description" content="FiveM Scripts, Websites & Discord Bots nach Maß – sauber, performant, aus dem Saarland.">
-  <meta name="theme-color" content="#0D0B14">
+  <?php $meta = ($meta ?? []) + ['description' => 'FiveM Scripts, Websites & Discord Bots nach Maß – sauber, performant, aus dem Saarland.']; ?>
+  <meta name="description" content="<?= e($meta['description']) ?>">
+  <?php if (!empty($meta['noindex'])): ?><meta name="robots" content="noindex, nofollow"><?php endif ?>
+  <?php if (!empty($meta['url'])): ?>
+  <meta property="og:site_name" content="Clyve.dev">
+  <meta property="og:title" content="<?= e($pageTitle) ?>">
+  <meta property="og:description" content="<?= e($meta['description']) ?>">
+  <meta property="og:type" content="<?= e($meta['type'] ?? 'website') ?>">
+  <meta property="og:url" content="<?= e($meta['url']) ?>">
+  <?php endif ?>
+  <meta name="theme-color" content="<?= e($meta['theme'] ?? '#0D0B14') ?>">
   <meta name="author" content="EinfachDev · einfachdev.de">
   <link rel="author" href="/humans.txt">
   <link rel="icon" href="/assets/brand/clyve-icon.svg" type="image/svg+xml">

@@ -50,7 +50,7 @@ final class Notifier
     public static function event(string $title, string $description, array $fields, string $footer): bool
     {
         $hook = (string)config('discord_webhook', '');
-        if ($hook === '' || !preg_match('#^https://(?:ptb\.|canary\.)?discord(?:app)?\.com/api/webhooks/\d+/[\w-]+$#', $hook)) {
+        if (!self::validWebhook($hook)) {
             return false;
         }
 
@@ -59,7 +59,7 @@ final class Notifier
             $embedFields[] = ['name' => mb_substr((string)$name, 0, 250), 'value' => mb_substr(self::escape((string)$value), 0, 1000) ?: '–', 'inline' => true];
         }
 
-        $payload = json_encode([
+        return self::send($hook, [
             'username'         => 'Clyve.dev',
             'allowed_mentions' => ['parse' => []],
             'embeds'           => [[
@@ -70,7 +70,17 @@ final class Notifier
                 'footer'      => ['text' => $footer],
                 'timestamp'   => gmdate('c'),
             ]],
-        ], JSON_UNESCAPED_UNICODE);
+        ]);
+    }
+
+    public static function validWebhook(string $hook): bool
+    {
+        return (bool)preg_match('#^https://(?:ptb\\.|canary\\.)?discord(?:app)?\\.com/api/webhooks/\\d+/[\\w-]+$#', $hook);
+    }
+
+    public static function send(string $hook, array $payload): bool
+    {
+        $payload = (string)json_encode($payload, JSON_UNESCAPED_UNICODE);
 
         $ch = curl_init($hook);
         curl_setopt_array($ch, [

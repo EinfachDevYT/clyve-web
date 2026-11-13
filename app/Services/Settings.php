@@ -42,9 +42,9 @@ final class Settings
     public const HOSTING_TOGGLES = ['hosting_auto_suspend', 'hosting_api_enabled', 'hosting_notify_discord', 'hosting_customer_view'];
 
     /** Config keys the admin can override in the staff area. */
-    private const OVERRIDABLE = ['business', 'smtp', 'tebex', 'discord_webhook', 'mail_to'];
+    private const OVERRIDABLE = ['business', 'smtp', 'tebex', 'discord_webhook', 'devlog_webhook', 'devlog_role', 'mail_to'];
     /** Stored encrypted, never shown again in the UI. */
-    public const SECRET_KEYS = ['smtp.password', 'discord_webhook'];
+    public const SECRET_KEYS = ['smtp.password', 'discord_webhook', 'devlog_webhook'];
 
     private static ?array $cache = null;
     private static ?array $overrides = null;

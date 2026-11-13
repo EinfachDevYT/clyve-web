@@ -12,6 +12,16 @@
     </section>
 
     <section class="panel glass stack">
+      <div class="row-between"><h2>Devlog-Kanal</h2><?= $hasDevlogHook ? '<span class="badge badge-ok">verbunden</span>' : '<span class="badge badge-muted">aus</span>' ?></div>
+      <p class="muted small">Webhook des öffentlichen Kanals, in dem Devlog-Beiträge erscheinen sollen (nicht der interne Benachrichtigungs-Kanal). Ohne Webhook kannst du die fertige Nachricht im Devlog kopieren und selbst posten.</p>
+      <label class="field<?= invalid('devlog_webhook') ?>"><span>Webhook-URL</span>
+        <input type="url" name="devlog_webhook" autocomplete="off" placeholder="<?= $hasDevlogHook ? '•••••••• gespeichert – leer lassen = unverändert' : 'https://discord.com/api/webhooks/…' ?>"><?= error_for('devlog_webhook') ?></label>
+      <?php if ($hasDevlogHook): ?><label class="consent"><input type="checkbox" name="devlog_webhook_clear" value="1"><span>Webhook entfernen</span></label><?php endif ?>
+      <label class="field<?= invalid('devlog_role') ?>"><span>Rolle erwähnen <small class="muted">(optional, Rollen-ID)</small></span>
+        <input type="text" name="devlog_role" inputmode="numeric" maxlength="22" class="mono" value="<?= e(old('devlog_role', (string)config('devlog_role', ''))) ?>" placeholder="z. B. 112233445566778899"><?= error_for('devlog_role') ?></label>
+    </section>
+
+    <section class="panel glass stack">
       <div class="row-between"><h2>Tebex</h2><?= !empty($tebex['webstore_token']) ? '<span class="badge badge-ok">verbunden</span>' : '<span class="badge badge-muted">aus</span>' ?></div>
       <p class="muted small">Für den Script-Shop: Tebex-Panel → Integrations → Headless API → öffentlichen Webstore-Identifier kopieren.</p>
       <label class="field<?= invalid('webstore_token') ?>"><span>Webstore-Identifier</span>
