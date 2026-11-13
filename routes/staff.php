@@ -105,6 +105,7 @@ $router->post('/mitarbeiter/{id}/status', [StaffController::class, 'toggleActive
 $router->post('/mitarbeiter/{id}/2fa-reset', [StaffController::class, 'resetTwoFactor']);
 $router->post('/mitarbeiter/{id}/link', [StaffController::class, 'sendLink']);
 $router->post('/kunden/{id}/2fa-reset', [CustomerController::class, 'resetTwoFactor']);
+$router->post('/kunden/{id}/bestaetigen', [CustomerController::class, 'verifyEmail']);
 $router->post('/kunden/{id}/passwort-link', [CustomerController::class, 'sendResetLink']);
 
 $router->get('/einstellungen', [ProfileController::class, 'profile']);

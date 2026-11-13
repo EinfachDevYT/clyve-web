@@ -27,7 +27,7 @@ final class SettingsController
     public function profile(): void
     {
         Auth::require();
-        View::render('site/account/settings', [], 'Einstellungen');
+        View::render('site/account/settings', [], 'Einstellungen', 'portal');
     }
 
     public function updateProfile(): void

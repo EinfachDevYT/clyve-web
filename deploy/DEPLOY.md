@@ -258,6 +258,8 @@ Die Datenbank wird beim nächsten Seitenaufruf **automatisch migriert** (`databa
 Vorher ein Backup zu machen schadet trotzdem nie (siehe unten).
 
 Nach dem Update auf die Version mit Zwei-Faktor-Anmeldung werden alle einmal abgemeldet (neue Sitzungsprüfung) – einfach neu anmelden.
+Mit der E-Mail-Bestätigung gelten alle bestehenden Kunden automatisch als bestätigt; nur neue Registrierungen müssen den Link anklicken.
+Damit die Links stimmen, muss der erste Eintrag in `site_origins` die öffentliche Adresse sein (z. B. `https://clyve.dev`).
 Weitere Mitarbeiter lädst du danach bequem im Staff-Bereich unter **Mitarbeiter** ein, `bin/create-staff.php` brauchst du nur für den ersten Admin.
 
 Neue Einstellungen in `config/config.example.php` sind optional – fehlen sie in deiner `config.php`, gelten sichere Standardwerte.

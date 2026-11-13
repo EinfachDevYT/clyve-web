@@ -1,4 +1,4 @@
-<?php use App\Core\View; ob_start() ?>
+<?php use App\Core\View; ?>
 <header class="page-head">
   <div><p class="kicker mono"><a href="/konto/tickets">Support</a> / Neu</p><h1>Neues Ticket</h1></div>
 </header>
@@ -19,4 +19,3 @@
     <textarea name="body" rows="8" maxlength="5000" required placeholder="Beschreib dein Anliegen so genau wie möglich."><?= e(old('body')) ?></textarea><?= error_for('body') ?></label>
   <div class="row-end"><button class="pill" type="submit">Ticket senden</button></div>
 </form>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

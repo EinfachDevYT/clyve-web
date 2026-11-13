@@ -18,7 +18,7 @@ final class InvoiceController
                 "SELECT * FROM invoices WHERE customer_id = ? AND status <> 'draft' ORDER BY issue_date DESC, id DESC",
                 [$user['id']]
             ),
-        ], 'Rechnungen');
+        ], 'Rechnungen', 'portal');
     }
 
     public function show(array $p): void
@@ -28,7 +28,7 @@ final class InvoiceController
         if (!$invoice) {
             abort(404);
         }
-        View::render('site/invoices/show', ['invoice' => $invoice], 'Rechnung ' . $invoice['number']);
+        View::render('site/invoices/show', ['invoice' => $invoice], 'Rechnung ' . $invoice['number'], 'portal');
     }
 
     public function print(array $p): void

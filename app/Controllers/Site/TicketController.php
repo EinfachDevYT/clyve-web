@@ -24,14 +24,14 @@ final class TicketController
         $user = Auth::require();
         View::render('site/tickets/index', [
             'tickets' => Db::all('SELECT * FROM tickets WHERE customer_id = ? ORDER BY updated_at DESC', [$user['id']]),
-        ], 'Support');
+        ], 'Support', 'portal');
     }
 
     public function create(): void
     {
         Auth::require();
         $this->enabled('/konto/tickets');
-        View::render('site/tickets/create', ['categories' => self::CATEGORIES], 'Neues Ticket');
+        View::render('site/tickets/create', ['categories' => self::CATEGORIES], 'Neues Ticket', 'portal');
     }
 
     public function store(): void
@@ -77,7 +77,7 @@ final class TicketController
                  WHERE m.ticket_id = ? ORDER BY m.id",
                 [$ticket['id']]
             ),
-        ], 'Ticket #' . $ticket['id']);
+        ], 'Ticket #' . $ticket['id'], 'portal');
     }
 
     public function reply(array $p): void

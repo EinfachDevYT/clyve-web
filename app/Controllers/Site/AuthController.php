@@ -9,6 +9,8 @@ use App\Core\RateLimiter;
 use App\Core\Validator;
 use App\Core\View;
 use App\Controllers\Concerns\AuthFlow;
+use App\Services\Account;
+use App\Services\Settings;
 
 final class AuthController
 {
@@ -27,7 +29,7 @@ final class AuthController
     public function showLogin(): void
     {
         $this->guestOnly();
-        View::render('site/auth/login', [], 'Anmelden');
+        View::render('site/auth/login', [], 'Anmelden', 'auth');
     }
 
     public function login(): void
@@ -43,6 +45,11 @@ final class AuthController
         if (!$user) {
             fail_back(['email' => ' '], '/login', 'E-Mail oder Passwort ist falsch.');
         }
+        if (Account::needsVerification($user)) {
+            $this->awaitVerification((int)$user['id']);
+            flash('info', 'Bitte bestätige zuerst deine E-Mail-Adresse.');
+            redirect('/bestaetigen');
+        }
         $this->completeLogin($user);
     }
 
@@ -50,7 +57,7 @@ final class AuthController
     {
         $this->guestOnly();
         $this->registrationOpen();
-        View::render('site/auth/register', [], 'Konto erstellen');
+        View::render('site/auth/register', [], 'Konto erstellen', 'auth');
     }
 
     public function register(): void
@@ -79,12 +86,106 @@ final class AuthController
             fail_back($v->errors(), '/registrieren');
         }
 
-        $id = Db::insert('INSERT INTO customers (email, name, password_hash) VALUES (?, ?, ?)', [$email, $name, Auth::hash($password)]);
+        $verify = Account::verificationRequired();
+        $id = Db::insert(
+            "INSERT INTO customers (email, name, password_hash, email_verified_at) VALUES (?, ?, ?, CASE WHEN ? THEN NULL ELSE datetime('now') END)",
+            [$email, $name, Auth::hash($password), $verify ? 1 : 0]
+        );
+        if ($verify) {
+            $this->awaitVerification($id);
+            Account::sendVerification(Account::find('customer', $id));
+            $_SESSION['_verify']['sent'] = time();
+            redirect('/bestaetigen');
+        }
         Db::exec('UPDATE requests SET customer_id = ? WHERE customer_id IS NULL AND email = ?', [$id, $email]);
         Auth::login($id);
-        \App\Services\Account::log('customer', $id, 'login');
+        Account::log('customer', $id, 'login');
         flash('success', 'Dein Konto ist bereit. 🌸');
         redirect('/konto');
+    }
+
+    /* ---------- e-mail verification ---------- */
+
+    private function awaitVerification(int $id): void
+    {
+        session_regenerate_id(true);
+        $sent = (int)($_SESSION['_verify']['id'] ?? 0) === $id ? (int)($_SESSION['_verify']['sent'] ?? 0) : 0;
+        $_SESSION['_verify'] = ['id' => $id, 'at' => time(), 'sent' => $sent];
+    }
+
+    /** Customer waiting for confirmation in this browser, or null. */
+    private function pendingVerification(): ?array
+    {
+        $pending = $_SESSION['_verify'] ?? null;
+        if (!is_array($pending) || time() - (int)$pending['at'] > 3600) {
+            unset($_SESSION['_verify']);
+            return null;
+        }
+        $customer = Account::find('customer', (int)$pending['id']);
+        if (!$customer || !empty($customer['email_verified_at'])) {
+            unset($_SESSION['_verify']);
+            return null;
+        }
+        return $customer;
+    }
+
+    public function showVerify(): void
+    {
+        $this->guestOnly();
+        $customer = $this->pendingVerification();
+        if (!$customer) {
+            redirect('/login');
+        }
+        View::render('site/auth/verify', ['email' => (string)$customer['email']], 'E-Mail bestätigen', 'auth');
+    }
+
+    public function resendVerify(): void
+    {
+        $this->guestOnly();
+        $customer = $this->pendingVerification();
+        if (!$customer) {
+            redirect('/login');
+        }
+        $last = (int)($_SESSION['_verify']['sent'] ?? 0);
+        if (time() - $last < 60) {
+            fail_back([], '/bestaetigen', 'Bitte warte eine Minute, bevor du eine neue E-Mail anforderst.');
+        }
+        if (!RateLimiter::ip('verify', [['window' => 3600, 'max' => 10]]) || !RateLimiter::hit('verify', 'customer:' . $customer['id'], [['window' => 3600, 'max' => 4]])) {
+            fail_back([], '/bestaetigen', 'Zu viele Anfragen. Bitte versuch es später erneut.');
+        }
+        $_SESSION['_verify']['sent'] = time();
+        if (!Account::sendVerification($customer)) {
+            fail_back([], '/bestaetigen', 'Die E-Mail konnte gerade nicht gesendet werden. Bitte versuch es später erneut.');
+        }
+        flash('success', 'Neue E-Mail ist unterwegs. Schau auch im Spam-Ordner nach.');
+        redirect('/bestaetigen');
+    }
+
+    public function verify(array $p): void
+    {
+        $token = Account::findToken(['verify'], 'customer', (string)($p['token'] ?? ''));
+        $customer = $token ? Account::find('customer', (int)$token['account_id']) : null;
+        if (!$token || !$customer || strcasecmp((string)$token['data'], (string)$customer['email']) !== 0) {
+            $me = Auth::user();
+            if ($me && !empty($me['email_verified_at'])) {
+                flash('info', 'Deine E-Mail-Adresse ist bereits bestätigt.');
+            } else {
+                flash('error', 'Der Bestätigungslink ist ungültig oder abgelaufen. Melde dich an, um einen neuen anzufordern.');
+            }
+            redirect(Auth::user() ? '/konto' : '/login');
+        }
+        Account::consumeToken((int)$token['id']);
+        Account::markVerified((int)$customer['id']);
+        $sameBrowser = (int)($_SESSION['_verify']['id'] ?? 0) === (int)$customer['id'];
+        unset($_SESSION['_verify']);
+        if ($sameBrowser && !Auth::user() && !Account::twoFactorOn($customer)) {
+            Auth::login((int)$customer['id']);
+            Account::log('customer', (int)$customer['id'], 'login');
+            flash('success', 'E-Mail bestätigt – dein Konto ist bereit. 🌸');
+            redirect('/konto');
+        }
+        flash('success', 'E-Mail bestätigt. Du kannst dich jetzt anmelden.');
+        redirect(Auth::user() ? '/konto' : '/login');
     }
 
     public function logout(): void
@@ -96,7 +197,7 @@ final class AuthController
 
     private function registrationOpen(): void
     {
-        if (!\App\Services\Settings::on('registration_open')) {
+        if (!Settings::on('registration_open')) {
             flash('info', 'Neue Konten können gerade nicht erstellt werden.');
             redirect('/login');
         }

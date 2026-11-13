@@ -14,11 +14,6 @@ trait AuthFlow
 {
     abstract protected function home(): string;
 
-    private function layout(): string
-    {
-        return APP_CONTEXT === 'staff' ? 'auth' : 'layout';
-    }
-
     /** Called after e-mail and password were verified. */
     protected function completeLogin(array $user): never
     {
@@ -36,7 +31,7 @@ trait AuthFlow
         if (Auth::pendingTwoFactor() === null) {
             redirect('/login');
         }
-        View::render('shared/auth/two-factor', [], 'Bestätigung', $this->layout());
+        View::render('shared/auth/two-factor', [], 'Bestätigung', 'auth');
     }
 
     public function verifyTwoFactor(): void
@@ -76,7 +71,7 @@ trait AuthFlow
         if (Auth::user()) {
             redirect($this->home());
         }
-        View::render('shared/auth/forgot', ['mail' => Mailer::enabled()], 'Passwort vergessen', $this->layout());
+        View::render('shared/auth/forgot', ['mail' => Mailer::enabled()], 'Passwort vergessen', 'auth');
     }
 
     public function sendForgot(): void
@@ -109,7 +104,7 @@ trait AuthFlow
             redirect('/passwort-vergessen');
         }
         $account = Account::find(Account::type(), (int)$token['account_id']);
-        View::render('shared/auth/reset', ['invite' => $token['purpose'] === 'invite', 'token' => (string)$p['token'], 'account' => $account], $token['purpose'] === 'invite' ? 'Konto einrichten' : 'Neues Passwort', $this->layout());
+        View::render('shared/auth/reset', ['invite' => $token['purpose'] === 'invite', 'token' => (string)$p['token'], 'account' => $account], $token['purpose'] === 'invite' ? 'Konto einrichten' : 'Neues Passwort', 'auth');
     }
 
     public function reset(array $p): void
@@ -133,6 +128,9 @@ trait AuthFlow
             redirect('/login');
         }
         Account::setPassword($type, (int)$account['id'], $password);
+        if ($type === 'customer') {
+            Account::markVerified((int)$account['id']);
+        }
         Account::log($type, (int)$account['id'], 'password_reset');
         if ($token['purpose'] === 'reset') {
             Account::notify($account, 'Dein Passwort wurde geändert', ['das Passwort für dein Konto wurde gerade über „Passwort vergessen“ neu festgelegt. Alle Geräte wurden abgemeldet.']);

@@ -140,7 +140,7 @@ final class RequestController
                 : [],
             'inAccount' => $inAccount,
         ];
-        View::render($inAccount ? 'site/account/request' : 'site/requests/show', $data, 'Anfrage ' . $request['public_id']);
+        View::render($inAccount ? 'site/account/request' : 'site/requests/show', $data, 'Anfrage ' . $request['public_id'], $inAccount ? 'portal' : 'layout');
     }
 
     public function replyByToken(array $p): void

@@ -90,6 +90,14 @@ Verfügbarkeitstext, Antwortzeit und ein Ankündigungsbanner. Die Schalter werde
 
 ## Konten & Sicherheit
 
+Der Kundenbereich (`/konto`) ist wie der Staff-Bereich eine eigene App mit Seitenleiste – getrennt von Startseite,
+Navigation und Footer der Website. Login, Registrierung und Bestätigung haben eigene Vollbild-Seiten.
+
+Neue Kunden bestätigen ihre E-Mail-Adresse per Link (48 Stunden gültig, erneut anforderbar), bevor sie ins Konto kommen.
+Erst danach werden frühere Gast-Anfragen mit derselben Adresse verknüpft. Abschaltbar unter Verwaltung → Allgemein
+(„E-Mail-Bestätigung“); ohne eingerichteten E-Mail-Versand ist sie automatisch aus. Ein Passwort-Reset per Mail
+bestätigt die Adresse ebenfalls, Admins können sie in der Kundenansicht manuell bestätigen.
+
 Kunden (Konto → Einstellungen) und Staff (Einstellungen) haben einen persönlichen Bereich mit Profil sowie
 „Anmeldung & Sicherheit“: Passwort ändern, E-Mail-Adresse ändern (mit Bestätigungslink an die neue Adresse),
 Zwei-Faktor-Anmeldung per Authenticator-App (TOTP, QR-Code, 10 Wiederherstellungscodes), „auf allen anderen Geräten abmelden“

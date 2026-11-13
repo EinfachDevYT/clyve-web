@@ -5,7 +5,6 @@ use App\Services\Settings;
 $state = Hosting::state($s);
 $left = Hosting::daysLeft($s);
 $progress = Hosting::termProgress($s);
-ob_start();
 ?>
 <header class="page-head">
   <div>
@@ -60,4 +59,3 @@ ob_start();
     </ul>
   </section>
 <?php endif ?>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

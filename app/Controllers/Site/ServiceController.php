@@ -16,7 +16,7 @@ final class ServiceController
         $user = $this->guard();
         View::render('site/account/services', [
             'services' => Db::all("SELECT * FROM services WHERE customer_id = ? ORDER BY status = 'cancelled', expires_on IS NULL, expires_on, id DESC", [$user['id']]),
-        ], 'Meine Dienste');
+        ], 'Meine Dienste', 'portal');
     }
 
     public function show(array $p): void
@@ -26,7 +26,7 @@ final class ServiceController
         if (!$s) {
             abort(404);
         }
-        View::render('site/account/service', ['s' => $s, 'events' => Hosting::events((int)$s['id'], false)], $s['name']);
+        View::render('site/account/service', ['s' => $s, 'events' => Hosting::events((int)$s['id'], false)], $s['name'], 'portal');
     }
 
     private function guard(): array

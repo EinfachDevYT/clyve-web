@@ -16,6 +16,7 @@ final class Settings
         'type_bot'                => '1',
         'type_other'              => '1',
         'registration_open'       => '1',
+        'registration_verify'     => '1',
         'tickets_enabled'         => '1',
         'shop_enabled'            => '1',
         'availability_label'      => 'Offen für neue Aufträge',
@@ -35,7 +36,7 @@ final class Settings
 
     public const TOGGLES = [
         'requests_open', 'type_fivem', 'type_web', 'type_bot', 'type_other',
-        'registration_open', 'tickets_enabled', 'shop_enabled',
+        'registration_open', 'registration_verify', 'tickets_enabled', 'shop_enabled',
     ];
 
     public const HOSTING_TOGGLES = ['hosting_auto_suspend', 'hosting_api_enabled', 'hosting_notify_discord', 'hosting_customer_view'];

@@ -61,6 +61,16 @@ final class CustomerController
         redirect('/kunden/' . $customer['id']);
     }
 
+    public function verifyEmail(array $p): void
+    {
+        $admin = Auth::requireAdmin();
+        $customer = Db::one('SELECT * FROM customers WHERE id = ?', [id_param($p)]) ?? abort(404);
+        \App\Services\Account::markVerified((int)$customer['id']);
+        audit('staff:' . $admin['id'], 'customer_email_verified', '#' . $customer['id']);
+        flash('success', 'E-Mail-Adresse als bestätigt markiert.');
+        redirect('/kunden/' . $customer['id']);
+    }
+
     public function sendResetLink(array $p): void
     {
         $admin = Auth::requireAdmin();

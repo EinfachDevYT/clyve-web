@@ -34,6 +34,9 @@ $router->get('/passwort-vergessen', [AuthController::class, 'showForgot']);
 $router->post('/passwort-vergessen', [AuthController::class, 'sendForgot']);
 $router->get('/passwort-zuruecksetzen/{token}', [AuthController::class, 'showReset']);
 $router->post('/passwort-zuruecksetzen/{token}', [AuthController::class, 'reset']);
+$router->get('/bestaetigen', [AuthController::class, 'showVerify']);
+$router->post('/bestaetigen', [AuthController::class, 'resendVerify']);
+$router->get('/bestaetigen/{token}', [AuthController::class, 'verify']);
 $router->get('/email-bestaetigen/{token}', [AuthController::class, 'confirmEmail']);
 
 $router->get('/konto', [AccountController::class, 'dashboard']);

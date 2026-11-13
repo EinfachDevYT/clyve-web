@@ -1,4 +1,4 @@
-<?php use App\Core\View; ob_start() ?>
+<?php use App\Core\View; ?>
 <header class="page-head">
   <div>
     <p class="kicker mono"><a href="/konto/rechnungen">Rechnungen</a> / <?= e($invoice['number']) ?></p>
@@ -22,4 +22,3 @@
     </dl>
   </section>
 <?php endif ?>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

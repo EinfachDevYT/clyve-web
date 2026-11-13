@@ -1,4 +1,4 @@
-<?php use App\Core\View; ob_start() ?>
+<?php use App\Core\View; ?>
 <header class="page-head">
   <div>
     <p class="kicker mono"><a href="/konto/tickets">Support</a> / #<?= (int)$ticket['id'] ?></p>
@@ -21,4 +21,3 @@
     <textarea name="body" rows="4" maxlength="5000" required><?= e(old('body')) ?></textarea><?= error_for('body') ?></label>
   <div class="row-end"><button class="pill" type="submit">Senden</button></div>
 </form>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

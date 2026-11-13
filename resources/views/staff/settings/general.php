@@ -25,6 +25,7 @@ $toggle = static function (string $key, string $label, string $hint) use ($setti
     <section class="panel glass stack">
       <h2>Bereiche</h2>
       <?= $toggle('registration_open', 'Registrierung', 'Neue Kundenkonten erlauben') ?>
+      <?= $toggle('registration_verify', 'E-Mail-Bestätigung', 'Neue Kunden müssen ihre Adresse per Link bestätigen, bevor sie ins Konto kommen' . (\App\Services\Mailer::enabled() ? '' : ' – wirkt erst mit eingerichtetem E-Mail-Versand')) ?>
       <?= $toggle('tickets_enabled', 'Support-Tickets', 'Kunden können neue Tickets erstellen') ?>
       <?= $toggle('shop_enabled', 'Script-Shop', 'Seite /scripts mit deinen Tebex-Produkten') ?>
 

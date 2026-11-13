@@ -1,4 +1,4 @@
-<?php use App\Core\View; ob_start() ?>
+<?php use App\Core\View; ?>
 <header class="page-head">
   <div><p class="kicker mono">Kundenbereich</p><h1>Rechnungen</h1></div>
 </header>
@@ -24,4 +24,3 @@
     </table>
   </div>
 <?php endif ?>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

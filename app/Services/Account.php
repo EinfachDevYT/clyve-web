@@ -24,9 +24,10 @@ final class Account
         'codes_renewed'    => 'Neue Wiederherstellungscodes erzeugt',
         'codes_viewed'     => 'Wiederherstellungscodes angezeigt',
         'sessions_revoked' => 'Auf anderen Geräten abgemeldet',
+        'email_verified'   => 'E-Mail-Adresse bestätigt',
     ];
 
-    private const TTL = ['reset' => 3600, 'invite' => 604800, 'email' => 86400];
+    private const TTL = ['reset' => 3600, 'invite' => 604800, 'email' => 86400, 'verify' => 172800];
 
     public static function type(): string
     {
@@ -227,6 +228,40 @@ final class Account
         Db::exec('UPDATE ' . self::table($type) . ' SET email = ? WHERE id = ?', [$email, $id]);
         self::cancelEmail($type, $id);
         self::log($type, $id, 'email_changed');
+    }
+
+    /* ---------- e-mail verification (customers) ---------- */
+
+    public static function verificationRequired(): bool
+    {
+        return Settings::on('registration_verify') && Mailer::enabled();
+    }
+
+    public static function needsVerification(array $customer): bool
+    {
+        return empty($customer['email_verified_at']) && self::verificationRequired();
+    }
+
+    /** Marks the address as confirmed and links guest requests sent from it. */
+    public static function markVerified(int $id): void
+    {
+        $customer = self::find('customer', $id);
+        if (!$customer || !empty($customer['email_verified_at'])) {
+            return;
+        }
+        Db::exec("UPDATE customers SET email_verified_at = datetime('now') WHERE id = ?", [$id]);
+        Db::exec('UPDATE requests SET customer_id = ? WHERE customer_id IS NULL AND email = ?', [$id, $customer['email']]);
+        Db::exec("DELETE FROM auth_tokens WHERE account_type = 'customer' AND account_id = ? AND purpose = 'verify'", [$id]);
+        self::log('customer', $id, 'email_verified');
+    }
+
+    public static function sendVerification(array $customer): bool
+    {
+        $token = self::createToken('verify', 'customer', (int)$customer['id'], (string)$customer['email']);
+        return Mailer::send((string)$customer['email'], 'Bitte bestätige deine E-Mail-Adresse', Mailer::compose(explode(' ', (string)$customer['name'])[0], [
+            'willkommen bei ' . ((string)config('business.name', 'Clyve.dev') ?: 'Clyve.dev') . '! Bitte bestätige noch kurz deine E-Mail-Adresse, damit dein Kundenkonto freigeschaltet wird.',
+            'Der Link ist 48 Stunden gültig. Wenn du dich nicht registriert hast, kannst du diese E-Mail ignorieren.',
+        ], 'E-Mail bestätigen', self::baseUrl('customer') . '/bestaetigen/' . $token));
     }
 
     /* ---------- activity ---------- */

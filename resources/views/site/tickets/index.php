@@ -1,4 +1,4 @@
-<?php use App\Core\View; ob_start() ?>
+<?php use App\Core\View; ?>
 <header class="page-head">
   <div><p class="kicker mono">Kundenbereich</p><h1>Support</h1></div>
   <?php if (\App\Services\Settings::on('tickets_enabled')): ?><a class="pill pill-sm" href="/konto/tickets/neu">Neues Ticket</a><?php endif ?>
@@ -27,4 +27,3 @@
     </table>
   </div>
 <?php endif ?>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

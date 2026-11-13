@@ -1,4 +1,4 @@
-<?php use App\Core\View; use App\Services\Notifier; ob_start() ?>
+<?php use App\Core\View; use App\Services\Notifier; ?>
 <header class="page-head">
   <div><p class="kicker mono">Kundenbereich</p><h1>Meine Anfragen</h1></div>
   <a class="pill pill-sm" href="/#anfrage">Neue Anfrage</a>
@@ -24,4 +24,3 @@
     </table>
   </div>
 <?php endif ?>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

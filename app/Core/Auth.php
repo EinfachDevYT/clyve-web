@@ -153,6 +153,12 @@ final class Auth
     {
         $user = self::user();
         if ($user) {
+            if (APP_CONTEXT === 'site' && \App\Services\Account::needsVerification($user)) {
+                self::logout();
+                $_SESSION['_verify'] = ['id' => (int)$user['id'], 'at' => time()];
+                flash('info', 'Bitte bestätige zuerst deine E-Mail-Adresse.');
+                redirect('/bestaetigen');
+            }
             if (APP_CONTEXT === 'staff' && !$user['has_2fa'] && \App\Services\Settings::on('staff_require_2fa')) {
                 $path = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
                 if (!str_starts_with($path, '/einstellungen/sicherheit')) {

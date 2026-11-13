@@ -24,7 +24,7 @@ final class AccountController
                 "SELECT * FROM services WHERE customer_id = ? AND (status = 'suspended' OR (status = 'active' AND expires_on IS NOT NULL AND expires_on <= date('now', 'localtime', '+14 days'))) ORDER BY expires_on",
                 [$id]
             ) : [],
-        ], 'Übersicht');
+        ], 'Übersicht', 'portal');
     }
 
     public function requests(): void
@@ -32,6 +32,6 @@ final class AccountController
         $user = Auth::require();
         View::render('site/account/requests', [
             'requests' => Db::all('SELECT * FROM requests WHERE customer_id = ? ORDER BY updated_at DESC, id DESC', [$user['id']]),
-        ], 'Meine Anfragen');
+        ], 'Meine Anfragen', 'portal');
     }
 }

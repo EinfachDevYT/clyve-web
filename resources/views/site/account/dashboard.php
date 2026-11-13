@@ -1,4 +1,4 @@
-<?php use App\Core\View; use App\Services\Notifier; ob_start() ?>
+<?php use App\Core\View; use App\Services\Notifier; ?>
 <header class="page-head">
   <div>
     <p class="kicker mono">Kundenbereich</p>
@@ -45,4 +45,3 @@
     <?php endif ?>
   </section>
 </div>
-<?php View::partial('site/account/_shell', ['user' => $user, 'inner' => ob_get_clean()]) ?>

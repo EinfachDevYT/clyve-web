@@ -51,6 +51,7 @@
       <dt>Discord</dt><dd class="mono"><?= e($customer['discord'] ?: '–') ?></dd>
       <dt>Firma</dt><dd><?= e($customer['company'] ?: '–') ?></dd>
       <dt>Anschrift</dt><dd><?php if ($customer['street']): ?><?= e($customer['street']) ?><br><?= e($customer['zip']) ?> <?= e($customer['city']) ?><br><?= e($customer['country']) ?><?php else: ?><span class="badge badge-warn">fehlt</span><?php endif ?></dd>
+      <dt>E-Mail bestätigt</dt><dd><?= $customer['email_verified_at'] ? '<span class="badge badge-ok">Ja</span>' : '<span class="badge badge-warn">Ausstehend</span>' ?></dd>
       <dt>Kunde seit</dt><dd><?= date_de($customer['created_at']) ?></dd>
       <dt>Letzte Anmeldung</dt><dd><?= $lastLogin ? date_de($lastLogin, true) : '–' ?></dd>
       <dt>Zwei-Faktor</dt><dd><?= $customer['totp_enabled_at'] ? '<span class="badge badge-ok">Aktiv</span>' : '<span class="badge badge-muted">Aus</span>' ?></dd>
@@ -62,6 +63,9 @@
     <?php endif ?>
     <?php if (($user['role'] ?? '') === 'admin'): ?>
       <div class="stack mt">
+        <?php if (!$customer['email_verified_at']): ?>
+          <form action="/kunden/<?= (int)$customer['id'] ?>/bestaetigen" method="post" data-confirm="E-Mail-Adresse manuell als bestätigt markieren? Nur, wenn du sicher bist, dass sie dem Kunden gehört."><?= csrf_field() ?><button class="pill pill-sm pill-ghost pill-block" type="submit">E-Mail manuell bestätigen</button></form>
+        <?php endif ?>
         <form action="/kunden/<?= (int)$customer['id'] ?>/passwort-link" method="post" data-confirm="Link zum Zurücksetzen des Passworts erstellen?"><?= csrf_field() ?><button class="pill pill-sm pill-ghost pill-block" type="submit">Passwort-Link erstellen</button></form>
         <?php if ($customer['totp_enabled_at']): ?>
           <form action="/kunden/<?= (int)$customer['id'] ?>/2fa-reset" method="post" data-confirm="Zwei-Faktor-Anmeldung des Kunden zurücksetzen? Nur nach sicherer Identitätsprüfung!"><?= csrf_field() ?><button class="pill pill-sm pill-ghost pill-block" type="submit">2FA zurücksetzen</button></form>

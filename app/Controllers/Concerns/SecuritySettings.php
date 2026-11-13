@@ -23,6 +23,11 @@ trait SecuritySettings
         return APP_CONTEXT === 'staff' && ($user['role'] ?? '') === 'admin';
     }
 
+    private function pageLayout(): string
+    {
+        return APP_CONTEXT === 'site' ? 'portal' : 'layout';
+    }
+
     private function securityUrl(): string
     {
         return $this->base() . '/sicherheit';
@@ -46,7 +51,7 @@ trait SecuritySettings
             'canReveal'     => $canReveal,
             'hasCopy'       => $canReveal && Account::hasStoredRecoveryCodes($type, (int)$user['id']),
             'revealed'      => $canReveal && is_array($revealed) ? $revealed : null,
-        ], 'Sicherheit');
+        ], 'Sicherheit', $this->pageLayout());
     }
 
     private function guardAttempts(): void
@@ -143,7 +148,7 @@ trait SecuritySettings
             'base'   => $this->base(),
             'qr'     => QrCode::svg($uri, 5),
             'secret' => Totp::pretty($pending['secret']),
-        ], 'Zwei-Faktor-Anmeldung');
+        ], 'Zwei-Faktor-Anmeldung', $this->pageLayout());
     }
 
     public function enableTwoFactor(): void
