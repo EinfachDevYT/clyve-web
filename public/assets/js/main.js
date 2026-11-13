@@ -397,6 +397,16 @@
     });
   }
 
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-pw-toggle]');
+    const input = btn?.parentElement.querySelector('input');
+    if (!input) return;
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.setAttribute('aria-pressed', String(show));
+    btn.setAttribute('aria-label', show ? 'Passwort verbergen' : 'Passwort anzeigen');
+  });
+
   function initPage(root = document) {
     cleanups.forEach((fn) => fn());
     cleanups = [];

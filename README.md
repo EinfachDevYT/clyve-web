@@ -98,6 +98,11 @@ Erst danach werden frühere Gast-Anfragen mit derselben Adresse verknüpft. Absc
 („E-Mail-Bestätigung“); ohne eingerichteten E-Mail-Versand ist sie automatisch aus. Ein Passwort-Reset per Mail
 bestätigt die Adresse ebenfalls, Admins können sie in der Kundenansicht manuell bestätigen.
 
+Bei der Registrierung werden die Stammdaten abgefragt: Anrede, Vor- und Nachname, Telefon (optional), Anschrift
+(Straße, Hausnummer, Zusatz, PLZ, Stadt, Land) und für Geschäftskunden Firmenname und USt-IdNr. Die PLZ wird je nach
+Land geprüft. Kunden pflegen die Daten unter Einstellungen → Profil; Bestandskunden ohne Anschrift sehen in der
+Übersicht einen Hinweis. Auf Belegen erscheinen Zusatz und – bei Firmen – die USt-IdNr.
+
 Kunden (Konto → Einstellungen) und Staff (Einstellungen) haben einen persönlichen Bereich mit Profil sowie
 „Anmeldung & Sicherheit“: Passwort ändern, E-Mail-Adresse ändern (mit Bestätigungslink an die neue Adresse),
 Zwei-Faktor-Anmeldung per Authenticator-App (TOTP, QR-Code, 10 Wiederherstellungscodes), „auf allen anderen Geräten abmelden“

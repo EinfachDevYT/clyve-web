@@ -139,7 +139,7 @@ final class InvoiceService
             }
             $mode = self::mode();
             $customer = Db::one('SELECT * FROM customers WHERE id = ?', [$invoice['customer_id']]);
-            if (!$customer || ($mode !== 'hobby' && ($customer['street'] === '' || $customer['zip'] === '' || $customer['city'] === ''))) {
+            if (!$customer || ($mode !== 'hobby' && !CustomerProfile::complete($customer))) {
                 throw new RuntimeException('Customer address incomplete');
             }
 
@@ -161,8 +161,9 @@ final class InvoiceService
                 'mode' => $mode, 'kleinunternehmer' => $mode === 'kleinunternehmer', 'vat_rate' => (int)($b['vat_rate'] ?? 19),
             ];
             $recipient = [
-                'name' => $customer['name'], 'company' => $customer['company'], 'street' => $customer['street'],
-                'zip' => $customer['zip'], 'city' => $customer['city'], 'country' => $customer['country'],
+                'name' => $customer['name'], 'company' => $customer['company'], 'street' => CustomerProfile::streetLine($customer),
+                'extra' => $customer['address_extra'], 'zip' => $customer['zip'], 'city' => $customer['city'], 'country' => $customer['country'],
+                'vat_id' => $customer['company'] !== '' ? $customer['vat_id'] : '',
             ];
             $totals = self::totals(['items' => $invoice['items'], 'sender' => $sender]);
             $due = $now->modify('+' . (int)($b['payment_days'] ?? 14) . ' days');

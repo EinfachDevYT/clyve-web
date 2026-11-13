@@ -47,10 +47,12 @@
   </div>
   <aside class="panel glass">
     <dl class="kv">
+      <dt>Name</dt><dd><?= e(\App\Services\CustomerProfile::addressedName($customer)) ?></dd>
+      <dt>Telefon</dt><dd><?= $customer['phone'] ? '<a href="tel:' . e(preg_replace('/[^\d+]/', '', $customer['phone'])) . '">' . e($customer['phone']) . '</a>' : '–' ?></dd>
       <dt>E-Mail</dt><dd><a href="mailto:<?= e($customer['email']) ?>"><?= e($customer['email']) ?></a></dd>
       <dt>Discord</dt><dd class="mono"><?= e($customer['discord'] ?: '–') ?></dd>
-      <dt>Firma</dt><dd><?= e($customer['company'] ?: '–') ?></dd>
-      <dt>Anschrift</dt><dd><?php if ($customer['street']): ?><?= e($customer['street']) ?><br><?= e($customer['zip']) ?> <?= e($customer['city']) ?><br><?= e($customer['country']) ?><?php else: ?><span class="badge badge-warn">fehlt</span><?php endif ?></dd>
+      <dt>Firma</dt><dd><?= e($customer['company'] ?: '–') ?><?= $customer['vat_id'] ? '<br><small class="mono">USt-IdNr. ' . e($customer['vat_id']) . '</small>' : '' ?></dd>
+      <dt>Anschrift</dt><dd><?php if (\App\Services\CustomerProfile::complete($customer)): ?><?= e(\App\Services\CustomerProfile::streetLine($customer)) ?><br><?php if ($customer['address_extra']): ?><?= e($customer['address_extra']) ?><br><?php endif ?><?= e($customer['zip']) ?> <?= e($customer['city']) ?><br><?= e($customer['country']) ?><?php else: ?><span class="badge badge-warn">fehlt</span><?php endif ?></dd>
       <dt>E-Mail bestätigt</dt><dd><?= $customer['email_verified_at'] ? '<span class="badge badge-ok">Ja</span>' : '<span class="badge badge-warn">Ausstehend</span>' ?></dd>
       <dt>Kunde seit</dt><dd><?= date_de($customer['created_at']) ?></dd>
       <dt>Letzte Anmeldung</dt><dd><?= $lastLogin ? date_de($lastLogin, true) : '–' ?></dd>

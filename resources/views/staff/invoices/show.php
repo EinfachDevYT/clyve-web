@@ -25,7 +25,7 @@
 <?php if ($draft): ?>
   <div class="notice">Wird ausgestellt als <b><?= e(\App\Services\InvoiceService::docLabel()) ?></b> (<?= e(\App\Services\InvoiceService::MODES[\App\Services\InvoiceService::mode()]) ?>).</div>
 <?php endif ?>
-<?php if ($draft && $customer && \App\Services\InvoiceService::mode() !== 'hobby' && ($customer['street'] === '' || $customer['city'] === '')): ?>
+<?php if ($draft && $customer && \App\Services\InvoiceService::mode() !== 'hobby' && !\App\Services\CustomerProfile::complete($customer)): ?>
   <div class="notice notice-warn">Beim Kunden fehlt die Anschrift – sie ist zum Ausstellen erforderlich.</div>
 <?php endif ?>
 

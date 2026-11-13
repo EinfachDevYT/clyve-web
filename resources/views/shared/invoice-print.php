@@ -42,8 +42,10 @@ $r = $invoice['recipient'] ?? ['name' => $invoice['customer_name'], 'company' =>
         <?php if ($r['company']): ?><?= e($r['company']) ?><br><?php endif ?>
         <?= e($r['name']) ?><br>
         <?= e($r['street']) ?><br>
+        <?php if (!empty($r['extra'])): ?><?= e($r['extra']) ?><br><?php endif ?>
         <?= e($r['zip']) ?> <?= e($r['city']) ?>
         <?php if ($r['country'] && $r['country'] !== 'Deutschland'): ?><br><?= e($r['country']) ?><?php endif ?>
+        <?php if (!empty($r['vat_id'])): ?><br><small>USt-IdNr. <?= e($r['vat_id']) ?></small><?php endif ?>
       </div>
       <dl class="facts">
         <dt><?= $doc === 'Quittung' ? 'Belegnr.' : 'Rechnungsnr.' ?></dt><dd><?= e($invoice['number'] ?? '—') ?></dd>

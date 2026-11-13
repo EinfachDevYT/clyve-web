@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Db;
 use App\Core\Validator;
 use App\Core\View;
+use App\Services\CustomerProfile;
 
 /** Personal settings in the customer area: profile and security. */
 final class SettingsController
@@ -34,23 +35,12 @@ final class SettingsController
     {
         $user = Auth::require();
         $v = new Validator($_POST);
-        $data = [
-            'name'    => $v->text('name', 2, 80, 'Name'),
-            'discord' => $v->discord('discord'),
-            'company' => $v->text('company', 0, 120, 'Firma'),
-            'street'  => $v->text('street', 0, 120, 'Straße'),
-            'zip'     => $v->text('zip', 0, 10, 'PLZ'),
-            'city'    => $v->text('city', 0, 80, 'Ort'),
-            'country' => $v->text('country', 2, 60, 'Land'),
-        ];
-        if ($data['zip'] !== '' && !preg_match('/^[A-Za-z0-9 \-]{3,10}$/', $data['zip'])) {
-            $v->addError('zip', 'Ungültige PLZ.');
-        }
+        $data = CustomerProfile::validate($v, $_POST) + ['discord' => $v->discord('discord')];
         if ($v->fails()) {
             fail_back($v->errors(), '/konto/einstellungen');
         }
         Db::exec(
-            'UPDATE customers SET name = ?, discord = ?, company = ?, street = ?, zip = ?, city = ?, country = ? WHERE id = ?',
+            'UPDATE customers SET ' . implode(', ', array_map(static fn(string $c) => "{$c} = ?", array_keys($data))) . ' WHERE id = ?',
             [...array_values($data), $user['id']]
         );
         flash('success', 'Profil gespeichert.');

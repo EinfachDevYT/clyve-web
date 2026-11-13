@@ -6,7 +6,7 @@ $copy = [
     'verify'   => ['Fast geschafft.', 'Ein kurzer Klick auf den Link in deinem Postfach – dann ist dein Kundenkonto freigeschaltet.'],
 ][$mode] ?? ['Dein Projekt im Blick.', ''];
 ?>
-<section class="staff-auth">
+<section class="staff-auth<?= $mode === 'register' ? ' staff-auth-wide' : '' ?>">
   <aside class="staff-auth-brand" aria-hidden="true">
     <svg class="branch staff-branch-a" viewBox="0 0 520 420">
       <path d="M-20 40 C 120 70, 220 40, 300 130 S 400 250, 340 360" />

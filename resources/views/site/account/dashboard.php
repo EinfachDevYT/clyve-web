@@ -7,6 +7,10 @@
   <?php if (\App\Services\Settings::on('tickets_enabled')): ?><a class="pill pill-sm" href="/konto/tickets/neu">Neues Ticket</a><?php endif ?>
 </header>
 
+<?php if (!\App\Services\CustomerProfile::complete($user)): ?>
+  <div class="notice notice-warn">Deine Anschrift fehlt noch – wir brauchen sie für Rechnungen. <a href="/konto/einstellungen">Jetzt ergänzen</a></div>
+<?php endif ?>
+
 <?php foreach ($attention as $sv): $left = \App\Services\Hosting::daysLeft($sv); ?>
   <div class="notice notice-warn"><a href="/konto/dienste/<?= (int)$sv['id'] ?>"><b><?= e($sv['name']) ?></b></a>
     <?= $sv['status'] === 'suspended' ? 'ist pausiert.' : ($left >= 0 ? 'läuft am ' . date_de($sv['expires_on']) . ' ab.' : 'ist seit ' . date_de($sv['expires_on']) . ' abgelaufen – bitte verlängern.') ?></div>

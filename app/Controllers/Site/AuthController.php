@@ -10,6 +10,7 @@ use App\Core\Validator;
 use App\Core\View;
 use App\Controllers\Concerns\AuthFlow;
 use App\Services\Account;
+use App\Services\CustomerProfile;
 use App\Services\Settings;
 
 final class AuthController
@@ -69,8 +70,8 @@ final class AuthController
         }
 
         $v = new Validator($_POST);
-        $name = $v->text('name', 2, 80, 'Name');
         $email = $v->email('email');
+        $profile = CustomerProfile::validate($v, $_POST);
         $password = (string)($_POST['password'] ?? '');
         if ($problem = Auth::passwordProblem($password, $email)) {
             $v->addError('password', $problem);
@@ -87,9 +88,11 @@ final class AuthController
         }
 
         $verify = Account::verificationRequired();
+        $cols = array_keys($profile);
         $id = Db::insert(
-            "INSERT INTO customers (email, name, password_hash, email_verified_at) VALUES (?, ?, ?, CASE WHEN ? THEN NULL ELSE datetime('now') END)",
-            [$email, $name, Auth::hash($password), $verify ? 1 : 0]
+            'INSERT INTO customers (email, password_hash, email_verified_at, ' . implode(', ', $cols) . ")
+             VALUES (?, ?, CASE WHEN ? THEN NULL ELSE datetime('now') END" . str_repeat(', ?', count($cols)) . ')',
+            [$email, Auth::hash($password), $verify ? 1 : 0, ...array_values($profile)]
         );
         if ($verify) {
             $this->awaitVerification($id);
