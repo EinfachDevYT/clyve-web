@@ -147,6 +147,19 @@ a notification e-mail. Admins can view their own recovery codes again after pass
 that, every view is logged); for all other accounts they are only stored hashed. 2FA secrets are stored encrypted,
 codes and links only hashed.
 
+## Closing accounts
+
+Customers can close their account themselves under „Einstellungen → Anmeldung & Sicherheit → Konto schließen“
+(password, plus 2FA code if enabled). This is blocked while an invoice is unpaid or a hosting service is still running.
+Admins can delete a customer on the customer page (type `LÖSCHEN` to confirm); only running services block that.
+
+- Without receipts or services the account is deleted completely, including tickets and requests.
+- Otherwise it is anonymised: login, contact details, profile, tickets and requests without a receipt are removed,
+  the name becomes „Gelöschter Kunde #id“. Issued receipts keep the recipient data printed on them, as required by
+  retention rules (§ 147 AO / § 257 HGB, currently 8 years for receipts). Requests behind a receipt or service stay as
+  business records without contact details.
+- The customer gets a confirmation e-mail, all sessions end immediately and the action is written to the audit log.
+
 ## Bot hosting & licenses
 
 Staff → Hosting: services per customer with plan, term, renewal (optionally with an invoice draft), manual suspension

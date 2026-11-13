@@ -34,7 +34,7 @@ final class InvoiceController
     {
         Auth::require();
         View::render('staff/invoices/create', [
-            'customers' => Db::all('SELECT id, name, email FROM customers ORDER BY name'),
+            'customers' => Db::all('SELECT id, name, email FROM customers WHERE deleted_at IS NULL ORDER BY name'),
             'selected'  => (int)($_GET['customer'] ?? 0),
         ], 'Neue Rechnung');
     }

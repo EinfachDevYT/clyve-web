@@ -4,11 +4,16 @@
     <p class="kicker mono"><a href="/kunden">Kunden</a> / <?= sprintf('K-%05d', (int)$customer['id']) ?></p>
     <h1><?= e($customer['name']) ?></h1>
   </div>
+  <?php if (!$customer['deleted_at']): ?>
   <div class="actions">
     <a class="pill pill-sm pill-ghost" href="/hosting/neu?kunde=<?= (int)$customer['id'] ?>">Dienst anlegen</a>
     <a class="pill pill-sm" href="/rechnungen/neu?customer=<?= (int)$customer['id'] ?>">Rechnung erstellen</a>
   </div>
+  <?php endif ?>
 </header>
+<?php if ($customer['deleted_at']): ?>
+  <div class="notice">Dieses Konto wurde am <?= date_de($customer['deleted_at']) ?> geschlossen. Persönliche Daten sind gelöscht – erhalten bleiben nur Belege und Dienste, die aufbewahrt werden müssen.</div>
+<?php endif ?>
 
 <div class="grid-side">
   <div class="stack-lg">
@@ -63,7 +68,7 @@
         <code class="mono small break"><?= e($resetLink['url']) ?></code>
         <div><button type="button" class="chip-btn" data-copy="<?= e($resetLink['url']) ?>">Kopieren</button></div></div>
     <?php endif ?>
-    <?php if (($user['role'] ?? '') === 'admin'): ?>
+    <?php if (($user['role'] ?? '') === 'admin' && !$customer['deleted_at']): ?>
       <div class="stack mt">
         <?php if (!$customer['email_verified_at']): ?>
           <form action="/kunden/<?= (int)$customer['id'] ?>/bestaetigen" method="post" data-confirm="E-Mail-Adresse manuell als bestätigt markieren? Nur, wenn du sicher bist, dass sie dem Kunden gehört."><?= csrf_field() ?><button class="pill pill-sm pill-ghost pill-block" type="submit">E-Mail manuell bestätigen</button></form>
@@ -73,6 +78,24 @@
           <form action="/kunden/<?= (int)$customer['id'] ?>/2fa-reset" method="post" data-confirm="Zwei-Faktor-Anmeldung des Kunden zurücksetzen? Nur nach sicherer Identitätsprüfung!"><?= csrf_field() ?><button class="pill pill-sm pill-ghost pill-block" type="submit">2FA zurücksetzen</button></form>
         <?php endif ?>
       </div>
+      <details class="danger-zone mt"<?= errors() ? ' open' : '' ?>>
+        <summary>Kunde löschen</summary>
+        <div class="stack">
+          <?php if ($deleteBlockers): ?>
+            <?php foreach ($deleteBlockers as $b): ?><p class="notice notice-warn small"><?= e($b) ?></p><?php endforeach ?>
+          <?php else: ?>
+            <p class="muted small"><?= $mustKeep
+              ? 'Der Kunde hat Belege oder Dienste. Das Konto wird deshalb <b>anonymisiert</b>: Login, Kontaktdaten, Profil, Tickets und Anfragen ohne Beleg werden gelöscht, ausgestellte Belege bleiben wie gesetzlich vorgeschrieben erhalten.'
+              : 'Das Konto wird mit Tickets und Anfragen <b>vollständig gelöscht</b>.' ?></p>
+            <?php if ($unpaid): ?><p class="notice notice-warn small"><?= $unpaid ?> offene Rechnung(en) – sie bleiben erhalten, aber der Kunde kann sie danach nicht mehr im Konto sehen.</p><?php endif ?>
+            <form class="stack" action="/kunden/<?= (int)$customer['id'] ?>/loeschen" method="post"><?= csrf_field() ?>
+              <label class="field<?= invalid('confirm') ?>"><span>Zum Bestätigen <b>LÖSCHEN</b> eintippen</span><input type="text" name="confirm" autocomplete="off" required><?= error_for('confirm') ?></label>
+              <label class="consent"><input type="checkbox" name="notify" value="1" checked><span>Kunden per E-Mail informieren</span></label>
+              <button class="pill pill-sm pill-block danger" type="submit">Endgültig löschen</button>
+            </form>
+          <?php endif ?>
+        </div>
+      </details>
     <?php endif ?>
   </aside>
 </div>

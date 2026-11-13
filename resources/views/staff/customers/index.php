@@ -13,7 +13,7 @@
         <tr>
           <td data-label="Nr." class="mono"><?= sprintf('K-%05d', (int)$c['id']) ?></td>
           <td data-label="Name"><a href="/kunden/<?= (int)$c['id'] ?>"><?= e($c['name']) ?></a></td>
-          <td data-label="E-Mail"><?= e($c['email']) ?><?= $c['email_verified_at'] ? '' : ' <span class="badge badge-warn">unbestätigt</span>' ?></td>
+          <td data-label="E-Mail"><?php if ($c['deleted_at']): ?><span class="badge badge-muted">Konto geschlossen</span><?php else: ?><?= e($c['email']) ?><?= $c['email_verified_at'] ? '' : ' <span class="badge badge-warn">unbestätigt</span>' ?><?php endif ?></td>
           <td data-label="Discord" class="mono"><?= e($c['discord'] ?: '–') ?></td>
           <td data-label="Seit"><?= date_de($c['created_at']) ?></td>
         </tr>

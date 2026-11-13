@@ -6,6 +6,7 @@ namespace App\Controllers\Staff;
 use App\Core\Auth;
 use App\Core\Db;
 use App\Core\View;
+use App\Services\CustomerDeletion;
 
 final class CustomerController
 {
@@ -16,7 +17,7 @@ final class CustomerController
         $q = mb_substr($q, 0, 80);
 
         $customers = $q === ''
-            ? Db::all('SELECT * FROM customers ORDER BY id DESC LIMIT 200')
+            ? Db::all('SELECT * FROM customers ORDER BY deleted_at IS NOT NULL, id DESC LIMIT 200')
             : Db::all(
                 "SELECT * FROM customers WHERE name LIKE ? ESCAPE '\\' OR email LIKE ? ESCAPE '\\' OR discord LIKE ? ESCAPE '\\' ORDER BY name LIMIT 200",
                 array_fill(0, 3, '%' . addcslashes($q, '%_\\') . '%')
@@ -39,6 +40,9 @@ final class CustomerController
             'services' => Db::all("SELECT * FROM services WHERE customer_id = ? ORDER BY status = 'cancelled', id DESC", [$id]),
             'lastLogin' => \App\Services\Account::lastLogin('customer', $id),
             'resetLink' => $this->takeLink($id),
+            'deleteBlockers' => CustomerDeletion::adminBlockers($customer),
+            'mustKeep'  => CustomerDeletion::mustKeep($customer),
+            'unpaid'    => (int)Db::value("SELECT COUNT(*) FROM invoices WHERE customer_id = ? AND status = 'issued'", [$id]),
         ], $customer['name']);
     }
 
@@ -69,6 +73,26 @@ final class CustomerController
         audit('staff:' . $admin['id'], 'customer_email_verified', '#' . $customer['id']);
         flash('success', 'E-Mail-Adresse als bestätigt markiert.');
         redirect('/kunden/' . $customer['id']);
+    }
+
+    public function destroy(array $p): void
+    {
+        $admin = Auth::requireAdmin();
+        $customer = Db::one('SELECT * FROM customers WHERE id = ? AND deleted_at IS NULL', [id_param($p)]) ?? abort(404);
+        $back = '/kunden/' . $customer['id'];
+        if ($blockers = CustomerDeletion::adminBlockers($customer)) {
+            fail_back([], $back, $blockers[0]);
+        }
+        if (trim((string)($_POST['confirm'] ?? '')) !== 'LÖSCHEN') {
+            fail_back(['confirm' => 'Bitte genau LÖSCHEN eintippen.'], $back);
+        }
+        $result = CustomerDeletion::close($customer);
+        if (($_POST['notify'] ?? '') === '1') {
+            CustomerDeletion::confirm($customer, $result);
+        }
+        audit('staff:' . $admin['id'], 'customer_' . $result, '#' . $customer['id']);
+        flash('success', $result === 'deleted' ? 'Kunde vollständig gelöscht.' : 'Konto geschlossen und anonymisiert – Belege bleiben erhalten.');
+        redirect($result === 'deleted' ? '/kunden' : $back);
     }
 
     public function sendResetLink(array $p): void

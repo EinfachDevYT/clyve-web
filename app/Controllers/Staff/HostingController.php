@@ -53,7 +53,7 @@ final class HostingController
         Auth::require();
         $customerId = id_param($_GET, 'kunde');
         View::render('staff/hosting/create', [
-            'customers' => Db::all('SELECT id, name, email FROM customers ORDER BY name'),
+            'customers' => Db::all('SELECT id, name, email FROM customers WHERE deleted_at IS NULL ORDER BY name'),
             'plans'     => Db::all('SELECT * FROM service_plans WHERE active = 1 ORDER BY price_cents, name'),
             'requests'  => Db::all("SELECT id, public_id, title, customer_id FROM requests WHERE customer_id IS NOT NULL AND type = 'bot' ORDER BY id DESC LIMIT 50"),
             'preselect' => $customerId,

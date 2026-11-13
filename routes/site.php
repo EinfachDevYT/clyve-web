@@ -57,6 +57,7 @@ $router->post('/konto/einstellungen/sicherheit/2fa', [SettingsController::class,
 $router->post('/konto/einstellungen/sicherheit/2fa/deaktivieren', [SettingsController::class, 'disableTwoFactor']);
 $router->post('/konto/einstellungen/sicherheit/2fa/codes', [SettingsController::class, 'renewCodes']);
 $router->post('/konto/einstellungen/sicherheit/abmelden', [SettingsController::class, 'revokeSessions']);
+$router->post('/konto/einstellungen/konto-schliessen', [SettingsController::class, 'closeAccount']);
 
 $router->get('/konto/tickets', [TicketController::class, 'index']);
 $router->get('/konto/tickets/neu', [TicketController::class, 'create']);

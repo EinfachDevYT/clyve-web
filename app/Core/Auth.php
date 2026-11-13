@@ -49,7 +49,7 @@ final class Auth
     public static function verify(string $email, string $password): ?array
     {
         $table = self::table();
-        $active = $table === 'staff' ? ' AND active = 1' : '';
+        $active = $table === 'staff' ? ' AND active = 1' : ' AND deleted_at IS NULL';
         $user = Db::one("SELECT * FROM {$table} WHERE email = ?{$active}", [$email]);
 
         $valid = password_verify($password, $user['password_hash'] ?? self::DUMMY_HASH);
@@ -133,7 +133,7 @@ final class Auth
             return self::$user = null;
         }
         $table = self::table();
-        $active = $table === 'staff' ? ' AND active = 1' : '';
+        $active = $table === 'staff' ? ' AND active = 1' : ' AND deleted_at IS NULL';
         $user = Db::one("SELECT * FROM {$table} WHERE id = ?{$active}", [$id]);
         if (!$user || (int)$user['session_version'] !== (int)($_SESSION['_sv'] ?? 0)) {
             unset($_SESSION['_uid'], $_SESSION['_sv']);

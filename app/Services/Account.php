@@ -46,7 +46,7 @@ final class Account
 
     public static function findByEmail(string $type, string $email): ?array
     {
-        $active = $type === 'staff' ? ' AND active = 1' : '';
+        $active = $type === 'staff' ? ' AND active = 1' : ' AND deleted_at IS NULL';
         return Db::one('SELECT * FROM ' . self::table($type) . ' WHERE email = ?' . $active, [$email]);
     }
 

@@ -113,6 +113,32 @@ ob_start();
   </div>
 </div>
 
+<?php if (Account::type() === 'customer'): $closeBlockers = \App\Services\CustomerDeletion::blockers($u); ?>
+<section class="panel glass stack mt">
+  <details class="danger-zone"<?= invalid('password_close') || invalid('code_close') || invalid('understood') ? ' open' : '' ?>>
+    <summary>Konto schließen</summary>
+    <div class="stack">
+      <?php if ($closeBlockers): ?>
+        <p class="muted small">Du kannst dein Konto gerade nicht selbst schließen:</p>
+        <ul class="small"><?php foreach ($closeBlockers as $b): ?><li><?= e($b) ?></li><?php endforeach ?></ul>
+        <p class="muted small">Sobald das erledigt ist, geht es hier. Bei Fragen: <a href="/konto/tickets/neu">Support-Ticket</a>.</p>
+      <?php else: ?>
+        <p class="muted small">Dein Konto, deine Kontaktdaten, Tickets und Anfragen werden gelöscht und du wirst abgemeldet. Ausgestellte Rechnungen bzw. Quittungen müssen wir gesetzlich aufbewahren – sie bleiben mit den Angaben erhalten, die darauf stehen. Das lässt sich nicht rückgängig machen.</p>
+        <form class="stack" action="<?= e($base) ?>/konto-schliessen" method="post" data-native data-confirm="Konto wirklich endgültig schließen?">
+          <?= csrf_field() ?>
+          <label class="field<?= invalid('password_close') ?>"><span>Passwort zur Bestätigung</span><input type="password" name="password_close" autocomplete="current-password" required><?= error_for('password_close') ?></label>
+          <?php if ($u['has_2fa']): ?>
+            <label class="field<?= invalid('code_close') ?>"><span>Code aus der Authenticator-App</span><input type="text" name="code_close" inputmode="numeric" autocomplete="one-time-code" maxlength="20" required><?= error_for('code_close') ?></label>
+          <?php endif ?>
+          <label class="consent<?= invalid('understood') ?>"><input type="checkbox" name="understood" value="1" required><span>Ich verstehe, dass mein Konto endgültig gelöscht wird.</span></label>
+          <div><button class="pill pill-sm danger" type="submit">Konto endgültig schließen</button></div>
+        </form>
+      <?php endif ?>
+    </div>
+  </details>
+</section>
+<?php endif ?>
+
 <section class="panel glass stack mt">
   <h2>Letzte Aktivität</h2>
   <?php if ($events): ?>

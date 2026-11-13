@@ -568,3 +568,9 @@ pre.code code { background: none; border: 0; padding: 0; color: inherit; font-si
   .devlog-body { padding: 20px 18px; }
   .devlog-public { padding-top: 96px; }
 }
+
+/* closing accounts */
+.danger-zone { border: 1px solid rgba(249, 168, 212, .28); border-radius: 14px; padding: 12px 16px; background: rgba(249, 168, 212, .04); }
+.danger-zone > summary { cursor: pointer; color: #F9A8D4; font-weight: 600; font-size: .92rem; }
+.danger-zone[open] > summary { margin-bottom: 12px; }
+.danger-zone ul { margin: 0; padding-left: 1.2em; color: var(--lilac); }
