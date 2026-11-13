@@ -28,11 +28,15 @@ final class Notifier
 
         $owner = (string)config('mail_to', '');
         if ($owner !== '') {
-            $lines = [];
-            foreach ($fields as $k => $v) {
-                $lines[] = $k . ': ' . $v;
-            }
-            Mailer::send($owner, $title, implode("\n", $lines) . "\n\n" . $r['message'] . "\n\n" . RequestService::siteUrl(), $r['email'] ?: null);
+            $staff = Account::baseUrl('staff');
+            Mailer::send($owner, $title, Mailer::compose(
+                explode(' ', (string)config('business.owner', ''))[0] ?: 'du',
+                [$r['name'] . ' hat eine neue Anfrage geschickt' . ($r['email'] !== '' ? ' – mit „Antworten“ schreibst du direkt zurück.' : '.')],
+                $staff !== '' && !empty($r['id']) ? 'Im Staff-Bereich öffnen' : null,
+                $staff !== '' && !empty($r['id']) ? $staff . '/anfragen/' . (int)$r['id'] : null,
+                $fields,
+                (string)$r['message'],
+            ), $r['email'] ?: null);
         }
     }
 

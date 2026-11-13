@@ -215,8 +215,7 @@ final class RequestService
         }
         return self::notifyCustomer($request, 'Neue Nachricht zu deiner Anfrage ' . $request['public_id'], [
             'du hast eine neue Nachricht zu deiner Anfrage „' . ($request['title'] ?: Notifier::TYPES[$request['type']]) . '“:',
-            $body,
-        ]);
+        ], quote: $body, action: 'Antworten');
     }
 
     public static function sendOffer(array $request, int $staffId, int $amountCents, string $delivery, string $description): bool
@@ -235,10 +234,9 @@ final class RequestService
         });
         self::touch((int)$request['id'], 'customer');
         return self::notifyCustomer($request, 'Dein Angebot zu ' . $request['public_id'], [
-            'ich habe dir ein Angebot zu deiner Anfrage „' . ($request['title'] ?: Notifier::TYPES[$request['type']]) . '“ erstellt:',
-            'Preis: ' . self::priceLabel($amountCents) . ($delivery !== '' ? "\nLieferung: " . $delivery : '') . "\n\n" . $description,
+            'ich habe dir ein Angebot zu deiner Anfrage „' . ($request['title'] ?: Notifier::TYPES[$request['type']]) . '“ erstellt.',
             'Du kannst es über den Link annehmen oder ablehnen.',
-        ]);
+        ], ['Preis' => self::priceLabel($amountCents)] + ($delivery !== '' ? ['Lieferung' => $delivery] : []), $description, 'Angebot ansehen');
     }
 
     public static function respondToOffer(array $request, bool $accept): void
@@ -292,7 +290,7 @@ final class RequestService
     }
 
     /** Sends a mail with a link to the request: the account page for customers, a fresh private link for guests. */
-    private static function notifyCustomer(array $request, string $subject, array $lines): bool
+    private static function notifyCustomer(array $request, string $subject, array $lines, array $facts = [], string $quote = '', string $action = 'Zur Anfrage'): bool
     {
         $to = $request['contact_email'];
         if ($to === '' || !Mailer::enabled()) {
@@ -301,6 +299,6 @@ final class RequestService
         $url = $request['customer_id']
             ? self::siteUrl('/konto/anfragen/' . $request['id'])
             : self::trackingUrl(self::tokenFor($request) ?? self::rotateToken((int)$request['id']));
-        return Mailer::send($to, $subject, Mailer::compose($request['name'], $lines, 'Zur Anfrage', $url));
+        return Mailer::send($to, $subject, Mailer::compose($request['name'], $lines, $action, $url, $facts, $quote));
     }
 }

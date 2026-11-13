@@ -6,8 +6,8 @@ namespace App\Services;
 use RuntimeException;
 
 /**
- * Minimal SMTP client (STARTTLS on 587, implicit TLS on 465). Falls back to nothing
- * when SMTP is not configured: callers get false and the message stays in the portal.
+ * Minimal SMTP client (STARTTLS on 587, implicit TLS on 465) sending HTML mails in the
+ * site's look with a plain-text alternative. Without SMTP config callers just get false.
  */
 final class Mailer
 {
@@ -16,13 +16,15 @@ final class Mailer
         return (string)config('smtp.host', '') !== '' && filter_var((string)config('smtp.from', ''), FILTER_VALIDATE_EMAIL) !== false;
     }
 
-    public static function send(string $to, string $subject, string $text, ?string $replyTo = null): bool
+    /** @param string|array $body plain text, or a message built with compose() */
+    public static function send(string $to, string $subject, string|array $body, ?string $replyTo = null): bool
     {
         if (!self::enabled() || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
         try {
-            self::deliver($to, $subject, $text, $replyTo);
+            $message = is_array($body) ? $body : self::fromText($body);
+            self::deliver($to, $subject, $message['text'], self::html($subject, $message), $replyTo);
             return true;
         } catch (\Throwable $e) {
             error_log('[mailer] ' . $e->getMessage());
@@ -30,14 +32,76 @@ final class Mailer
         }
     }
 
-    /** Renders a plain-text mail from lines and an optional call to action. */
-    public static function compose(string $greetingName, array $lines, ?string $actionLabel = null, ?string $actionUrl = null): string
-    {
-        $out = 'Hallo ' . $greetingName . ",\n\n" . implode("\n\n", $lines);
-        if ($actionUrl) {
-            $out .= "\n\n" . ($actionLabel ? $actionLabel . ":\n" : '') . $actionUrl;
+    /**
+     * Builds a message with greeting, paragraphs, an optional button and optional facts / quoted text.
+     * The plain-text version is kept for clients that don't show HTML.
+     */
+    public static function compose(
+        string $greetingName,
+        array $lines,
+        ?string $actionLabel = null,
+        ?string $actionUrl = null,
+        array $facts = [],
+        string $quote = '',
+    ): array {
+        $greeting = 'Hallo ' . trim($greetingName) . ',';
+        $text = $greeting . "\n\n" . implode("\n\n", $lines);
+        if ($facts) {
+            $text .= "\n";
+            foreach ($facts as $k => $v) {
+                $text .= "\n" . $k . ': ' . $v;
+            }
         }
-        return $out . "\n\nViele Grüße\n" . config('business.name', 'Clyve.dev') . "\n";
+        if ($quote !== '') {
+            $text .= "\n\n> " . str_replace("\n", "\n> ", trim($quote));
+        }
+        if ($actionUrl) {
+            $text .= "\n\n" . ($actionLabel ? $actionLabel . ":\n" : '') . $actionUrl;
+        }
+        $text .= "\n\nViele Grüße\n" . self::sender() . "\n";
+
+        return [
+            'greeting' => $greeting,
+            'lines'    => array_values(array_filter($lines, static fn($l) => trim((string)$l) !== '')),
+            'action'   => $actionUrl ? [$actionLabel ?: 'Öffnen', $actionUrl] : null,
+            'facts'    => $facts,
+            'quote'    => trim($quote),
+            'text'     => $text,
+        ];
+    }
+
+    private static function fromText(string $text): array
+    {
+        $text = trim(str_replace(["\r\n", "\r"], "\n", $text));
+        return ['greeting' => '', 'lines' => preg_split('/\n{2,}/', $text) ?: [], 'action' => null, 'facts' => [], 'quote' => '', 'text' => $text . "\n"];
+    }
+
+    private static function sender(): string
+    {
+        return (string)config('business.name', 'Clyve.dev');
+    }
+
+    /** Escapes text and turns URLs into links. */
+    public static function richText(string $text): string
+    {
+        $html = e($text);
+        $html = (string)preg_replace_callback('#https?://[^\s<>"\']+#', static function (array $m): string {
+            $url = rtrim($m[0], '.,);:');
+            return '<a href="' . $url . '" style="color:#C084FC;text-decoration:underline;word-break:break-all;">' . $url . '</a>' . substr($m[0], strlen($url));
+        }, $html);
+        return nl2br($html, false);
+    }
+
+    public static function html(string $subject, array $message): string
+    {
+        $base = rtrim((string)(((array)config('site_origins', []))[0] ?? ''), '/');
+        return \App\Core\View::capture('mail/html', [
+            'subject'   => $subject,
+            'message'   => $message,
+            'business'  => self::sender(),
+            'siteUrl'   => $base,
+            'preheader' => mb_substr(trim((string)preg_replace('/\s+/', ' ', (string)($message['lines'][0] ?? ''))), 0, 140),
+        ]);
     }
 
     private static function header(string $value): string
@@ -50,7 +114,7 @@ final class Mailer
         return preg_match('/[^\x20-\x7E]/', $value) ? '=?UTF-8?B?' . base64_encode($value) . '?=' : $value;
     }
 
-    private static function deliver(string $to, string $subject, string $text, ?string $replyTo): void
+    private static function deliver(string $to, string $subject, string $text, string $html, ?string $replyTo): void
     {
         $host = (string)config('smtp.host');
         $port = (int)config('smtp.port', 587);
@@ -127,15 +191,24 @@ final class Mailer
                 'Subject: ' . self::encode(self::header($subject)),
                 'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . $domain . '>',
                 'MIME-Version: 1.0',
-                'Content-Type: text/plain; charset=UTF-8',
-                'Content-Transfer-Encoding: base64',
+                'Content-Type: multipart/alternative; boundary="' . ($alt = 'alt-' . bin2hex(random_bytes(10))) . '"',
                 'Auto-Submitted: auto-generated',
             ];
             if ($replyTo && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
                 $headers[] = 'Reply-To: <' . $replyTo . '>';
             }
-            $body = rtrim(chunk_split(base64_encode(str_replace(["\r\n", "\r"], "\n", $text)), 76, "\r\n"));
-            $cmd(implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.", [250]);
+            $b64 = static fn(string $data): string => rtrim(chunk_split(base64_encode($data), 76, "\r\n"));
+            $rel = 'rel-' . bin2hex(random_bytes(10));
+            $logo = BASE_PATH . '/public/assets/brand/clyve-logo-mail.png';
+            $parts = [
+                "--{$alt}\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $b64(str_replace(["\r\n", "\r"], "\n", $text)),
+                "--{$alt}\r\nContent-Type: multipart/related; boundary=\"{$rel}\"\r\n\r\n"
+                . "--{$rel}\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . $b64($html) . "\r\n"
+                . (is_file($logo) ? "--{$rel}\r\nContent-Type: image/png; name=\"clyve.png\"\r\nContent-Transfer-Encoding: base64\r\nContent-ID: <logo@clyve>\r\nContent-Disposition: inline; filename=\"clyve.png\"\r\n\r\n" . $b64((string)file_get_contents($logo)) . "\r\n" : '')
+                . "--{$rel}--",
+                "--{$alt}--",
+            ];
+            $cmd(implode("\r\n", $headers) . "\r\n\r\n" . implode("\r\n", $parts) . "\r\n.", [250]);
             fwrite($fp, "QUIT\r\n");
         } finally {
             fclose($fp);

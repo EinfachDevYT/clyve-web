@@ -73,6 +73,12 @@ Production with nginx: see **[deploy/DEPLOY.md](deploy/DEPLOY.md)**.
 
 Notifications: the customer by e-mail (SMTP, optional), you via Discord webhook.
 
+E-mails are sent as HTML in the site's look (dark card, violet button, logo embedded inline, so it shows without
+loading remote images) with a plain-text version for clients that don't render HTML. The template is
+`resources/views/mail/html.php`; `Mailer::compose()` builds a message from greeting, paragraphs, an optional button,
+key/value facts (e.g. price and delivery of an offer) and a quoted text. Send yourself a sample via
+Verwaltung → E-Mail → „Test-E-Mail senden“.
+
 ## Receipts: hobby, small business, VAT registered
 
 `business.mode` in the config:
