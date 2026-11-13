@@ -3,6 +3,15 @@ use App\Services\Account;
 $u = $user;
 ob_start();
 ?>
+<?php if ($revealed): ?>
+  <section class="panel glass license-once stack">
+    <div><h2>Deine Wiederherstellungscodes</h2>
+      <p class="muted small">Nur jetzt sichtbar – beim Neuladen verschwinden sie wieder. Durchgestrichene Codes wurden bereits verwendet.</p></div>
+    <ol class="recovery-codes mono"><?php foreach ($revealed as $rc): ?><li<?= $rc['used'] ? ' class="is-used"' : '' ?>><?= e($rc['code']) ?></li><?php endforeach ?></ol>
+    <div><button type="button" class="pill pill-sm" data-copy="<?= e(implode("\n", array_column(array_filter($revealed, static fn($rc) => !$rc['used']), 'code'))) ?>">Unbenutzte kopieren</button></div>
+  </section>
+<?php endif ?>
+
 <?php if ($recoveryCodes): ?>
   <section class="panel glass license-once stack">
     <div><h2>Deine Wiederherstellungscodes</h2>
@@ -24,6 +33,22 @@ ob_start();
         <div><a class="pill pill-sm" href="<?= e($base) ?>/sicherheit/2fa">Einrichten</a></div>
       <?php else: ?>
         <p class="muted small">Aktiv seit <?= date_de($u['totp_enabled_at']) ?>. Noch <b><?= (int)$recoveryLeft ?></b> von 10 Wiederherstellungscodes übrig.</p>
+        <?php if ($canReveal): ?>
+          <details class="snippet"<?= invalid('password_reveal') || invalid('code_reveal') ? ' open' : '' ?>>
+            <summary class="panel-summary"><b>Codes anzeigen</b></summary>
+            <?php if ($hasCopy): ?>
+              <form class="stack mt-sm" action="<?= e($base) ?>/sicherheit/2fa/codes/anzeigen" method="post">
+                <?= csrf_field() ?>
+                <p class="muted small">Nur für dein eigenes Admin-Konto. Zur Sicherheit brauchst du Passwort und einen aktuellen Code aus der App; die Anzeige wird protokolliert.</p>
+                <label class="field<?= invalid('password_reveal') ?>"><span>Passwort</span><input type="password" name="password_reveal" autocomplete="current-password" required><?= error_for('password_reveal') ?></label>
+                <label class="field<?= invalid('code_reveal') ?>"><span>Code aus der App</span><input type="text" name="code" class="mono" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required><?= error_for('code_reveal') ?></label>
+                <div><button class="pill pill-sm pill-ghost" type="submit">Codes anzeigen</button></div>
+              </form>
+            <?php else: ?>
+              <p class="muted small mt-sm">Für deine aktuellen Codes ist keine Kopie gespeichert (sie wurden vor dieser Funktion oder vor deiner Admin-Rolle erzeugt). Erzeuge einmal neue Codes – danach kannst du sie hier jederzeit wieder anzeigen.</p>
+            <?php endif ?>
+          </details>
+        <?php endif ?>
         <details class="snippet"<?= invalid('password_codes') ? ' open' : '' ?>>
           <summary class="panel-summary"><b>Neue Wiederherstellungscodes</b></summary>
           <form class="stack mt-sm" action="<?= e($base) ?>/sicherheit/2fa/codes" method="post">

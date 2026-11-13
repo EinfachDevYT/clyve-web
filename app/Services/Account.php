@@ -22,6 +22,7 @@ final class Account
         'twofa_disabled'   => 'Zwei-Faktor-Anmeldung deaktiviert',
         'twofa_reset'      => 'Zwei-Faktor-Anmeldung vom Admin zurückgesetzt',
         'codes_renewed'    => 'Neue Wiederherstellungscodes erzeugt',
+        'codes_viewed'     => 'Wiederherstellungscodes angezeigt',
         'sessions_revoked' => 'Auf anderen Geräten abgemeldet',
     ];
 
@@ -77,14 +78,14 @@ final class Account
     }
 
     /** @return string[] plain recovery codes, shown once */
-    public static function enableTwoFactor(string $type, int $id, string $secret, int $step): array
+    public static function enableTwoFactor(string $type, int $id, string $secret, int $step, bool $keepCopy = false): array
     {
         Db::exec(
             'UPDATE ' . self::table($type) . " SET totp_secret = ?, totp_enabled_at = datetime('now'), totp_last_step = ? WHERE id = ?",
             [Crypto::encrypt($secret, 'totp'), $step, $id]
         );
         self::log($type, $id, 'twofa_enabled');
-        return self::newRecoveryCodes($type, $id);
+        return self::newRecoveryCodes($type, $id, $keepCopy);
     }
 
     public static function disableTwoFactor(string $type, int $id, string $event = 'twofa_disabled'): void
@@ -122,22 +123,51 @@ final class Account
     }
 
     /** @return string[] */
-    public static function newRecoveryCodes(string $type, int $id): array
+    /** $keepCopy additionally stores the codes encrypted so their owner can view them again (admins only). */
+    public static function newRecoveryCodes(string $type, int $id, bool $keepCopy = false): array
     {
         $alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
         $codes = [];
-        Db::transaction(static function () use ($type, $id, $alphabet, &$codes): void {
+        Db::transaction(static function () use ($type, $id, $alphabet, $keepCopy, &$codes): void {
             Db::exec('DELETE FROM recovery_codes WHERE account_type = ? AND account_id = ?', [$type, $id]);
             for ($i = 0; $i < 10; $i++) {
                 $raw = '';
                 for ($j = 0; $j < 10; $j++) {
                     $raw .= $alphabet[random_int(0, strlen($alphabet) - 1)];
                 }
-                $codes[] = substr($raw, 0, 5) . '-' . substr($raw, 5);
-                Db::exec('INSERT INTO recovery_codes (account_type, account_id, code_hash) VALUES (?, ?, ?)', [$type, $id, hash('sha256', 'clyve-recovery|' . $raw)]);
+                $code = substr($raw, 0, 5) . '-' . substr($raw, 5);
+                $codes[] = $code;
+                Db::exec(
+                    'INSERT INTO recovery_codes (account_type, account_id, code_hash, code_enc) VALUES (?, ?, ?, ?)',
+                    [$type, $id, hash('sha256', 'clyve-recovery|' . $raw), $keepCopy ? Crypto::encrypt($code, 'recovery|' . $type . '|' . $id) : null]
+                );
             }
         });
         return $codes;
+    }
+
+    /** @return array<int, array{code: string, used: bool}>|null null = no stored copy */
+    public static function storedRecoveryCodes(string $type, int $id): ?array
+    {
+        $rows = Db::all('SELECT code_enc, used_at FROM recovery_codes WHERE account_type = ? AND account_id = ? AND code_enc IS NOT NULL ORDER BY id', [$type, $id]);
+        $out = [];
+        foreach ($rows as $row) {
+            $code = Crypto::decrypt((string)$row['code_enc'], 'recovery|' . $type . '|' . $id);
+            if ($code !== null) {
+                $out[] = ['code' => $code, 'used' => $row['used_at'] !== null];
+            }
+        }
+        return $out ?: null;
+    }
+
+    public static function hasStoredRecoveryCodes(string $type, int $id): bool
+    {
+        return (bool)Db::value('SELECT 1 FROM recovery_codes WHERE account_type = ? AND account_id = ? AND code_enc IS NOT NULL LIMIT 1', [$type, $id]);
+    }
+
+    public static function dropStoredRecoveryCodes(string $type, int $id): void
+    {
+        Db::exec('UPDATE recovery_codes SET code_enc = NULL WHERE account_type = ? AND account_id = ?', [$type, $id]);
     }
 
     public static function recoveryLeft(string $type, int $id): int

@@ -97,7 +97,7 @@ und ein Verlauf der letzten Anmeldungen. „Passwort vergessen“ schickt einen 
 
 Admins verwalten unter **Mitarbeiter** das Team: einladen (Link per E-Mail oder zum Weitergeben), Rolle ändern,
 Zugang sperren, 2FA zurücksetzen. Unter **Verwaltung → Sicherheit** lässt sich 2FA für Staff verpflichtend machen.
-Sicherheitsrelevante Änderungen lösen eine Hinweis-E-Mail aus. 2FA-Schlüssel sind verschlüsselt, Codes und Links nur gehasht gespeichert.
+Sicherheitsrelevante Änderungen lösen eine Hinweis-E-Mail aus. Admins können ihre eigenen Wiederherstellungscodes nach Passwort + App-Code erneut anzeigen (dafür verschlüsselt gespeichert, Anzeige wird protokolliert); bei allen anderen Konten werden sie nur gehasht. 2FA-Schlüssel sind verschlüsselt, Codes und Links nur gehasht gespeichert.
 
 ## Bot-Hosting & Lizenzen
 

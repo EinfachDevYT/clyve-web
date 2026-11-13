@@ -17,6 +17,12 @@ trait SecuritySettings
 {
     abstract protected function base(): string;
 
+    /** Only admins of the staff area may view their own recovery codes again. */
+    private function mayRevealCodes(array $user): bool
+    {
+        return APP_CONTEXT === 'staff' && ($user['role'] ?? '') === 'admin';
+    }
+
     private function securityUrl(): string
     {
         return $this->base() . '/sicherheit';
@@ -27,7 +33,9 @@ trait SecuritySettings
         $user = Auth::require();
         $type = Account::type();
         $codes = $_SESSION['_recovery_once'] ?? null;
-        unset($_SESSION['_recovery_once']);
+        $revealed = $_SESSION['_recovery_reveal'] ?? null;
+        unset($_SESSION['_recovery_once'], $_SESSION['_recovery_reveal']);
+        $canReveal = $user['has_2fa'] && $this->mayRevealCodes($user);
         View::render('shared/security/index', [
             'base'          => $this->base(),
             'pendingEmail'  => Account::pendingEmail($type, (int)$user['id']),
@@ -35,6 +43,9 @@ trait SecuritySettings
             'events'        => Account::events($type, (int)$user['id'], 10),
             'recoveryLeft'  => $user['has_2fa'] ? Account::recoveryLeft($type, (int)$user['id']) : 0,
             'recoveryCodes' => is_array($codes) ? $codes : null,
+            'canReveal'     => $canReveal,
+            'hasCopy'       => $canReveal && Account::hasStoredRecoveryCodes($type, (int)$user['id']),
+            'revealed'      => $canReveal && is_array($revealed) ? $revealed : null,
         ], 'Sicherheit');
     }
 
@@ -148,7 +159,7 @@ trait SecuritySettings
             fail_back(['code' => 'Der Code stimmt nicht. Prüfe die Uhrzeit deines Handys und versuch es erneut.'], $this->securityUrl() . '/2fa');
         }
         unset($_SESSION['_totp_setup']);
-        $_SESSION['_recovery_once'] = Account::enableTwoFactor(Account::type(), (int)$user['id'], (string)$pending['secret'], $step);
+        $_SESSION['_recovery_once'] = Account::enableTwoFactor(Account::type(), (int)$user['id'], (string)$pending['secret'], $step, $this->mayRevealCodes($user));
         flash('success', 'Zwei-Faktor-Anmeldung ist aktiv. Speichere jetzt deine Wiederherstellungscodes.');
         redirect($this->securityUrl());
     }
@@ -179,9 +190,33 @@ trait SecuritySettings
         }
         $this->requirePassword('password_codes');
         $type = Account::type();
-        $_SESSION['_recovery_once'] = Account::newRecoveryCodes($type, (int)$user['id']);
+        $_SESSION['_recovery_once'] = Account::newRecoveryCodes($type, (int)$user['id'], $this->mayRevealCodes($user));
         Account::log($type, (int)$user['id'], 'codes_renewed');
         flash('success', 'Neue Wiederherstellungscodes erzeugt. Die alten gelten nicht mehr.');
+        redirect($this->securityUrl());
+    }
+
+    public function revealCodes(): void
+    {
+        $user = Auth::require();
+        if (!$user['has_2fa'] || !$this->mayRevealCodes($user)) {
+            abort(404);
+        }
+        $this->requirePassword('password_reveal');
+        $type = Account::type();
+        $code = (string)preg_replace('/\s+/', '', (string)($_POST['code'] ?? ''));
+        $account = Account::find($type, (int)$user['id']);
+        if (!preg_match('/^\d{6}$/', $code) || Account::verifySecondFactor($type, $account, $code) !== 'totp') {
+            fail_back(['code_reveal' => 'Der Code aus der App stimmt nicht.'], $this->securityUrl());
+        }
+        $codes = Account::storedRecoveryCodes($type, (int)$user['id']);
+        if ($codes === null) {
+            fail_back([], $this->securityUrl(), 'Für deine aktuellen Codes ist keine Kopie gespeichert. Erzeuge einmal neue Codes, dann kannst du sie künftig wieder anzeigen.');
+        }
+        $_SESSION['_recovery_reveal'] = $codes;
+        Account::log($type, (int)$user['id'], 'codes_viewed');
+        Account::notify($user, 'Wiederherstellungscodes angezeigt', ['in deinem Staff-Konto wurden gerade die Wiederherstellungscodes angezeigt.']);
+        audit('staff:' . $user['id'], 'recovery_codes_viewed');
         redirect($this->securityUrl());
     }
 

@@ -77,6 +77,9 @@ final class StaffController
             fail_back($v->errors(), '/mitarbeiter/' . $m['id']);
         }
         Db::exec('UPDATE staff SET name = ?, role = ? WHERE id = ?', [$name, $role, $m['id']]);
+        if ($m['role'] === 'admin' && $role !== 'admin') {
+            Account::dropStoredRecoveryCodes('staff', (int)$m['id']);
+        }
         audit('staff:' . $admin['id'], 'staff_updated', '#' . $m['id'] . ' role=' . $role);
         flash('success', 'Gespeichert.');
         redirect('/mitarbeiter/' . $m['id']);

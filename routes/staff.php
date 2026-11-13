@@ -117,6 +117,7 @@ $router->get('/einstellungen/sicherheit/2fa', [ProfileController::class, 'setupT
 $router->post('/einstellungen/sicherheit/2fa', [ProfileController::class, 'enableTwoFactor']);
 $router->post('/einstellungen/sicherheit/2fa/deaktivieren', [ProfileController::class, 'disableTwoFactor']);
 $router->post('/einstellungen/sicherheit/2fa/codes', [ProfileController::class, 'renewCodes']);
+$router->post('/einstellungen/sicherheit/2fa/codes/anzeigen', [ProfileController::class, 'revealCodes']);
 $router->post('/einstellungen/sicherheit/abmelden', [ProfileController::class, 'revokeSessions']);
 
 return $router;

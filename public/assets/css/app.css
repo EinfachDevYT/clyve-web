@@ -526,3 +526,4 @@ pre.code code { background: none; border: 0; padding: 0; color: inherit; font-si
   .recovery-codes { grid-template-columns: minmax(0, 1fr); }
 }
 .license-key code.small { font-size: .85rem; letter-spacing: 0; }
+.recovery-codes li.is-used { text-decoration: line-through; opacity: .45; }
