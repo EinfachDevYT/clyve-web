@@ -43,7 +43,7 @@
           <button type="submit" class="link-btn">Abmelden</button>
         </form>
       <?php else: ?>
-        <a href="/login"<?= View::active('/login') ?>>Kundenlogin</a>
+        <a href="/login"<?= View::active('/login') ?>>Kundenpanel</a>
       <?php endif ?>
       <a class="pill pill-sm" href="/#anfrage">Auftrag anfragen</a>
     </nav>
