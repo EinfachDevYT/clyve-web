@@ -35,14 +35,57 @@ final class Auth
         if ($len > 200) {
             return 'Maximal 200 Zeichen.';
         }
-        $local = strtolower((string)strtok($email, '@'));
-        if (strlen($local) >= 4 && str_contains(strtolower($password), $local)) {
+        if (self::containsEmail($password, $email)) {
             return 'Das Passwort darf nicht deine E-Mail enthalten.';
         }
-        if (count(array_unique(mb_str_split($password))) < 5) {
+        if (count(array_unique(mb_str_split($password))) < 5 || self::isSequence($password)) {
             return 'Das Passwort ist zu einfach.';
         }
+        if (self::isCommon($password)) {
+            return 'Dieses Passwort ist zu bekannt – such dir bitte ein anderes aus.';
+        }
         return null;
+    }
+
+    /** "lena.sommer@…" also matches "lenasommer2024" and "Sommer!2024". */
+    private static function containsEmail(string $password, string $email): bool
+    {
+        $pw = (string)preg_replace('/[._+\-]/', '', mb_strtolower($password));
+        $local = mb_strtolower((string)strtok($email, '@'));
+        $needles = [(string)preg_replace('/[._+\-]/', '', $local)];
+        foreach (preg_split('/[._+\-]+/', $local) ?: [] as $part) {
+            if (mb_strlen($part) >= 5) {
+                $needles[] = $part;
+            }
+        }
+        foreach ($needles as $n) {
+            if (mb_strlen($n) >= 4 && str_contains($pw, $n)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Well-known passwords, also with a few digits or symbols added (e.g. "Passwort123!"). */
+    public static function isCommon(string $password): bool
+    {
+        static $list = null;
+        $list ??= array_flip(array_filter(array_map('trim', file(BASE_PATH . '/public/assets/data/common-passwords.txt') ?: [])));
+        $lower = mb_strtolower($password);
+        $letters = (string)preg_replace('/[^\p{L}]/u', '', $lower);
+        return isset($list[$lower])
+            || (mb_strlen($letters) >= 4 && isset($list[$letters]) && mb_strlen($lower) - mb_strlen($letters) <= 4);
+    }
+
+    /** "abcdefghij", "1234567890", "9876543210" … */
+    private static function isSequence(string $password): bool
+    {
+        $chars = mb_str_split(mb_strtolower($password));
+        $steps = 0;
+        for ($i = 1, $n = count($chars); $i < $n; $i++) {
+            $steps += abs(mb_ord($chars[$i]) - mb_ord($chars[$i - 1])) === 1 ? 1 : 0;
+        }
+        return $steps >= (count($chars) - 1) * 0.8;
     }
 
     /** Checks e-mail and password without logging in. */

@@ -17,11 +17,10 @@
   <h2 class="form-rule">Passwort</h2>
   <div class="form-grid g-2">
     <label class="field<?= invalid('password') ?>"><span>Passwort</span>
-      <span class="pw-wrap"><input type="password" name="password" minlength="10" maxlength="200" autocomplete="new-password" placeholder="Passwort eingeben…" required><button type="button" class="pw-toggle" data-pw-toggle aria-label="Passwort anzeigen"></button></span><?= error_for('password') ?></label>
+      <span class="pw-wrap"><input type="password" name="password" minlength="10" maxlength="200" autocomplete="new-password" placeholder="Passwort eingeben…" required data-pw-check><button type="button" class="pw-toggle" data-pw-toggle aria-label="Passwort anzeigen"></button></span><?= error_for('password') ?></label>
     <label class="field<?= invalid('password_confirm') ?>"><span>Passwort bestätigen</span>
       <span class="pw-wrap"><input type="password" name="password_confirm" autocomplete="new-password" placeholder="Passwort wiederholen…" required><button type="button" class="pw-toggle" data-pw-toggle aria-label="Passwort anzeigen"></button></span><?= error_for('password_confirm') ?></label>
   </div>
-  <p class="muted small form-hint">Das Passwort muss mindestens 10 Zeichen lang sein.</p>
 
   <label class="consent<?= invalid('consent') ?>">
     <input type="checkbox" name="consent" value="1" required>

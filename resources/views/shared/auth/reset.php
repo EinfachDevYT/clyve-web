@@ -5,9 +5,9 @@
   <?= csrf_field() ?>
   <input type="text" name="username" value="<?= e($account['email']) ?>" autocomplete="username" hidden>
   <label class="field<?= invalid('password') ?>"><span>Neues Passwort <small class="muted">(mind. 10 Zeichen)</small></span>
-    <input type="password" name="password" minlength="10" autocomplete="new-password" required autofocus><?= error_for('password') ?></label>
+    <span class="pw-wrap"><input type="password" name="password" minlength="10" maxlength="200" autocomplete="new-password" required autofocus data-pw-check data-pw-email="<?= e($account['email']) ?>"><button type="button" class="pw-toggle" data-pw-toggle aria-label="Passwort anzeigen"></button></span><?= error_for('password') ?></label>
   <label class="field<?= invalid('password_confirm') ?>"><span>Wiederholen</span>
-    <input type="password" name="password_confirm" autocomplete="new-password" required><?= error_for('password_confirm') ?></label>
+    <span class="pw-wrap"><input type="password" name="password_confirm" autocomplete="new-password" required><button type="button" class="pw-toggle" data-pw-toggle aria-label="Passwort anzeigen"></button></span><?= error_for('password_confirm') ?></label>
   <button class="pill pill-block" type="submit"><?= $invite ? 'Konto einrichten' : 'Passwort speichern' ?></button>
 </form>
 <?php App\Core\View::partial('shared/auth/_wrap', ['inner' => ob_get_clean()]) ?>

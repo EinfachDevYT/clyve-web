@@ -191,6 +191,8 @@ Restore steps: see `deploy/DEPLOY.md`.
 - CSRF token + origin check on every POST
 - Strict CSP without inline scripts, HSTS, frame protection
 - Passwords with Argon2id, session fixation protection, idle timeout
+- Password rules (min. 10 chars, no simple patterns, not the e-mail address, not a well-known password from
+  `public/assets/data/common-passwords.txt`) checked on the server and shown live with a strength meter
 - Separate sessions for main site and staff area (host-only cookies)
 - Rate limits for login, registration, requests, tickets (IPs stored only as HMAC)
 - Staff area optionally behind an IP allowlist, first admin only via CLI, further staff by invitation, audit log

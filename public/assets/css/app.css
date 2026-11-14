@@ -297,7 +297,7 @@ code { font-family: var(--mono); font-size: .9em; background: rgba(168, 85, 247,
 .staff-auth-wide { grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr); }
 .staff-auth-wide .staff-auth-form { max-width: 760px; }
 .staff-auth-wide .staff-auth-copy h2 { font-size: clamp(1.8rem, 2.8vw, 2.5rem); }
-.form-grid { display: grid; gap: 14px; }
+.form-grid { display: grid; gap: 14px; align-items: start; }
 .form-grid > * { min-width: 0; }
 .g-person { grid-template-columns: minmax(0, .8fr) minmax(0, 1fr) minmax(0, 1fr); }
 .g-2, .g-biz { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -577,3 +577,29 @@ pre.code code { background: none; border: 0; padding: 0; color: inherit; font-si
 .danger-zone ul { margin: 0; padding-left: 1.2em; color: var(--lilac); }
 .form-sub { margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--line); }
 .form-sub h3 { margin: 0 0 4px; font-size: 1rem; text-shadow: none; }
+
+/* password checker */
+.pw-meter { display: grid; gap: 8px; margin-top: 10px; }
+.pw-meter[hidden] { display: none; }
+.pw-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.pw-bar i { height: 5px; border-radius: 99px; background: rgba(196, 181, 253, .14); transition: background .25s; }
+.pw-meter[data-score="1"] .pw-bar i:nth-child(-n+1) { background: #F472B6; }
+.pw-meter[data-score="2"] .pw-bar i:nth-child(-n+2) { background: #FBBF24; }
+.pw-meter[data-score="3"] .pw-bar i:nth-child(-n+3) { background: #A855F7; }
+.pw-meter[data-score="4"] .pw-bar i { background: #4ADE80; }
+.pw-label { margin: 0; font-size: .8rem; font-weight: 600; }
+.pw-meter[data-score="1"] .pw-label { color: #F9A8D4; }
+.pw-meter[data-score="2"] .pw-label { color: #FCD34D; }
+.pw-meter[data-score="3"] .pw-label { color: #C4B5FD; }
+.pw-meter[data-score="4"] .pw-label { color: #86EFAC; }
+.pw-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: .78rem; color: var(--muted); }
+.pw-rules li { position: relative; padding-left: 20px; }
+.pw-rules li::before { content: "○"; position: absolute; left: 2px; color: #F9A8D4; }
+.pw-rules li.is-ok { color: var(--lilac); }
+.pw-rules li.is-ok::before { content: "✓"; color: #4ADE80; }
+.pw-rules li.pw-tip::before { content: "★"; color: var(--muted); }
+.pw-rules li.pw-tip.is-ok::before { color: #FBBF24; }
+.pw-match { margin: 6px 0 0; font-size: .8rem; min-height: 0; }
+.pw-match:empty { display: none; }
+.pw-match.is-ok { color: #86EFAC; }
+.pw-match.is-bad { color: #F9A8D4; }

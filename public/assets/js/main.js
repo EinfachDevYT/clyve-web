@@ -407,6 +407,88 @@
     btn.setAttribute('aria-label', show ? 'Passwort verbergen' : 'Passwort anzeigen');
   });
 
+  /* ---------- password checker (mirrors Auth::passwordProblem) ---------- */
+
+  let commonPasswords = null;
+  const loadCommon = () => (commonPasswords ??= fetch('/assets/data/common-passwords.txt')
+    .then((r) => (r.ok ? r.text() : ''))
+    .then((t) => new Set(t.split('\n').map((l) => l.trim()).filter(Boolean)))
+    .catch(() => new Set()));
+
+  function passwordInfo(pw, email, common) {
+    const chars = [...pw];
+    const lower = pw.toLowerCase();
+    const letters = lower.replace(/[^\p{L}]/gu, '');
+    const local = (email.split('@')[0] || '').toLowerCase();
+    const flat = lower.replace(/[._+-]/g, '');
+    const needles = [local.replace(/[._+-]/g, ''), ...local.split(/[._+-]+/).filter((p) => p.length >= 5)];
+    let steps = 0;
+    for (let i = 1; i < chars.length; i++) steps += Math.abs(lower.codePointAt(i) - lower.codePointAt(i - 1)) === 1 ? 1 : 0;
+    const simple = new Set(chars).size < 5 || (chars.length > 1 && steps >= (chars.length - 1) * 0.8);
+    const known = common.has(lower) || (letters.length >= 4 && common.has(letters) && chars.length - [...letters].length <= 4);
+    const rules = {
+      length: chars.length >= 10 && chars.length <= 200,
+      email: !needles.some((n) => n.length >= 4 && flat.includes(n)),
+      simple: chars.length > 0 && !simple,
+      known: chars.length > 0 && !known,
+    };
+    const classes = [/[a-zäöüß]/, /[A-ZÄÖÜ]/, /\d/, /[^\p{L}\d]/u].filter((r) => r.test(pw)).length;
+    const pool = [/[a-zäöüß]/.test(pw) && 26, /[A-ZÄÖÜ]/.test(pw) && 26, /\d/.test(pw) && 10, /[^\p{L}\d]/u.test(pw) && 33].reduce((a, b) => a + (b || 0), 0);
+    const bits = new Set(chars).size * 0.6 * Math.log2(Math.max(pool, 2)) + chars.length * 0.4 * Math.log2(Math.max(pool, 2));
+    const ok = Object.values(rules).every(Boolean);
+    const score = !pw ? 0 : !ok ? 1 : bits < 50 ? 2 : bits < 70 || classes < 3 ? 3 : 4;
+    return { rules, score, classes };
+  }
+
+  function passwordChecker(root) {
+    root.querySelectorAll('input[data-pw-check]:not([data-pw-ready])').forEach((input) => {
+      input.dataset.pwReady = '1';
+      const form = input.form;
+      const anchor = input.closest('.pw-wrap') || input;
+      const box = document.createElement('div');
+      box.className = 'pw-meter';
+      box.hidden = true;
+      box.innerHTML = '<div class="pw-bar" aria-hidden="true"><i></i><i></i><i></i><i></i></div>'
+        + '<p class="pw-label" aria-live="polite"></p>'
+        + '<ul class="pw-rules">'
+        + '<li data-rule="length">Mindestens 10 Zeichen</li>'
+        + '<li data-rule="simple">Keine einfachen Muster (aaaa, 12345, abcde)</li>'
+        + '<li data-rule="known">Kein bekanntes Passwort</li>'
+        + '<li data-rule="email">Enthält nicht deine E-Mail-Adresse</li>'
+        + '<li data-rule="mix" class="pw-tip">Tipp: Groß- & Kleinbuchstaben, Zahlen und Zeichen mischen – oder einfach länger</li>'
+        + '</ul>';
+      anchor.insertAdjacentElement('afterend', box);
+      const labels = ['', 'Zu schwach', 'Okay', 'Stark', 'Sehr stark'];
+      const confirm = form?.querySelector('input[name="password_confirm"]');
+      let match = null;
+      if (confirm) {
+        match = document.createElement('p');
+        match.className = 'pw-match';
+        match.setAttribute('aria-live', 'polite');
+        (confirm.closest('.pw-wrap') || confirm).insertAdjacentElement('afterend', match);
+      }
+      const email = () => input.dataset.pwEmail || form?.querySelector('input[name="email"]')?.value || '';
+      const update = async () => {
+        const pw = input.value;
+        box.hidden = pw === '';
+        const info = passwordInfo(pw, email(), await loadCommon());
+        box.dataset.score = String(info.score);
+        box.querySelector('.pw-label').textContent = pw ? labels[info.score] : '';
+        for (const [rule, ok] of Object.entries(info.rules)) box.querySelector(`[data-rule="${rule}"]`).classList.toggle('is-ok', ok);
+        box.querySelector('[data-rule="mix"]').classList.toggle('is-ok', info.classes >= 3 || pw.length >= 16);
+        if (match) {
+          const c = confirm.value;
+          match.textContent = !c ? '' : c === pw ? '✓ Passwörter stimmen überein' : '✗ Passwörter stimmen nicht überein';
+          match.className = 'pw-match' + (c ? (c === pw ? ' is-ok' : ' is-bad') : '');
+        }
+      };
+      input.addEventListener('input', update);
+      confirm?.addEventListener('input', update);
+      form?.querySelector('input[name="email"]')?.addEventListener('input', () => input.value && update());
+      if (input.value) update();
+    });
+  }
+
   function initPage(root = document) {
     cleanups.forEach((fn) => fn());
     cleanups = [];
@@ -417,6 +499,7 @@
     root.querySelectorAll('[data-progress]').forEach((el) => { el.style.width = `${Math.max(0, Math.min(100, Number(el.dataset.progress) || 0))}%`; });
     toasts(root);
     requestForm(root);
+    passwordChecker(root);
   }
 
   /* ---------- seamless navigation ---------- */

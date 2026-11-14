@@ -76,9 +76,9 @@ ob_start();
       <label class="field<?= invalid('password_current') ?>"><span>Aktuelles Passwort</span>
         <input type="password" name="password_current" autocomplete="current-password" required><?= error_for('password_current') ?></label>
       <label class="field<?= invalid('password') ?>"><span>Neues Passwort <small class="muted">(mind. 10 Zeichen)</small></span>
-        <input type="password" name="password" minlength="10" autocomplete="new-password" required><?= error_for('password') ?></label>
+        <span class="pw-wrap"><input type="password" name="password" minlength="10" maxlength="200" autocomplete="new-password" required data-pw-check data-pw-email="<?= e($u['email']) ?>"><button type="button" class="pw-toggle" data-pw-toggle aria-label="Passwort anzeigen"></button></span><?= error_for('password') ?></label>
       <label class="field<?= invalid('password_confirm') ?>"><span>Wiederholen</span>
-        <input type="password" name="password_confirm" autocomplete="new-password" required><?= error_for('password_confirm') ?></label>
+        <span class="pw-wrap"><input type="password" name="password_confirm" autocomplete="new-password" required><button type="button" class="pw-toggle" data-pw-toggle aria-label="Passwort anzeigen"></button></span><?= error_for('password_confirm') ?></label>
       <p class="muted small"><?= $u['password_changed_at'] ? 'Zuletzt geändert am ' . date_de($u['password_changed_at']) . '. ' : '' ?>Andere Geräte werden danach abgemeldet.</p>
       <div><button class="pill pill-sm" type="submit">Passwort ändern</button></div>
     </form>
