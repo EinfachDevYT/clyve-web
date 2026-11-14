@@ -4,7 +4,7 @@ Builds the Clyve.dev Discord server in the website's design with one command: ro
 categories and channels with permissions, server icon/banner, welcome screen, onboarding with ping roles,
 welcome/rules/info messages with buttons, and the two webhooks the website uses.
 
-No dependencies – Node 18+ only.
+No dependencies – Python 3.9+ standard library only.
 
 ## 1. Create server and bot
 
@@ -15,8 +15,11 @@ No dependencies – Node 18+ only.
 
 ## 2. Run
 
+On Windows (PowerShell): `$env:DISCORD_TOKEN="your-bot-token"; py discord\setup.py --clean`
+
+
 ```bash
-DISCORD_TOKEN=your-bot-token node discord/setup.mjs --clean
+DISCORD_TOKEN=your-bot-token python3 discord/setup.py --clean
 ```
 
 - `GUILD_ID=…` – only needed if the bot is on more than one server
@@ -24,7 +27,7 @@ DISCORD_TOKEN=your-bot-token node discord/setup.mjs --clean
 - `--clean` – removes Discord's default channels (`general`, „Text Channels“, …)
 - `--repost` – posts the welcome/rules/info messages again
 
-The script can be run again any time after editing `server.mjs`: roles and channels are matched by name and updated.
+The script can be run again any time after editing `server.py`: roles and channels are matched by name and updated.
 
 At the end it prints the webhook URLs and the devlog role ID – enter them in the staff area under
 Verwaltung → Integrationen (Discord webhook, devlog webhook, role to mention). Keep the webhook URLs secret.
@@ -47,4 +50,4 @@ Verwaltung → Integrationen (Discord webhook, devlog webhook, role to mention).
 | 🔒 TEAM | team-chat, website (webhook for site notifications), mod-log, Team voice |
 
 Roles: Clyve Team, Developer, Support, Kunde, Bots and the self-assignable ping roles Devlog-Ping, Release-Ping,
-News-Ping (picked in Discord's onboarding). Layout and texts live in `server.mjs`, artwork in `assets/`.
+News-Ping (picked in Discord's onboarding). Layout and texts live in `server.py`, artwork in `assets/`.

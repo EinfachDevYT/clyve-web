@@ -191,7 +191,7 @@ Payment, licensing/escrow and receipts for buyers are handled by Tebex.
 
 ## Discord server
 
-`discord/setup.mjs` builds the matching Discord server (roles, channels, artwork, welcome texts, webhooks for the
+`discord/setup.py` (Python, no dependencies) builds the matching Discord server (roles, channels, artwork, welcome texts, webhooks for the
 website) in one run – see [discord/README.md](discord/README.md).
 
 ## Logo
