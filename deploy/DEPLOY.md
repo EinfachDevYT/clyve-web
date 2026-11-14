@@ -303,25 +303,51 @@ Wichtig: den Cronjob **nicht** als `root` laufen lassen.
 
 ## Backup
 
-Wichtig sind nur zwei Dinge: die Datenbank und die Config.
+Die Website sichert die Datenbank selbst: täglich ab 3 Uhr über denselben Cronjob wie oben (`bin/cron.php`).
+Jedes Backup wird geprüft, komprimiert und unter `storage/backups/` abgelegt (nur für `www-data` lesbar).
+Aufbewahrt werden 14 Tage, mindestens aber die letzten 3. Im Staff-Bereich unter **Verwaltung → Backups**
+siehst du den Status, kannst sofort sichern und Backups (nach Passwort-Eingabe) herunterladen.
+Ist das letzte Backup älter als zwei Tage, warnt das Dashboard. Schlägt ein Backup fehl, kommt eine Discord-Meldung.
+
+Anpassen in `config.php` (optional):
+
+```php
+'backup' => ['dir' => '/var/backups/clyve', 'keep_days' => 30, 'hour' => 3],
+```
+
+Ein eigener Ordner muss `www-data` gehören:
 
 ```bash
-sudo mkdir -p /var/backups/clyve && sudo chown www-data:www-data /var/backups/clyve
+sudo mkdir -p /var/backups/clyve && sudo chown www-data:www-data /var/backups/clyve && sudo chmod 700 /var/backups/clyve
+```
+
+**Zusätzlich wichtig:** `config/config.php` einmal sicher aufbewahren (Passwort-Manager o. Ä.). Ohne den `app_secret`
+lassen sich gespeicherte Zugangsdaten und 2FA-Schlüssel aus einem Backup nicht mehr entschlüsseln.
+Kopiere die Backups außerdem regelmäßig auf einen anderen Rechner, z. B. von deinem PC aus:
+
+```bash
+scp 'user@dein-server:/var/www/clyve-web/storage/backups/*.gz' ~/clyve-backups/
+```
+
+### Wiederherstellen
+
+```bash
+cd /var/www/clyve-web && sudo -u www-data cp storage/app.sqlite storage/app.sqlite.vorher
 ```
 ```bash
-sudo -u www-data php -r '$s=new SQLite3("/var/www/clyve-web/storage/app.sqlite"); $s->backup(new SQLite3("/var/backups/clyve/app-".date("Y-m-d").".sqlite"));'
+sudo -u www-data sh -c 'gunzip -c storage/backups/app-2026-11-14-030000.sqlite.gz > storage/app.sqlite && rm -f storage/app.sqlite-wal storage/app.sqlite-shm'
 ```
 ```bash
-sudo cp /var/www/clyve-web/config/config.php /var/backups/clyve/config.php
+sudo systemctl reload php8.4-fpm
 ```
 
-Täglich automatisch um 3:17 Uhr, 30 Tage aufbewahren. Mit `sudo crontab -u www-data -e` diese Zeile eintragen:
+Den Dateinamen durch das gewünschte Backup ersetzen. Passt etwas nicht, liegt der alte Stand in `storage/app.sqlite.vorher`.
 
-```
-17 3 * * * php -r '$s=new SQLite3("/var/www/clyve-web/storage/app.sqlite"); $s->backup(new SQLite3("/var/backups/clyve/app-".date("Y-m-d").".sqlite"));' && find /var/backups/clyve -name 'app-*.sqlite' -mtime +30 -delete
-```
+## Fehler-Meldungen
 
-Die Backups sollten zusätzlich regelmäßig auf einen anderen Rechner kopiert werden.
+Bei Serverfehlern (und fehlgeschlagenen Backups) schickt die Website eine Meldung an den Discord-Webhook aus
+Verwaltung → Integrationen – derselbe Fehler höchstens einmal pro Stunde, mit Zähler wie oft er dazwischen auftrat.
+Abschaltbar dort unter „Fehler-Meldungen senden“. Details stehen weiterhin im PHP-Fehlerlog.
 
 ## Rückgängig machen
 

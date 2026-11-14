@@ -49,7 +49,16 @@ if (!is_dir(STORAGE_PATH)) {
     mkdir(STORAGE_PATH, 0700, true);
 }
 
-if (PHP_SAPI !== 'cli') {
+App\Services\ErrorReporter::register();
+
+if (PHP_SAPI === 'cli') {
+    set_exception_handler(static function (Throwable $e): void {
+        error_log('[cli] ' . $e::class . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+        App\Services\ErrorReporter::exception($e);
+        fwrite(STDERR, $e->getMessage() . "\n");
+        exit(1);
+    });
+} else {
     Security::sendHeaders();
     if (APP_CONTEXT !== 'api') {
         Security::startSession(APP_CONTEXT);
@@ -57,6 +66,7 @@ if (PHP_SAPI !== 'cli') {
 
     set_exception_handler(static function (Throwable $e): void {
         error_log('[app] ' . $e::class . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+        App\Services\ErrorReporter::exception($e);
         if (!headers_sent()) {
             http_response_code(500);
         }

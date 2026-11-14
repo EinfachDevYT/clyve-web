@@ -9,6 +9,7 @@
       <label class="field<?= invalid('discord_webhook') ?>"><span>Webhook-URL</span>
         <input type="url" name="discord_webhook" autocomplete="off" placeholder="<?= $hasWebhook ? '•••••••• gespeichert – leer lassen = unverändert' : 'https://discord.com/api/webhooks/…' ?>"><?= error_for('discord_webhook') ?></label>
       <?php if ($hasWebhook): ?><label class="consent"><input type="checkbox" name="discord_webhook_clear" value="1"><span>Webhook entfernen</span></label><?php endif ?>
+      <label class="consent"><input type="checkbox" name="error_alerts" value="1"<?= \App\Services\Settings::on('error_alerts') ? ' checked' : '' ?>><span>Fehler-Meldungen senden – bei Serverfehlern oder fehlgeschlagenen Backups (gleicher Fehler max. 1× pro Stunde)</span></label>
     </section>
 
     <section class="panel glass stack">

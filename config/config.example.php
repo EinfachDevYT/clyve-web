@@ -88,6 +88,13 @@ return [
     ],
 
     // ── Tebex (Script-Shop) ──────────────────────────────────────
+    // Datenbank-Backups (laufen über bin/cron.php). Standard: storage/backups, 14 Tage, ab 3 Uhr.
+    'backup' => [
+        'dir'       => dirname(__DIR__) . '/storage/backups',
+        'keep_days' => 14,
+        'hour'      => 3,
+    ],
+
     'tebex' => [
         // Öffentlicher Webstore-Identifier aus dem Tebex-Panel (Integrations → Headless API). Leer = nur manuelle Produkte.
         'webstore_token' => '',

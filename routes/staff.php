@@ -103,6 +103,9 @@ $router->post('/verwaltung/integrationen', [SettingsController::class, 'updateIn
 $router->post('/verwaltung/discord-test', [SettingsController::class, 'testDiscord']);
 $router->get('/verwaltung/hosting', [SettingsController::class, 'hosting']);
 $router->post('/verwaltung/hosting', [SettingsController::class, 'updateHosting']);
+$router->get('/verwaltung/backups', [SettingsController::class, 'backups']);
+$router->post('/verwaltung/backups', [SettingsController::class, 'createBackup']);
+$router->post('/verwaltung/backups/download', [SettingsController::class, 'downloadBackup']);
 $router->get('/verwaltung/sicherheit', [SettingsController::class, 'securityPolicy']);
 $router->post('/verwaltung/sicherheit', [SettingsController::class, 'updateSecurityPolicy']);
 

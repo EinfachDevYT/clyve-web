@@ -8,6 +8,16 @@ if (PHP_SAPI !== 'cli') {
 define('APP_CONTEXT', 'cron');
 require dirname(__DIR__) . '/app/bootstrap.php';
 
+if (App\Services\Backup::due()) {
+    try {
+        echo date('c') . ' backup: ' . App\Services\Backup::create() . "\n";
+    } catch (Throwable $e) {
+        error_log('[backup] ' . $e->getMessage());
+        App\Services\ErrorReporter::report('Backup fehlgeschlagen: ' . $e->getMessage(), $e->getFile(), $e->getLine());
+        fwrite(STDERR, "backup failed: {$e->getMessage()}\n");
+    }
+}
+
 $r = App\Services\Hosting::tick(true);
 if ($r === null) {
     fwrite(STDERR, "hosting: skipped (locked or failed, see error log)\n");

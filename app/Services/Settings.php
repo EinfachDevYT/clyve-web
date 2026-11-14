@@ -32,6 +32,7 @@ final class Settings
         'hosting_customer_view'   => '1',
         'staff_require_2fa'       => '0',
         'security_mails'          => '1',
+        'error_alerts'            => '1',
     ];
 
     public const TOGGLES = [

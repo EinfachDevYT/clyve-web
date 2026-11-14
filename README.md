@@ -177,6 +177,14 @@ Page `/scripts` with framework filter and „Auf Tebex kaufen“. Products are m
 synced from your Tebex store with one click (`tebex.webstore_token`, `tebex.store_url`).
 Payment, licensing/escrow and receipts for buyers are handled by Tebex.
 
+## Backups & error alerts
+
+`bin/cron.php` also makes a daily, integrity-checked and compressed copy of the database in `storage/backups/`
+(14 days, at least the last 3). Verwaltung → Backups shows the status, creates a backup on demand and offers
+downloads after password confirmation; the dashboard warns when the last backup is older than two days.
+Server errors and failed backups are sent to the Discord webhook (same error at most once per hour).
+Restore steps: see `deploy/DEPLOY.md`.
+
 ## Security
 
 - Prepared statements everywhere, output escaping in all templates

@@ -20,6 +20,7 @@ final class SettingsController
         'integrationen' => ['/verwaltung/integrationen', 'Integrationen'],
         'hosting'       => ['/verwaltung/hosting', 'Hosting & Lizenzen'],
         'sicherheit'    => ['/verwaltung/sicherheit', 'Sicherheit'],
+        'backups'       => ['/verwaltung/backups', 'Backups'],
     ];
 
     /** Fields that must be filled before Impressum and Datenschutz are complete. */
@@ -300,6 +301,58 @@ final class SettingsController
 
     /* ---------- Sicherheit ---------- */
 
+    /* ---------- Backups ---------- */
+
+    public function backups(): void
+    {
+        Auth::requireAdmin();
+        $this->render('backups', [
+            'backups'   => \App\Services\Backup::all(),
+            'age'       => \App\Services\Backup::age(),
+            'dir'       => \App\Services\Backup::dir(),
+            'keepDays'  => \App\Services\Backup::keepDays(),
+            'hour'      => (int)config('backup.hour', 3),
+        ], 'Backups');
+    }
+
+    public function createBackup(): void
+    {
+        $staff = Auth::requireAdmin();
+        if (!\App\Core\RateLimiter::hit('backup', 'staff:' . $staff['id'], [['window' => 600, 'max' => 5]])) {
+            fail_back([], '/verwaltung/backups', 'Bitte warte ein paar Minuten.');
+        }
+        try {
+            $name = \App\Services\Backup::create();
+        } catch (\Throwable $e) {
+            error_log('[backup] ' . $e->getMessage());
+            fail_back([], '/verwaltung/backups', 'Backup fehlgeschlagen: ' . $e->getMessage());
+        }
+        audit('staff:' . $staff['id'], 'backup_created', $name);
+        flash('success', 'Backup erstellt: ' . $name);
+        redirect('/verwaltung/backups');
+    }
+
+    public function downloadBackup(): void
+    {
+        $staff = Auth::requireAdmin();
+        $back = '/verwaltung/backups';
+        if (!\App\Core\RateLimiter::hit('reauth', 'staff:' . $staff['id'], [['window' => 900, 'max' => 10]])) {
+            fail_back([], $back, 'Zu viele Versuche. Bitte warte ein paar Minuten.');
+        }
+        if (!Auth::checkPassword((int)$staff['id'], (string)($_POST['password'] ?? ''))) {
+            fail_back(['password' => 'Das Passwort ist falsch.'], $back);
+        }
+        $file = \App\Services\Backup::file((string)($_POST['file'] ?? '')) ?? abort(404);
+        audit('staff:' . $staff['id'], 'backup_downloaded', basename($file));
+        \App\Services\Account::notify($staff, 'Backup heruntergeladen', ['gerade wurde ein Datenbank-Backup (' . basename($file) . ') mit deinem Konto heruntergeladen. Warst du das nicht, ändere sofort dein Passwort.']);
+        header('Content-Type: application/gzip');
+        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+        header('Content-Length: ' . filesize($file));
+        header('Cache-Control: no-store');
+        readfile($file);
+        exit;
+    }
+
     public function securityPolicy(): void
     {
         Auth::requireAdmin();
@@ -396,6 +449,7 @@ final class SettingsController
 
         $values += ['tebex.webstore_token' => $token, 'tebex.store_url' => $store, 'tebex.image_hosts' => $hosts ?: Tebex::DEFAULT_IMAGE_HOSTS];
         Settings::setConfig($values);
+        Settings::set(['error_alerts' => ($_POST['error_alerts'] ?? '') === '1' ? '1' : '0']);
         audit('staff:' . $staff['id'], 'settings_integrations');
         flash('success', 'Integrationen gespeichert.');
         redirect($back);

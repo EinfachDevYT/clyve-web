@@ -8,6 +8,10 @@
   <div class="notice notice-warn">Impressum und Datenschutz sind noch nicht vollständig. <a href="/verwaltung/betreiber">Jetzt Betreiberangaben ergänzen →</a></div>
 <?php endif ?>
 
+<?php if (($user['role'] ?? '') === 'admin' && (($age = \App\Services\Backup::age()) === null || $age > 50)): ?>
+  <div class="notice notice-warn"><?= $age === null ? 'Es gibt noch kein Datenbank-Backup.' : 'Das letzte Datenbank-Backup ist ' . (int)floor($age / 24) . ' Tage alt.' ?> <a href="/verwaltung/backups">Backups ansehen →</a></div>
+<?php endif ?>
+
 <?php if ($expiring): ?>
   <section class="panel glass mb">
     <header class="panel-head"><h2>Dienste laufen bald ab</h2><a href="/hosting?status=bald">Alle</a></header>

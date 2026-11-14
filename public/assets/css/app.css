@@ -110,6 +110,7 @@ code { font-family: var(--mono); font-size: .9em; background: rgba(168, 85, 247,
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; color: var(--petal); overflow-wrap: anywhere; }
 .kv a { color: var(--lilac); }
+.kv .kv-mail { overflow-wrap: break-word; word-break: normal; }
 .prose { color: var(--lilac-soft); margin-top: 12px; overflow-wrap: anywhere; }
 
 /* tables */
